@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  accession: 
+  species_id: 
+  title_id: 
+  manuscript: 
+
+two:
+  accession: 
+  species_id: 
+  title_id: 
+  manuscript: 
