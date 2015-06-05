@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Variety:</strong>
+  <%= @experiment.variety %>
+</p>
+
+<p>
+  <strong>Tissue:</strong>
+  <%= @experiment.tissue %>
+</p>
+
+<p>
+  <strong>Age:</strong>
+  <%= @experiment.age %>
+</p>
+
+<p>
+  <strong>Stress:</strong>
+  <%= @experiment.stress %>
+</p>
+
+<p>
+  <strong>Accession:</strong>
+  <%= @experiment.accession %>
+</p>
+
+<%= link_to 'Edit', edit_experiment_path(@experiment) %> |
+<%= link_to 'Back', experiments_path %>

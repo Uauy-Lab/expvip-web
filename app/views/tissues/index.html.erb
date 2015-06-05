@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Tissues</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @tissues.each do |tissue| %>
+      <tr>
+        <td><%= tissue.name %></td>
+        <td><%= tissue.description %></td>
+        <td><%= link_to 'Show', tissue %></td>
+        <td><%= link_to 'Edit', edit_tissue_path(tissue) %></td>
+        <td><%= link_to 'Destroy', tissue, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Tissue', new_tissue_path %>

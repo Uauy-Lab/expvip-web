@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Species</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Scientific name</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @species.each do |species| %>
+      <tr>
+        <td><%= species.name %></td>
+        <td><%= species.scientific_name %></td>
+        <td><%= link_to 'Show', species %></td>
+        <td><%= link_to 'Edit', edit_species_path(species) %></td>
+        <td><%= link_to 'Destroy', species, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Species', new_species_path %>

@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @experiment_group.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @experiment_group.description %>
+</p>
+
+<%= link_to 'Edit', edit_experiment_group_path(@experiment_group) %> |
+<%= link_to 'Back', experiment_groups_path %>

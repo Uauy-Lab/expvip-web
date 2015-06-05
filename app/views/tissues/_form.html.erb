@@ -1,0 +1,25 @@
+<%= form_for(@tissue) do |f| %>
+  <% if @tissue.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@tissue.errors.count, "error") %> prohibited this tissue from being saved:</h2>
+
+      <ul>
+      <% @tissue.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br>
+    <%= f.text_field :description %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

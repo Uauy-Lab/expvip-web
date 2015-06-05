@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @tissue.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @tissue.description %>
+</p>
+
+<%= link_to 'Edit', edit_tissue_path(@tissue) %> |
+<%= link_to 'Back', tissues_path %>
