@@ -1,0 +1,2 @@
+module TypeOfValuesHelper
+end

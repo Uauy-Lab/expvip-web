@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @meta_experiment.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @meta_experiment.description %>
+</p>
+
+<p>
+  <strong>Gene set:</strong>
+  <%= @meta_experiment.gene_set %>
+</p>
+
+<%= link_to 'Edit', edit_meta_experiment_path(@meta_experiment) %> |
+<%= link_to 'Back', meta_experiments_path %>

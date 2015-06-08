@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  resources :expression_values
+  resources :type_of_values
+  resources :meta_experiments
   resources :gene_sets
   resources :genes
   # The priority is based upon order of creation: first created -> highest priority.

@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Meta Experiments</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Gene set</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @meta_experiments.each do |meta_experiment| %>
+      <tr>
+        <td><%= meta_experiment.name %></td>
+        <td><%= meta_experiment.description %></td>
+        <td><%= meta_experiment.gene_set %></td>
+        <td><%= link_to 'Show', meta_experiment %></td>
+        <td><%= link_to 'Edit', edit_meta_experiment_path(meta_experiment) %></td>
+        <td><%= link_to 'Destroy', meta_experiment, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Meta experiment', new_meta_experiment_path %>

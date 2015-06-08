@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  experiment_id: 
+  gene_id: 
+  meta_experiment_id: 
+  type_of_value_id: 
+  value: 1.5
+
+two:
+  experiment_id: 
+  gene_id: 
+  meta_experiment_id: 
+  type_of_value_id: 
+  value: 1.5

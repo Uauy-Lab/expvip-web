@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Type Of Values</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @type_of_values.each do |type_of_value| %>
+      <tr>
+        <td><%= type_of_value.name %></td>
+        <td><%= type_of_value.description %></td>
+        <td><%= link_to 'Show', type_of_value %></td>
+        <td><%= link_to 'Edit', edit_type_of_value_path(type_of_value) %></td>
+        <td><%= link_to 'Destroy', type_of_value, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Type of value', new_type_of_value_path %>

@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Experiment:</strong>
+  <%= @expression_value.experiment %>
+</p>
+
+<p>
+  <strong>Gene:</strong>
+  <%= @expression_value.gene %>
+</p>
+
+<p>
+  <strong>Meta experiment:</strong>
+  <%= @expression_value.meta_experiment %>
+</p>
+
+<p>
+  <strong>Type of value:</strong>
+  <%= @expression_value.type_of_value %>
+</p>
+
+<p>
+  <strong>Value:</strong>
+  <%= @expression_value.value %>
+</p>
+
+<%= link_to 'Edit', edit_expression_value_path(@expression_value) %> |
+<%= link_to 'Back', expression_values_path %>

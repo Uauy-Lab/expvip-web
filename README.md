@@ -39,3 +39,12 @@ Before loading the actual expression, it is necesary to load the gene models. Cu
 ```sh
 rake load_data:ensembl_genes[IWGSC2.26,/Triticum_aestivum.IWGSC2.26.cdna.all.fa]
 ```
+
+###Loading values ###
+
+The values are stored in a single long table. This allows to get new values, should we want to.  In order to load the data, the task ```load_data:values``` is provided. The table must contain a column ```target_id``` that has the gene name, as the first field in the fasta file used for the mapping. The rest of the columns most contain a header with the accession of the experiment. Each row represents a value. All the values in the table must be from the same time. For exaple, to load the FPKMs, the following command is used. 
+
+```sh
+rake "load_data:values[First run,IWGSC2.26,fpkm,edited_final_output_fpkm.txt]"
+```
+

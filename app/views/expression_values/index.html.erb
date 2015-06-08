@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Expression Values</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Experiment</th>
+      <th>Gene</th>
+      <th>Meta experiment</th>
+      <th>Type of value</th>
+      <th>Value</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @expression_values.each do |expression_value| %>
+      <tr>
+        <td><%= expression_value.experiment %></td>
+        <td><%= expression_value.gene %></td>
+        <td><%= expression_value.meta_experiment %></td>
+        <td><%= expression_value.type_of_value %></td>
+        <td><%= expression_value.value %></td>
+        <td><%= link_to 'Show', expression_value %></td>
+        <td><%= link_to 'Edit', edit_expression_value_path(expression_value) %></td>
+        <td><%= link_to 'Destroy', expression_value, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Expression value', new_expression_value_path %>

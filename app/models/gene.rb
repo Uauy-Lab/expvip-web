@@ -11,4 +11,8 @@ class Gene < ActiveRecord::Base
 		self.send(arr[0]+'=',arr[1])
 
 	end
+
+	def to_s
+		name
+	end
 end
