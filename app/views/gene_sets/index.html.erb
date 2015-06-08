@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Gene Sets</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @gene_sets.each do |gene_set| %>
+      <tr>
+        <td><%= gene_set.name %></td>
+        <td><%= gene_set.description %></td>
+        <td><%= link_to 'Show', gene_set %></td>
+        <td><%= link_to 'Edit', edit_gene_set_path(gene_set) %></td>
+        <td><%= link_to 'Destroy', gene_set, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Gene set', new_gene_set_path %>

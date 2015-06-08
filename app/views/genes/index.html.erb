@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Genes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Cdna</th>
+      <th>Possition</th>
+      <th>Gene</th>
+      <th>Transcript</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @genes.each do |gene| %>
+      <tr>
+        <td><%= gene.name %></td>
+        <td><%= gene.cdna %></td>
+        <td><%= gene.possition %></td>
+        <td><%= gene.gene %></td>
+        <td><%= gene.transcript %></td>
+        <td><%= link_to 'Show', gene %></td>
+        <td><%= link_to 'Edit', edit_gene_path(gene) %></td>
+        <td><%= link_to 'Destroy', gene, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Gene', new_gene_path %>

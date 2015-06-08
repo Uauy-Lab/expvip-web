@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @gene.name %>
+</p>
+
+<p>
+  <strong>Cdna:</strong>
+  <%= @gene.cdna %>
+</p>
+
+<p>
+  <strong>Possition:</strong>
+  <%= @gene.possition %>
+</p>
+
+<p>
+  <strong>Gene:</strong>
+  <%= @gene.gene %>
+</p>
+
+<p>
+  <strong>Transcript:</strong>
+  <%= @gene.transcript %>
+</p>
+
+<%= link_to 'Edit', edit_gene_path(@gene) %> |
+<%= link_to 'Back', genes_path %>

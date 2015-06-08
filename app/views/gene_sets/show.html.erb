@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @gene_set.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @gene_set.description %>
+</p>
+
+<%= link_to 'Edit', edit_gene_set_path(@gene_set) %> |
+<%= link_to 'Back', gene_sets_path %>

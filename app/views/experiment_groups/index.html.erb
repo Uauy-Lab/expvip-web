@@ -7,6 +7,7 @@
     <tr>
       <th>Name</th>
       <th>Description</th>
+      <th>Group size</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -16,6 +17,7 @@
       <tr>
         <td><%= experiment_group.name %></td>
         <td><%= experiment_group.description %></td>
+        <td><%= experiment_group.experiments.size %></td>
         <td><%= link_to 'Show', experiment_group %></td>
         <td><%= link_to 'Edit', edit_experiment_group_path(experiment_group) %></td>
         <td><%= link_to 'Destroy', experiment_group, method: :delete, data: { confirm: 'Are you sure?' } %></td>
