@@ -26,3 +26,16 @@ The rake task is :
 ```sh
 rake load_data:metadata[metadata.txt]
 ```
+
+### Loading the gene sets ###
+Before loading the actual expression, it is necesary to load the gene models. Currently, only the fasta file with the cdna from ensembl is supported. The fasta header should contain the following fields, besides the gene name (first string in the header).
+
+* **cdna**
+* **chromosome** or **scaffold** are converted to possition
+* **gene** 
+* **transcript** 
+* **description** a free text, in quotes. Any other field with quotes may fail in the load. 
+
+```sh
+rake load_data:ensembl_genes[IWGSC2.26,/Triticum_aestivum.IWGSC2.26.cdna.all.fa]
+```
