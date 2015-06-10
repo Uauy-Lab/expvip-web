@@ -16,3 +16,6 @@
 !/log/.keep
 /tmp
 log/development.log
+
+/node_modules/
+npm-debug.log

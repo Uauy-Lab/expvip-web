@@ -1,3 +1,4 @@
+require 'json'
 class ExpressionValuesController < ApplicationController
   before_action :set_expression_value, only: [:show, :edit, :update, :destroy]
 
@@ -19,6 +20,16 @@ class ExpressionValuesController < ApplicationController
 
   # GET /expression_values/1/edit
   def edit
+  end
+
+  def gene
+    #puts @gene_id
+    ret = Hash.new
+    ret["Hello"] = "Workld"
+    respond_to do |format|
+      format.json {render json: ret}
+    end
+
   end
 
   # POST /expression_values
