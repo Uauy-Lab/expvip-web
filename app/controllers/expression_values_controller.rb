@@ -22,15 +22,7 @@ class ExpressionValuesController < ApplicationController
   def edit
   end
 
-  def gene
-    #puts @gene_id
-    ret = Hash.new
-    ret["Hello"] = "Workld"
-    respond_to do |format|
-      format.json {render json: ret}
-    end
-
-  end
+  
 
   # POST /expression_values
   # POST /expression_values.json
@@ -70,6 +62,16 @@ class ExpressionValuesController < ApplicationController
       format.html { redirect_to expression_values_url, notice: 'Expression value was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+
+  def gene
+    #puts @gene_id
+    ret = Hash.new
+    ret["Hello"] = params
+    respond_to do |format|
+      format.json {render json: ret}
+    end
+
   end
 
   private

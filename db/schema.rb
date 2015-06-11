@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150608145405) do
+ActiveRecord::Schema.define(version: 20150611090600) do
 
   create_table "experiment_groups", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -36,9 +36,11 @@ ActiveRecord::Schema.define(version: 20150608145405) do
     t.string   "accession",  limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.integer  "study_id",   limit: 4
   end
 
   add_index "experiments", ["accession"], name: "index_experiments_on_accession", using: :btree
+  add_index "experiments", ["study_id"], name: "index_experiments_on_study_id", using: :btree
   add_index "experiments", ["tissue_id"], name: "index_experiments_on_tissue_id", using: :btree
   add_index "experiments", ["variety_id"], name: "index_experiments_on_variety_id", using: :btree
 
@@ -134,6 +136,7 @@ ActiveRecord::Schema.define(version: 20150608145405) do
     t.datetime "updated_at",                null: false
   end
 
+  add_foreign_key "experiments", "studies"
   add_foreign_key "experiments", "tissues"
   add_foreign_key "experiments", "varieties"
   add_foreign_key "expression_values", "experiments"
