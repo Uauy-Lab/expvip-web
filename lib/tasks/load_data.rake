@@ -26,6 +26,7 @@ namespace :load_data do
 		  		experiment.age = row["Age"]
 		  		experiment.stress = row["Stress/disease"]
 		  		experiment.accession = row["run_accession"]
+          experiment.study = study
 		  		experiment.save!
 
 		  		experiment_group = ExperimentGroup.find_or_create_by(:name=>row["Group_number_for_averaging"], :description=>row["Group_for_averaging"])
@@ -34,6 +35,29 @@ namespace :load_data do
 		  	end
 	  	end
   end
+
+  desc "Loads the metadata from the metadata file"
+  task :fixStudyExpression, [:filename]  => :environment do |t, args|
+      puts "FixingStudies"
+
+      ActiveRecord::Base.transaction do
+        CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
+          #puts row.inspect
+          #species = Species.find_or_create_by(:scientific_name=>row["scientific_name"])
+          
+          #Maybe we need to validate that we are not overwritting. Look if there is a way to know if find_or_create tells which is the case. 
+          puts row["secondary_study_accession"]
+          study = Study.find_by(:accession=>row["secondary_study_accession"])
+          puts study.inspect
+          #We need to validate that it doesn't exist. Maybe make the accessions primary keys. 
+          experiment = Experiment.find_by(:accession=>row["run_accession"])
+          experiment.study = study
+          puts experiment.inspect
+          experiment.save!
+        end
+      end
+  end
+
 
   desc "Load the genes, from the ENSEMBL fasta file."
   task :ensembl_genes, [:gene_set, :filename] => :environment do |t, args|

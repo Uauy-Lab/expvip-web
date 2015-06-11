@@ -66,8 +66,9 @@ class ExpressionValuesController < ApplicationController
 
   def gene
     #puts @gene_id
-    ret = Hash.new
-    ret["Hello"] = params
+    #ret = Hash.new
+    #ret["Hello"] = params
+    ret = ExpressionValue.find_expression_for_gene(params["gene_id"])
     respond_to do |format|
       format.json {render json: ret}
     end

@@ -1,13 +1,15 @@
 {
   "name": "bioruby-rna-explorer",
   "scripts": {
-  "bundle": "browserify app/assets/javascripts/index.js -o app/assets/javascripts/bundle.js",
-  "watch-js": "watchify app/assets/javascripts/index.js -o app/assets/javascripts/bundle.js",
-  "start": "npm run watch-js & rails s"
+    "bundle": "browserify app/assets/javascripts/index.js -o app/assets/javascripts/bundle.js",
+    "watch-js": "watchify app/assets/javascripts/index.js -o app/assets/javascripts/bundle.js",
+    "start": "npm run watch-js & rails s"
   },
   "devDependencies": {
     "browserify": "^10.2.4",
     "watchify": "^3.2.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bio-vis-expression-bar": "^0.1.24"
+  }
 }

@@ -25,5 +25,19 @@
   <%= @gene.transcript %>
 </p>
 
+
+
+<div id="bar_expression_viewer"> </div>
+
 <%= link_to 'Edit', edit_gene_path(@gene) %> |
 <%= link_to 'Back', genes_path %>
+
+<script type="text/javascript">
+  console.log("AAAR");
+  var container_div="bar_expression_viewer";
+  var data_url = "<%= "../../expression_values/gene/#{@gene.id}.json "%>" ;
+  var eb =  new biovisexpressionbar.ExpressionBar({
+    target: container_div,
+    data: data_url
+  });
+</script>
