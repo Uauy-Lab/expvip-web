@@ -4,13 +4,15 @@ class GenesController < ApplicationController
   # GET /genes
   # GET /genes.json
   def index
-    puts params[:gene]
+   
     if params[:gene]
-      logger.info "BLALALALALALA"
+      logger.debug params
       @gene =  Gene.find_by(:name=>params[:gene])
-      logger.info @gene.inspect
-      #format.html { redirect_to  @gene, notice: 'Gene was successfully created.'}
-      redirect_to  action: "show", id: @gene.id
+      #TODO: Show error message on the way back. 
+      session[:gene] = params[:gene]
+      session[:studies] = params[:studies]
+      redirect_to :back and return unless @gene 
+      redirect_to  action: "show", id: @gene.id, studies: params[:studies]
     else
       @genes = Gene.all
     end
@@ -21,6 +23,8 @@ class GenesController < ApplicationController
   # GET /genes/1
   # GET /genes/1.json
   def show
+    logger.debug "In show"
+    logger.debug params
   end
 
   # GET /genes/new
@@ -80,6 +84,6 @@ class GenesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def gene_params
-      params.require(:gene).permit(:name, :cdna, :possition, :gene, :transcript)
+      params.require(:gene).permit(:name,:studies, :cdna, :possition, :gene, :transcript)
     end
 end

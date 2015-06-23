@@ -1,6 +1,7 @@
 class WellcomeController < ApplicationController
   def default
-  	
+  	logger.debug params
+  	@studies = Study.all
   end
 
   def search_gene
@@ -10,5 +11,4 @@ class WellcomeController < ApplicationController
       params.require(:variety).permit(:gene)
    end
 end
-
 
