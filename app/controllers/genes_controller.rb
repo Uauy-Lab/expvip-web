@@ -79,11 +79,19 @@ class GenesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_gene
-      @gene = Gene.find(params[:id])
+      @gene = Gene.find(params[:id]) if numeric? params[:id]
+      @gene = Gene.find_by(:name=>params[:gene]) unless @gene
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def gene_params
       params.require(:gene).permit(:name,:studies, :cdna, :possition, :gene, :transcript)
+    end
+
+    def numeric?(string)
+    # `!!` converts parsed number to `true`
+        !!Kernel.Float(string) 
+    rescue TypeError, ArgumentError
+      false
     end
 end

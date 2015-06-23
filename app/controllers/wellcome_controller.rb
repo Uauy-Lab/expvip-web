@@ -1,7 +1,6 @@
 class WellcomeController < ApplicationController
   def default
-  	logger.debug params
-  	@studies = Study.all
+  	 @studies = Study.all
   end
 
   def search_gene
