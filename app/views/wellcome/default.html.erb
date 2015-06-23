@@ -1,0 +1,9 @@
+<h1>Wheat Expression browser</h1>
+
+<%= form_tag("/genes/", method: "get") do  %>
+	<%= label_tag(:gene, "Gene:") %>
+	<%= text_field_tag(:gene) %>
+  	<%= submit_tag("Search") %>
+  	<br\>
+
+<% end %>

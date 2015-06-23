@@ -19,10 +19,12 @@ SELECT
     genes.name,
     expression_values.value,
 	type_of_values.name,
-	experiment_id,
+	experiments.id as experiment,
 	experiments.accession,
-	study_id,
-    studies.accession
+	studies.id as study,
+    studies.accession,
+	experiment_group_id, 
+	experiment_groups.description
 FROM
     genes
         INNER JOIN
@@ -33,6 +35,10 @@ FROM
     experiments ON expression_values.experiment_id = experiments.id
         INNER JOIN
     studies ON studies.id = experiments.study_id
+		INNER JOIN 
+	experiment_groups_experiments ON experiment_groups_experiments.experiment_id = experiments.id
+		INNER JOIN
+	experiment_groups ON experiment_groups_experiments.experiment_group_id = experiment_groups.id
 WHERE
     genes.name = 'Traes_7DS_FFE9ACDAB.2'
 ORDER by	

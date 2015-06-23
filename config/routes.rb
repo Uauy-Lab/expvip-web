@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  #map.root :controller => 'wellcome', :action => :default
+  #get 'wellcome/default'
+  root 'wellcome#default'
+  get 'wellcome/search_gene'
+
   resources :expression_values
   resources :type_of_values
   resources :meta_experiments

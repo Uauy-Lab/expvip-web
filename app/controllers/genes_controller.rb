@@ -4,7 +4,18 @@ class GenesController < ApplicationController
   # GET /genes
   # GET /genes.json
   def index
-    @genes = Gene.all
+    puts params[:gene]
+    if params[:gene]
+      logger.info "BLALALALALALA"
+      @gene =  Gene.find_by(:name=>params[:gene])
+      logger.info @gene.inspect
+      #format.html { redirect_to  @gene, notice: 'Gene was successfully created.'}
+      redirect_to  action: "show", id: @gene.id
+    else
+      @genes = Gene.all
+    end
+      
+ #   format.html { redirect_to action: :show, id: @gene.id }
   end
 
   # GET /genes/1
