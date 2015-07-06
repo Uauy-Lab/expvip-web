@@ -46,3 +46,39 @@ ORDER by
 	studies.id,
 	experiments.id
 ; 
+
+--This works with Compara 80
+
+select * from gene_member where genome_db_id IN (SELECT genome_db_id FROM genome_db WHERE assembly="IWGSC2" and assembly_default=0);
+select * from gene_member ;
+SELECT * FROM genome_db WHERE assembly="IWGSC2";
+SELECT * FROM genome_db;
+select * from species_set;
+
+
+SELECT * FROM 
+gene_member
+ INNER JOIN
+genome_db ON gene_member.genome_db_id = genome_db.genome_db_id
+where genome_db.name = "triticum_aestivum";
+
+-- From the documentation:
+
+SELECT homology_member.* FROM 
+    homology_member JOIN homology USING (homology_id) 
+INNER JOIN method_link_species_set USING (method_link_species_set_id) 
+WHERE name="T.aes homoeologues" LIMIT 2;
+
+--To get all the homology groups
+SELECT 
+    homology_member.homology_id, cigar_line, perc_cov, perc_id, perc_pos, 
+    gene_member.stable_id as genes, 
+    gene_member.genome_db_id
+
+FROM 
+    homology_member 
+INNER JOIN homology USING (homology_id) 
+INNER JOIN method_link_species_set USING (method_link_species_set_id) 
+INNER JOIN gene_member USING (gene_member_id)
+WHERE method_link_species_set.name="T.aes homoeologues";
+
