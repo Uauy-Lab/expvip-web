@@ -11,7 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150611090600) do
+ActiveRecord::Schema.define(version: 20150917220826) do
+
+  create_table "ExperimentGroups_Factors", id: false, force: :cascade do |t|
+    t.integer "experiment_group_id", limit: 4, null: false
+    t.integer "factor_id",           limit: 4, null: false
+  end
 
   create_table "experiment_groups", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -29,10 +34,6 @@ ActiveRecord::Schema.define(version: 20150611090600) do
   add_index "experiment_groups_experiments", ["experiment_id"], name: "index_experiment_groups_experiments_on_experiment_id", using: :btree
 
   create_table "experiments", force: :cascade do |t|
-    t.integer  "variety_id", limit: 4
-    t.integer  "tissue_id",  limit: 4
-    t.string   "age",        limit: 255
-    t.string   "stress",     limit: 255
     t.string   "accession",  limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
@@ -41,8 +42,6 @@ ActiveRecord::Schema.define(version: 20150611090600) do
 
   add_index "experiments", ["accession"], name: "index_experiments_on_accession", using: :btree
   add_index "experiments", ["study_id"], name: "index_experiments_on_study_id", using: :btree
-  add_index "experiments", ["tissue_id"], name: "index_experiments_on_tissue_id", using: :btree
-  add_index "experiments", ["variety_id"], name: "index_experiments_on_variety_id", using: :btree
 
   create_table "expression_values", force: :cascade do |t|
     t.integer  "experiment_id",      limit: 4
@@ -58,6 +57,17 @@ ActiveRecord::Schema.define(version: 20150611090600) do
   add_index "expression_values", ["gene_id"], name: "index_expression_values_on_gene_id", using: :btree
   add_index "expression_values", ["meta_experiment_id"], name: "index_expression_values_on_meta_experiment_id", using: :btree
   add_index "expression_values", ["type_of_value_id"], name: "index_expression_values_on_type_of_value_id", using: :btree
+
+  create_table "factors", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.text     "description", limit: 65535
+    t.integer  "order",       limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.string   "factor",      limit: 255
+  end
+
+  add_index "factors", ["factor"], name: "index_factors_on_factor", using: :btree
 
   create_table "gene_sets", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -101,7 +111,6 @@ ActiveRecord::Schema.define(version: 20150611090600) do
 
   create_table "studies", force: :cascade do |t|
     t.string   "accession",  limit: 255
-    t.integer  "species_id", limit: 4
     t.string   "title",      limit: 255
     t.string   "manuscript", limit: 255
     t.datetime "created_at",             null: false
@@ -109,7 +118,6 @@ ActiveRecord::Schema.define(version: 20150611090600) do
   end
 
   add_index "studies", ["accession"], name: "index_studies_on_accession", using: :btree
-  add_index "studies", ["species_id"], name: "index_studies_on_species_id", using: :btree
   add_index "studies", ["title"], name: "index_studies_on_title", using: :btree
 
   create_table "tissues", force: :cascade do |t|
@@ -137,13 +145,10 @@ ActiveRecord::Schema.define(version: 20150611090600) do
   end
 
   add_foreign_key "experiments", "studies"
-  add_foreign_key "experiments", "tissues"
-  add_foreign_key "experiments", "varieties"
   add_foreign_key "expression_values", "experiments"
   add_foreign_key "expression_values", "genes"
   add_foreign_key "expression_values", "meta_experiments"
   add_foreign_key "expression_values", "type_of_values"
   add_foreign_key "genes", "gene_sets"
   add_foreign_key "meta_experiments", "gene_sets"
-  add_foreign_key "studies", "species"
 end

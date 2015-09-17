@@ -1,6 +1,24 @@
 require 'csv'  
 require 'bio'
 namespace :load_data do
+
+  desc "Loads the values for a factor. The file must have 4 columns, separated by tabs: facor, order, name and short."
+  task :factor, [:filename] => :environment do |t, args|
+    ActiveRecord::Base.transaction do 
+      CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
+        puts row.inspect
+        #puts row[2]
+        #puts row[1]
+
+        factor = Factor.find_or_create_by(
+          :factor=>row["factor"],  :description=>row["name"], 
+           :name=>row["short"])
+        factor.order = row["order"].to_i
+        factor.save!
+      end
+    end
+  end
+
   desc "Loads the metadata from the metadata file"
   task :metadata, [:filename]  => :environment do |t, args|
 	  	puts "Loading metadata"

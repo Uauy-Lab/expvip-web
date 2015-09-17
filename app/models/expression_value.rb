@@ -13,6 +13,8 @@ class ExpressionValue < ActiveRecord::Base
 	expression_values.experiment_id as exp,
 	experiments.accession as experiment_accession,
 	studies.id as study,
+	experiments.age as age,
+	experiments.stress as stress, 
     studies.accession study_accession,
 	experiment_group_id, 
 	experiment_groups.description as group_description
@@ -39,9 +41,11 @@ ORDER by
 ; }
 	rows = ExpressionValue.find_by_sql sql
 	ret = Hash.new 
-	ret[:values] = Hash.new
-	ret[:groups] = Hash.new
-	ret[:studies] = Hash.new
+	ret[:experiments] = Hash.new
+	ret[:values]      = Hash.new
+	ret[:groups]      = Hash.new
+	ret[:studies]     = Hash.new
+	ret[:factorOder]  = Hash.new
 	rows.each do |e|  
 		ret[:gene] = e.gene_name unless ret[:gene]
 		ret[:values][e.value_name] = Array.new unless ret[:values][e.value_name] 

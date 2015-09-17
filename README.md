@@ -4,9 +4,52 @@
 ##Loading data ##
 
 To laod data in the database, a set of rake tasks is provded. 
+
+###Available factors and their order. 
+The first thing to do is to setup the available factors. Each file looks like:
+
+```
+factor	order	name	short
+Age	1	7 days	7d
+Age	2	seedling stage	see
+Age	3	14 days	14d
+Age	4	three leaf stage	3_lea
+Age	5	24 days	24d
+Age	6	tillering stage	till
+Age	7	fifth leaf stage	5_lea
+Age	8	1 cm spike	1_sp
+Age	9	two nodes detectable	2_no
+Age	10	flag leaf stage	f_lea
+Age	11	anthesis	anth
+Age	12	2 dpa	2dpa
+Age	13	4 dpa	4dpa
+Age	14	6 dpa	6dpa
+Age	15	8 dpa	8dpa
+Age	16	9 dpa	9dpa
+Age	17	10 dpa	10dpa
+Age	18	11 dpa	11dpa
+Age	19	12 dpa	12dpa
+Age	20	4-12 dpa	4+dpa
+Age	21	14 dpa	14dpa
+Age	22	15 dpa	15dpa
+Age	23	20 dpa	20dpa
+Age	24	25 dpa	25dpa
+Age	25	30 dpa	30dpa
+Age	26	35 dpa	35dpa
+```
+Alternatively, a single file with all the factors on the same columns can be used to populate the table. 
+
+To load several files of factors do the following:
+
+```sh
+for f in .FactorOrders/*.tsv; do 
+	rake load_data:factor[$f]; 
+done
+
+```
 ###Experiment Metadata ###
 
-The first step is to load the experiment meta data. Currently, a tab separated file is the input and it must contain the following collumns with the header named exactly as stated:
+The second step is to load the experiment meta data. Currently, a tab separated file is the input and it must contain the following collumns with the header named exactly as stated:
 
 * **secondary\_study\_accession**
 * **run\_accession**
@@ -20,6 +63,12 @@ The first step is to load the experiment meta data. Currently, a tab separated f
 * **Manuscript**
 * **Group\_for\_averaging**
 * **Group\_number\_for\_averaging**
+* **Total_reads**	
+* **Mapped reads**
+* **High\_level\_variety**
+* **High\_level\_tissue**
+* **High\_level\_age**
+* **High\_level\_stress/disease**
 
 The rake task is :
 
