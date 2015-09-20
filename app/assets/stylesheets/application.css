@@ -12,4 +12,9 @@
  *
  *= require_tree .
  *= require_self
+ *= require jquery-ui/tooltip
+ *= require jquery-ui/autocomplete
+ *= require jquery-ui/button
+ *= require jquery-ui/core
+ *
  */

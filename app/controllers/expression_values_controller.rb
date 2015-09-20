@@ -64,11 +64,98 @@ class ExpressionValuesController < ApplicationController
     end
   end
 
+  def getFactorOrder
+     factorOrder     = Hash.new
+     longFactorName  = Hash.new
+     selectedFactors = Hash.new
+     Factor.find_each do |f|
+      
+      factorOrder[f.factor]     = Hash.new unless factorOrder[f.factor]
+      longFactorName[f.factor]  = Hash.new unless longFactorName[f.factor]
+      selectedFactors[f.factor] = Hash.new unless selectedFactors[f.factor]  
+
+      order = factorOrder[f.factor] 
+      longName = longFactorName[f.factor]
+      selected = selectedFactors[f.factor] 
+
+      order[f.name] = f.order
+      longName[f.name] = f.description
+      selected[f.name] = true
+    end
+    return [factorOrder, longFactorName, selectedFactors]
+  end
+
+  def getExperimentGroups
+    experiments     = Hash.new 
+    groups          = Hash.new 
+    ExperimentGroup.find_each do | g |
+      group = Hash.new
+      #Should we use description instead?
+      group["name"] = g.name
+      group["description"] = g.name
+      factors = Hash.new
+      g.factors.each { |f| factors[f.factor] = f.name }
+      group['factors'] = factors
+
+      g.experiments.each do |e|  
+        unless experiments[e.id]
+          experiments[e.id] = Hash.new 
+          exp = experiments[e.id]
+          exp["name"] = e.accession
+          exp["study"] = e.study_id.to_s
+          exp["group"] = g.id.to_s
+        end
+      end
+      groups[g.id] = group
+    end
+    return [experiments, groups]
+  end
+
+  def getValuesForGene(gene)
+    values = Hash.new
+    ExpressionValue.where("gene_id = :gene", {gene: gene.id }).each do |ev|  
+      type_of_value = ev.type_of_value.name
+      values[type_of_value] = Hash.new unless  values[type_of_value]
+      tvh = values[type_of_value]
+
+      tvh[ev.experiment.id] = { experiment:  ev.experiment.id.to_s , value: ev.value}
+
+    end
+    return values
+  end
+
+
+
   def gene
     #puts @gene_id
     #ret = Hash.new
     #ret["Hello"] = params
-    ret = ExpressionValue.find_expression_for_gene(params["gene_id"])
+    #ret = ExpressionValue.find_expression_for_gene(params["gene_id"])
+    ret = Hash.new 
+    gene = Gene.find params["gene_id"]
+    
+    factorOrder, longFactorName, selectedFactors = getFactorOrder 
+    experiments, groups = getExperimentGroups
+    values = Hash.new
+   
+
+    Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
+
+       values[h.A.name] = getValuesForGene(h.A) if h.A
+       values[h.B.name] = getValuesForGene(h.B) if h.B
+       values[h.D.name] = getValuesForGene(h.D) if h.D
+    end
+
+
+    ret["gene"]= gene.name
+    ret["factorOrder"]= factorOrder
+    ret["longFactorName"]= longFactorName
+    ret["selectedFactors"]= selectedFactors
+
+    ret["experiments"] = experiments
+    ret["groups"] = groups
+    ret["values"] = values
+
     respond_to do |format|
       format.json {render json: ret}
     end

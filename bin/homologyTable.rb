@@ -15,7 +15,9 @@ class Gene
 
 
 	def chromosome
-		name.split("_")[1]
+		ret = name.split("_")[1] 
+		ret = "3B" if !name.nil? and name.start_with? "TRAES3B"
+		ret
 	end
 
 	def group
@@ -97,7 +99,7 @@ genes.each_pair do |name, gene|
 	to_print << group
 	to_print << genome
 	counts[total_homs] += 1
-	out_three.puts to_print.join("\t") if sum == 4
+	out_three.puts to_print.join("\t")  # if sum == 4
 end
 
 out_three.close

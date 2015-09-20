@@ -4,12 +4,16 @@ class GenesController < ApplicationController
   # GET /genes
   # GET /genes.json
   def index
-   
-    if params[:gene]
+    
+    gene_name = nil
+    gene_name = params[:gene]
+    gene_name = params[:query]
+
+    if gene_name
       logger.debug params
-      @gene =  Gene.find_by(:name=>params[:gene])
+      @gene =  Gene.find_by(:name=>gene_name)
       #TODO: Show error message on the way back. 
-      session[:gene] = params[:gene]
+      session[:gene] = gene_name
       session[:studies] = params[:studies]
       redirect_to :back and return unless @gene 
       redirect_to  action: "show", id: @gene.id, studies: params[:studies]
@@ -18,6 +22,18 @@ class GenesController < ApplicationController
     end
       
  #   format.html { redirect_to action: :show, id: @gene.id }
+  end
+
+  def autocomplete
+    #puts "In autocomplete!"
+    @genes = Gene.order(:name).where("name LIKE ?", "%#{params[:term]}%")
+    puts @genes
+    respond_to do |format|
+      format.html
+      format.json { 
+        render json: @genes.map(&:name)
+      }
+    end
   end
 
   # GET /genes/1

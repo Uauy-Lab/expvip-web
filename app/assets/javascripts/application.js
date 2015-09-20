@@ -13,3 +13,16 @@
 
 
 //= require bundle
+//= require jquery
+//= require jquery-ui
+
+var ready;
+ready = (function() {
+  $('a[href="' + this.location.pathname + '"]').parent().addClass('active');
+  $("#gene-search-input").autocomplete({
+    source: '/genes/autocomplete.json',
+  });
+});
+
+$(document).ready(ready);
+$(document).on('page:load', ready);

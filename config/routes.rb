@@ -8,7 +8,11 @@ Rails.application.routes.draw do
   resources :type_of_values
   resources :meta_experiments
   resources :gene_sets
-  resources :genes
+  resources :genes  do
+    collection do
+      get 'autocomplete'
+    end
+  end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

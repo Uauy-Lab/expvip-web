@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150917220826) do
+ActiveRecord::Schema.define(version: 20150919092509) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade do |t|
     t.integer "experiment_group_id", limit: 4, null: false
@@ -34,10 +34,12 @@ ActiveRecord::Schema.define(version: 20150917220826) do
   add_index "experiment_groups_experiments", ["experiment_id"], name: "index_experiment_groups_experiments_on_experiment_id", using: :btree
 
   create_table "experiments", force: :cascade do |t|
-    t.string   "accession",  limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "study_id",   limit: 4
+    t.string   "accession",    limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "study_id",     limit: 4
+    t.integer  "total_reads",  limit: 4
+    t.integer  "mapped_reads", limit: 4
   end
 
   add_index "experiments", ["accession"], name: "index_experiments_on_accession", using: :btree
@@ -91,6 +93,19 @@ ActiveRecord::Schema.define(version: 20150917220826) do
   add_index "genes", ["gene_set_id"], name: "index_genes_on_gene_set_id", using: :btree
   add_index "genes", ["name"], name: "index_genes_on_name", using: :btree
 
+  create_table "homologies", force: :cascade do |t|
+    t.integer  "Gene_id",    limit: 4
+    t.integer  "Group",      limit: 4
+    t.string   "Genome",     limit: 255
+    t.integer  "A_id",       limit: 4
+    t.integer  "B_id",       limit: 4
+    t.integer  "D_id",       limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "homologies", ["Gene_id"], name: "index_homologies_on_Gene_id", using: :btree
+
   create_table "meta_experiments", force: :cascade do |t|
     t.string   "name",        limit: 255
     t.text     "description", limit: 65535
@@ -115,9 +130,11 @@ ActiveRecord::Schema.define(version: 20150917220826) do
     t.string   "manuscript", limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.integer  "species_id", limit: 4
   end
 
   add_index "studies", ["accession"], name: "index_studies_on_accession", using: :btree
+  add_index "studies", ["species_id"], name: "index_studies_on_species_id", using: :btree
   add_index "studies", ["title"], name: "index_studies_on_title", using: :btree
 
   create_table "tissues", force: :cascade do |t|
@@ -150,5 +167,7 @@ ActiveRecord::Schema.define(version: 20150917220826) do
   add_foreign_key "expression_values", "meta_experiments"
   add_foreign_key "expression_values", "type_of_values"
   add_foreign_key "genes", "gene_sets"
+  add_foreign_key "homologies", "Genes"
   add_foreign_key "meta_experiments", "gene_sets"
+  add_foreign_key "studies", "species"
 end

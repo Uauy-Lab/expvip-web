@@ -6,10 +6,7 @@ namespace :load_data do
   task :factor, [:filename] => :environment do |t, args|
     ActiveRecord::Base.transaction do 
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-        puts row.inspect
-        #puts row[2]
-        #puts row[1]
-
+        #puts row.inspect
         factor = Factor.find_or_create_by(
           :factor=>row["factor"],  :description=>row["name"], 
            :name=>row["short"])
@@ -24,8 +21,9 @@ namespace :load_data do
 	  	puts "Loading metadata"
 
 	  	ActiveRecord::Base.transaction do
-		  	CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-		  		puts row.inspect
+		  	factors = Factor.uniq.pluck(:factor)
+        CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
+		  	#	puts row.inspect
 		  		species = Species.find_or_create_by(:scientific_name=>row["scientific_name"])
 		  		
 		  		#Maybe we need to validate that we are not overwritting. Look if there is a way to know if find_or_create tells which is the case. 
@@ -34,22 +32,42 @@ namespace :load_data do
 		  		study.manuscript = row["Manuscript"]
 		  		study.species = species
 		  		study.save!
-		  		variety = Variety.find_or_create_by(:name=>row["Variety"])
-		  		tissue = Tissue.find_or_create_by(:name=>row["Tissue"])
+		  		#variety = Variety.find_or_create_by(:name=>row["Variety"])
+		  		#tissue = Tissue.find_or_create_by(:name=>row["Tissue"])
 
 		  		#We need to validate that it doesn't exist. Maybe make the accessions primary keys. 
 		  		experiment = Experiment.new
-		  		experiment.variety = variety
-		  		experiment.tissue = tissue
-		  		experiment.age = row["Age"]
-		  		experiment.stress = row["Stress/disease"]
 		  		experiment.accession = row["run_accession"]
+          #experiment.variety = variety
+		  		#experiment.tissue = tissue
+		  		#experiment.age = row["Age"]
+		  		#experiment.stress = row["Stress/disease"]
+		  		experiment.accession = row["run_accession"]
+          experiment.total_reads = row["Total reads"].to_i
+          experiment.mapped_reads = row["Mapped reads"].to_i
           experiment.study = study
 		  		experiment.save!
 
+
+
 		  		experiment_group = ExperimentGroup.find_or_create_by(:name=>row["Group_number_for_averaging"], :description=>row["Group_for_averaging"])
-		  		experiment_group.experiments << experiment
-		  		experiment_group.save!
+		  		
+          if experiment_group.factors.length == 0
+        
+            #puts "Factors not loaded yet! for #{experiment_group.name}"
+            factors.each do |f|
+              v = row[f]
+              factor = Factor.find_by factor: f, description:v
+              #puts "#{f}:#{v}:#{factor}"
+              experiment_group.factors << factor
+            end
+          end
+
+          experiment_group.experiments << experiment
+		  		
+
+
+          experiment_group.save!
 		  	end
 	  	end
   end
@@ -96,48 +114,96 @@ namespace :load_data do
   	end
   end
 
-  def get_experiment(name)
-  	@experiments[name] = Experiment.find_by(:accession=>name) unless @experiments[name]
-  	return @experiments[name]
+  #def get_experiment(name)
+  #	@experiments[name] = Experiment.find_by(:accession=>name) unless @experiments[name]
+  #	return @experiments[name]
+  #end
+
+  desc "Load the homology values. The headers of the table must be: Gene  A B D Group Genome. The gene corresponds to the gene name, not the specific transcript"
+  task :homology, [:gene_set, :filename] => :environment do |t, args|
+    puts args 
+    ActiveRecord::Base::transaction do
+       conn = ActiveRecord::Base.connection
+       gene_set = GeneSet.find_by(:name=>args[:gene_set])
+       genes = Hash.new
+       Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
+        genes[g.gene] = g
+       end
+       puts "Loaded #{genes.size} genes  in memory"
+       count = 0
+
+       CSV.foreach(args[:filename], :headers=>true, :col_sep=>"\t") do |row|
+        h = Homology.new
+        #Gene A B D Group Genome
+        h.Gene = genes[row["Gene"]]
+        h.A = genes[row["A"]]
+        h.B = genes[row["B"]]
+        h.D = genes[row["D"]]
+        h.Genome = row["Genome"]
+        h.Group = row["Group"]
+        h.save!
+        count += 1
+        if count % 10000 == 0
+          puts "Loaded #{count} Homologies (#{row['Gene']})" 
+        end
+       end
+       puts "Loaded #{count} Homologies"
+    end
   end
 
   desc "Load the values from a csv file"
   task :values, [:meta_experiment, :gene_set, :value_type, :filename ] => :environment do |t, args| 
-  	ActiveRecord::Base::transaction do
+  	puts args
+    ActiveRecord::Base::transaction do
+      conn = ActiveRecord::Base.connection
   		meta_exp = MetaExperiment.find_or_create_by(:name=>args[:meta_experiment])
   		gene_set = GeneSet.find_by(:name=>args[:gene_set])
   		value_type = TypeOfValue.find_or_create_by(:name=>args[:value_type])
-  		@experiments = Hash.new
+  		experiments = Hash.new
+      meta_exp.gene_set = gene_set
+      #TODO: add validation if any of the find_by is null
+
 
   		#genes_arr = Gene.connection.select_all("SELECT * FROM clients WHERE id = '1'")
   		genes = Hash.new
-
   		Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
-  			genes[g.name] = g
-
+  			genes[g.name] = g.id
   		end
-  		puts "Loaded #{genes.size} genes  in memory"
+      puts "Loaded #{genes.size} genes  in memory"
+
+      Experiment.find_each do | e |
+        experiments[e.accession] = e.id
+      end  
+      puts "Loaded #{experiments.size} experiments  in memory"
+      count = 0
+  		inserts = Array.new
   		CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
   			#puts row.inspect
-
+        #puts meta_exp.inspect
   			#gene = Gene.find_by(:name=>row["target_id"])
+        gene_name = row["target_id"]
   			gene = genes[row["target_id"]]
-  			puts gene
+  			#puts gene.inspect
   			row.delete("target_id")
   			row.to_hash.each_pair do |name, val| 
   				val = val.to_f
-  				next if val == 0
-  				ev = ExpressionValue.new
-  				ev.gene = gene
-  				ev.meta_experiment = meta_exp
-  				ev.type_of_value = value_type
-  				ev.experiment = get_experiment(name)
-  				ev.value = val
-  				ev.save!
-  				#puts ev.inspect
+          str = "(#{experiments[name]},#{gene},#{meta_exp.id},#{value_type.id},#{val},NOW(),NOW())"
+          inserts.push str          
   			end
-  			
+  			count += 1
+        if count % 1000 == 0
+          puts "Loaded #{count} ExpressionValue (#{gene_name})" 
+          sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
+          #puts sql
+          conn.execute sql
+          inserts = Array.new
+        end
   		end
+      puts "Loaded #{count} ExpressionValue " 
+      sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
+      #puts sql
+      conn.execute sql
+      inserts = Array.new
   	end
   end
 

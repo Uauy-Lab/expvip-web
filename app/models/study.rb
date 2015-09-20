@@ -1,3 +1,4 @@
-class Study < ActiveRecord::Base
-  has_many :experiment_groups
+class Study < ActiveRecord::Base 
+	belongs_to :species
+	has_many :experiment_groups
 end
