@@ -68,6 +68,21 @@ class ExpressionValuesController < ApplicationController
      factorOrder     = Hash.new
      longFactorName  = Hash.new
      selectedFactors = Hash.new
+
+     Study.find_each do |s| 
+      factorOrder["study"]     = Hash.new unless factorOrder["study"]
+      longFactorName["study"]  = Hash.new unless longFactorName["study"]
+      selectedFactors["study"] = Hash.new unless selectedFactors["study"]  
+      order = factorOrder["study"] 
+      longName = longFactorName["study"]
+      selected = selectedFactors["study"] 
+
+      order[s.accession] = s.id
+      longName[s.accession] = s.title
+      selected[s.accession] = false
+
+     end
+
      Factor.find_each do |f|
       
       factorOrder[f.factor]     = Hash.new unless factorOrder[f.factor]
@@ -95,7 +110,7 @@ class ExpressionValuesController < ApplicationController
       group["description"] = g.name
       factors = Hash.new
       g.factors.each { |f| factors[f.factor] = f.name }
-      group['factors'] = factors
+      
 
       g.experiments.each do |e|  
         unless experiments[e.id]
@@ -104,8 +119,10 @@ class ExpressionValuesController < ApplicationController
           exp["name"] = e.accession
           exp["study"] = e.study_id.to_s
           exp["group"] = g.id.to_s
+          factors["study"] = e.study.accession
         end
       end
+      group['factors'] = factors
       groups[g.id] = group
     end
     return [experiments, groups]
@@ -133,11 +150,12 @@ class ExpressionValuesController < ApplicationController
     #ret = ExpressionValue.find_expression_for_gene(params["gene_id"])
     ret = Hash.new 
     gene = Gene.find params["gene_id"]
-    
+    compare = Gene.find_by name: params["compare"] if params["compare"]
+
     factorOrder, longFactorName, selectedFactors = getFactorOrder 
     experiments, groups = getExperimentGroups
     values = Hash.new
-   
+    params["studies"].each { |e| selectedFactors["study"][e] = true }
 
     Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
 
@@ -145,6 +163,13 @@ class ExpressionValuesController < ApplicationController
        values[h.B.name] = getValuesForGene(h.B) if h.B
        values[h.D.name] = getValuesForGene(h.D) if h.D
     end
+
+
+    Homology.where("Gene_id = :gene", {gene: compare.id}).each do |h|
+       values[h.A.name] = getValuesForGene(h.A) if h.A
+       values[h.B.name] = getValuesForGene(h.B) if h.B
+       values[h.D.name] = getValuesForGene(h.D) if h.D
+    end if compare
 
 
     ret["gene"]= gene.name
@@ -170,6 +195,6 @@ class ExpressionValuesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def expression_value_params
-      params.require(:expression_value).permit(:experiment_id, :gene_id, :meta_experiment_id, :type_of_value_id, :value)
+      params.require(:expression_value).permit(:compare, :experiment_id, :gene_id, :meta_experiment_id, :type_of_value_id, :value)
     end
 end

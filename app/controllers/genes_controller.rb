@@ -7,16 +7,16 @@ class GenesController < ApplicationController
     
     gene_name = nil
     gene_name = params[:gene]
-    gene_name = params[:query]
+    gene_name = params[:query] if params[:query]
 
     if gene_name
-      logger.debug params
+     # logger.debug params
       @gene =  Gene.find_by(:name=>gene_name)
       #TODO: Show error message on the way back. 
       session[:gene] = gene_name
       session[:studies] = params[:studies]
       redirect_to :back and return unless @gene 
-      redirect_to  action: "show", id: @gene.id, studies: params[:studies]
+      redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare: params[:compare]
     else
       @genes = Gene.all
     end
@@ -39,8 +39,9 @@ class GenesController < ApplicationController
   # GET /genes/1
   # GET /genes/1.json
   def show
-    logger.debug "In show"
-    logger.debug params
+    studies = params[:studies]
+    @args = {studies: studies, compare: params[:compare] }.to_query.html_safe
+    #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end
 
   # GET /genes/new

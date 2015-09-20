@@ -9,7 +9,7 @@
    </div>
 
     Compare to: 
-    <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', placeholder: @gene.name %>
+    <%= text_field_tag :compare, params[:compare], id: "gene-search-compare", class: 'form-control', placeholder: @gene.name, value:  params[:compare]%>
    </div>
    <%= button_tag(type: 'submit', id: 'gene-search-btn', class: 'btn btn-default') do %>
      <i class='fa fa-search fa-fw'></i> Search
@@ -54,7 +54,7 @@
 
 <script type="text/javascript">
   var container_div="bar_expression_viewer";
-  var data_url = "<%= "../../expression_values/gene/#{@gene.id}.json "%>" ;
+  var data_url = "<%=raw "../../expression_values/gene/#{@gene.id}.json?#{@args}"%>" ;
   var gene = "<%= @gene.name %>" ;
   var eb =  new biovisexpressionbar.ExpressionBar({
     target: container_div,
@@ -63,7 +63,7 @@
     renderProperty: 'tpm', 
     fontFamily:'Palatino Linotype", "Book Antiqua", Palatino, serif', 
     barHeight:10,
-    width:1500,
+    width:1000,
     headerOffset:200
   });
 </script>

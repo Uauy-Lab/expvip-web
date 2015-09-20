@@ -22,6 +22,9 @@ ready = (function() {
   $("#gene-search-input").autocomplete({
     source: '/genes/autocomplete.json',
   });
+   $("#gene-search-compare").autocomplete({
+    source: '/genes/autocomplete.json',
+  });
 });
 
 $(document).ready(ready);
