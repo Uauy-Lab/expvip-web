@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  Gene_id: 
+  Group: MyString
+  Genome: MyString
+
+two:
+  Gene_id: 
+  Group: MyString
+  Genome: MyString

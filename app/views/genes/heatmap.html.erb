@@ -1,0 +1,23 @@
+
+<p>
+In the heatmap
+<div id="heatmap_div"> </div>
+<%= params["genes_heatmap"] %>
+
+<script type="text/javascript">
+xhr("https://cdn.rawgit.com/gyachdav/biojs-vis-heatmap-d3/master/snippets/data/dummy.json", function(err,resp,data){
+  var jsonData = JSON.parse(data);
+  console.log(jsonData);
+  var instance = new app({
+    jsonData: jsonData, 
+    user_defined_config: {
+      colorLow: 'green',
+      colorMed: 'white',
+      colorHigh: 'red'
+    },
+    target: 'heatmap_div'
+  });
+});
+
+</script>
+</p>
