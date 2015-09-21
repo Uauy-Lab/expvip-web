@@ -8,6 +8,22 @@
 </head>
 <body>
 
+<%= form_tag genes_path, method: :get, class: 'navbar-form navbar-left' do %>
+ <div class='form-group'>
+    Gene: 
+    <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: params[:query], placeholder: "Traes_4AL_F99FCB25F.1" %>
+    Compare to: 
+    <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>
+   
+
+   <%= button_tag(type: 'submit', id: 'gene-search-btn', class: 'btn btn-default') do %>
+     <i class='fa fa-search fa-fw'></i> Search
+   <% end %>   
+
+</div>
+<% end %>
+
+
 <%= yield %>
 
 </body>

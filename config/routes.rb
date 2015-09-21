@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :genes  do
     collection do
       get 'autocomplete'
+      get 'heatmap'
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.
@@ -22,6 +23,7 @@ Rails.application.routes.draw do
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
   get 'expression_values/gene/:gene_id' => 'expression_values#gene'
+
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 

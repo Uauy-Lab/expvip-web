@@ -1,26 +1,6 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-
-<%= form_tag genes_path, method: :get, class: 'navbar-form navbar-left' do %>
- <div class='form-group'>
-    Gene: 
-    <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: @gene.name %>
-   </div>
-
-    Compare to: 
-    <%= text_field_tag :compare, params[:compare], id: "gene-search-compare", class: 'form-control', placeholder: @gene.name, value:  params[:compare]%>
-   </div>
-   <%= button_tag(type: 'submit', id: 'gene-search-btn', class: 'btn btn-default') do %>
-     <i class='fa fa-search fa-fw'></i> Search
-   <% end %>   
-
-</div>
-<% end %>
-
-</p>
-
-<p>
   <strong>Name:</strong>
   <%= @gene.name %>
 </p>
@@ -66,4 +46,5 @@
     width:1000,
     headerOffset:200
   });
+  //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js component
 </script>

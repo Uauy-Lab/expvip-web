@@ -155,7 +155,7 @@ class ExpressionValuesController < ApplicationController
     factorOrder, longFactorName, selectedFactors = getFactorOrder 
     experiments, groups = getExperimentGroups
     values = Hash.new
-    params["studies"].each { |e| selectedFactors["study"][e] = true }
+    params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
 
     Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
 
