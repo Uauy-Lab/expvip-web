@@ -15,6 +15,7 @@
 //= require bundle
 //= require jquery
 //= require jquery-ui
+//= require inchlib-1.2.0
 
 var ready;
 ready = (function() {
