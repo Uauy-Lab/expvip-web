@@ -8,8 +8,7 @@ class GenesController < ApplicationController
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
-     puts "In index !"
-     puts  params[:genes_heatmap]
+    
     if gene_name
      # logger.debug params
       @gene =  Gene.find_by(:name=>gene_name)
@@ -19,7 +18,7 @@ class GenesController < ApplicationController
       redirect_to :back and return unless @gene 
       redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare: params[:compare]
     elsif params[:genes_heatmap]
-       puts "Redirecting heatmp!"
+     
        redirect_to action: "heatmap", genes_heatmap: params[:genes_heatmap]      
     else
       @genes = Gene.all
@@ -31,7 +30,7 @@ class GenesController < ApplicationController
   def autocomplete
     #puts "In autocomplete!"
     @genes = Gene.order(:name).where("name LIKE ?", "%#{params[:term]}%")
-    puts @genes
+
     respond_to do |format|
       format.html
       format.json { 
