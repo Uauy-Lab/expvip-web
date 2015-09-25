@@ -12,16 +12,21 @@ class GenesController < ApplicationController
     if gene_name
      # logger.debug params
       @gene =  Gene.find_by(:name=>gene_name)
-      #TODO: Show error message on the way back. 
-      session[:gene] = gene_name
-      session[:studies] = params[:studies]
+      @gene = Gene.find_by(:gene=>gene_name) unless  @gene
+        
+      
+
+      #TODO: Show error message on the way back.
+
+      session[:gene] = @gene.name
+      session[:studies] = params[:studies] if  params[:studies]
       redirect_to :back and return unless @gene 
       redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare: params[:compare]
     elsif params[:genes_heatmap]
      
        redirect_to action: "heatmap", genes_heatmap: params[:genes_heatmap]      
     else
-      @genes = Gene.all
+       @genes = Gene.find(:all, :order => "id desc", :limit => 10) #TODO: make this in a way you can page. 
     end
       
  #   format.html { redirect_to action: :show, id: @gene.id }
@@ -48,7 +53,8 @@ class GenesController < ApplicationController
   # GET /genes/1
   # GET /genes/1.json
   def show
-    studies = params[:studies]
+    studies = session[:studies]
+
     @args = {studies: studies, compare: params[:compare] }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end
