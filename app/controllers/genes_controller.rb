@@ -26,7 +26,7 @@ class GenesController < ApplicationController
       session[:studies] = params[:studies] if  params[:studies] 
 
       if params[:commit] == "Compare"
-        redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare: params[:compare]
+        redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name 
       else
         redirect_to  action: "show", id: @gene.id, studies: params[:studies]
       end
@@ -67,7 +67,7 @@ class GenesController < ApplicationController
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
-      conmpare = @compare.transcript
+      compare = @compare.transcript
     end
 
     @args = {studies: studies, compare: compare }.to_query
