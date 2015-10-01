@@ -7,7 +7,7 @@
   	<%= submit_tag("Compare") %>
   	<br/>
   	Examples: Traes_5BS_0AFC3F795.1, Traes_4DS_1CF5D9107.1
-  	<h2>Select studies to dislay:</h2>
+  	<h2>Select studies to display:</h2>
   	<% @studies.each do |study| %>
 	   <%= check_box_tag("studies[]", study.accession, checked = true) %>
 	   <%= label_tag(study.accession, study.title) %>
