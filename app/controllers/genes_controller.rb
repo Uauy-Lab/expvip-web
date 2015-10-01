@@ -52,7 +52,7 @@ class GenesController < ApplicationController
 
   def autocomplete
     #puts "In autocomplete!"
-    @genes = Gene.order(:name).where("name LIKE ?", "%#{params[:term]}%")
+    @genes = Gene.order(:name).where("name LIKE ?", "%#{params[:term]}%").limit(20)
 
     respond_to do |format|
       format.html
