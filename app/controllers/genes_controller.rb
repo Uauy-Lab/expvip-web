@@ -63,13 +63,14 @@ class GenesController < ApplicationController
   def show
     session[:studies] = params[:studies] if  params[:studies] 
     studies = session[:studies]
-    
+    conmpare = ""
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
+      conmpare = @compare.transcript
     end
 
-    @args = {studies: studies, compare: @compare.transcript }.to_query
+    @args = {studies: studies, compare: compare }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end
 
