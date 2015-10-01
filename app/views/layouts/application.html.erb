@@ -22,22 +22,17 @@
 <%= form_tag genes_path, method: :get, class: 'navbar-form navbar-left' do %>
  
  <div class="left">
-  <h1>
+  <h1 >
   expVIP: Wheat Expression browser
   </h1>
+  <%= link_to "Home", root_path %>
  </div>
 
  <div class='form-group right header-form  '>
-    <%= label_tag(:query,  "Gene:" ) %> 
-    <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %> 
-   <br/>
-    <%= label_tag(:query,  "Compare:") %> 
-    <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>
-    <br/> 
-
-   <%= button_tag(type: 'submit', id: 'gene-search-btn', class: 'btn btn-default') do %>
-     <i class='fa fa-search fa-fw'></i> Search
-   <% end %>   
+    
+    <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %> <%= submit_tag("Search") %>
+  
+    <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>  <%= submit_tag("Compare") %> 
 
 </div>
 <% end %>

@@ -27,7 +27,10 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
-   $("#gene").autocomplete({
+  $("#gene").autocomplete({
+    source: '/genes/autocomplete.json',
+  });
+  $("#compare").autocomplete({
     source: '/genes/autocomplete.json',
   });
 

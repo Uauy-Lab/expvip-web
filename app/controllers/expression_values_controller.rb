@@ -211,6 +211,57 @@ class ExpressionValuesController < ApplicationController
     end
   end
 
+  #TODO: Add this to the database. 
+  def getDefaultSelection 
+       defSelection = {
+        "Age"=> false, 
+        "High level Stress-disease"=> true, 
+        "High level age"=> true, 
+        "High level tissue"=>true,
+        "High level variety"=>true,
+        "Stress-disease"=>false,
+        "study"=>false,
+        "Tissue" => false,
+        "Variety" => false
+       }
+       return defSelection
+  end
+
+  def getDefaultOrder 
+    defOrder = [
+        "study",
+        "High level age", 
+        "Age", 
+        "High level tissue",
+        "Tissue",
+        "High level variety",
+        "Variety",
+        "High level Stress-disease", 
+        "Stress-disease"
+    ]
+    return defOrder
+  end
+
+  def getValuesForHomologues(gene)
+
+    values = Hash.new
+    Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
+       values[h.A.name] = getValuesForGene(h.A) if h.A
+       values[h.B.name] = getValuesForGene(h.B) if h.B
+       values[h.D.name] = getValuesForGene(h.D) if h.D
+    end
+    return values
+  end
+
+  def getValuesToCompare(gene, compare)
+    values = Hash.new
+    values[gene.name]    = getValuesForGene(gene)
+    values[compare.name] = getValuesForGene(compare) 
+    return values
+  end
+
+
+
   def gene
     #puts @gene_id
     #ret = Hash.new
@@ -225,26 +276,22 @@ class ExpressionValuesController < ApplicationController
     values = Hash.new
     params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
 
-    Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
-
-       values[h.A.name] = getValuesForGene(h.A) if h.A
-       values[h.B.name] = getValuesForGene(h.B) if h.B
-       values[h.D.name] = getValuesForGene(h.D) if h.D
+    if compare
+      
+      values = getValuesToCompare(gene, compare)
+      ret["compare"] = params["compare"]
+    else
+      values = getValuesForHomologues(gene)
     end
-
-
-    Homology.where("Gene_id = :gene", {gene: compare.id}).each do |h|
-       values[h.A.name] = getValuesForGene(h.A) if h.A
-       values[h.B.name] = getValuesForGene(h.B) if h.B
-       values[h.D.name] = getValuesForGene(h.D) if h.D
-    end if compare
-
 
     ret["gene"]= gene.name
     ret["factorOrder"]= factorOrder
     ret["longFactorName"]= longFactorName
+    
     ret["selectedFactors"]= selectedFactors
-
+    ret["defaultFactorSelection"] = getDefaultSelection
+    ret["defaultFactorOrder"] = getDefaultOrder
+    
     ret["experiments"] = experiments
     ret["groups"] = groups
     ret["values"] = values

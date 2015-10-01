@@ -46,16 +46,15 @@ div.header {
 
  .header-form {
     width: 300px;
+
  }
  .header-form input {
-    width: 45%;
     display:inline-block;
 
 }
  .header-form label {
     width: 25%;
     display:inline-block;
-
 }
 .wrapper {
     /** Top padding so that initially, the content is below the header **/

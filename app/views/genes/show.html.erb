@@ -1,21 +1,17 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Name:</strong>
-  <%= @gene.name %>
-    <strong>Gene:</strong>
-  <%= @gene.gene %>
-  <strong>Transcript:</strong>
-  <%= @gene.transcript %>
-  <br/>
-  
-  <strong>Position:</strong>
-  <%= @gene.possition %>
-  
+
+ <strong>Gene:</strong>
+ <%= @gene.gene %>
+ 
+<% if @compare %>
+ <strong>Compare:</strong>
+ <%= @compare.gene %>   
+
+<% end %>
 
 <div id="bar_expression_viewer"> </div>
-
-<%= link_to 'Back', genes_path %>
 
 <script type="text/javascript">
   var container_div="bar_expression_viewer";
@@ -26,10 +22,11 @@
     highlight: gene, 
     data: data_url,
     renderProperty: 'tpm', 
-    fontFamily:'Palatino Linotype", "Book Antiqua", Palatino, serif', 
+    fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
+    groupBy: ["High level Stress-disease", "High level age","High level tissue","High level variety"], 
     barHeight:10,
     width:1000,
-    headerOffset:200
+    headerOffset:100
   });
   //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js component
 

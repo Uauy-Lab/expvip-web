@@ -8,20 +8,28 @@ class GenesController < ApplicationController
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
+
+   if params[:compare]
+      @compare =  Gene.find_by(:name=>params[:compare])
+      @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
+   end
     
     if gene_name
      # logger.debug params
       @gene =  Gene.find_by(:name=>gene_name)
       @gene = Gene.find_by(:gene=>gene_name) unless  @gene
-        
-      
-
+      redirect_to :back and return unless @gene   
+      #"commit" "Compare" 
       #TODO: Show error message on the way back.
 
       session[:gene] = @gene.name
-      session[:studies] = params[:studies] if  params[:studies]
-      redirect_to :back and return unless @gene 
-      redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare: params[:compare]
+      session[:studies] = params[:studies] if  params[:studies] 
+
+      if params[:commit] == "Compare"
+        redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare: params[:compare]
+      else
+        redirect_to  action: "show", id: @gene.id, studies: params[:studies]
+      end
     elsif params[:genes_heatmap]
      
        redirect_to action: "heatmap", genes_heatmap: params[:genes_heatmap]      
@@ -53,9 +61,15 @@ class GenesController < ApplicationController
   # GET /genes/1
   # GET /genes/1.json
   def show
+    session[:studies] = params[:studies] if  params[:studies] 
     studies = session[:studies]
+    
+    if params[:compare]
+      @compare =  Gene.find_by(:name=>params[:compare])
+      @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
+    end
 
-    @args = {studies: studies, compare: params[:compare] }.to_query
+    @args = {studies: studies, compare: @compare.transcript }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end
 

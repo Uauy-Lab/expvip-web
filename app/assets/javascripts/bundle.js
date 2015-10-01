@@ -43,68 +43,95 @@ require('jquery-ui');
 //This is a patch!
 d3.selection.prototype.position = function() {
 
-    var el = this.node();
-    var elPos = el.getBoundingClientRect();
-    var vpPos = getVpPos(el);
+  var el = this.node();
+  var elPos = el.getBoundingClientRect();
+  var vpPos = getVpPos(el);
 
-    function getVpPos(el) {
-        if(el.parentElement.tagName === 'svg') {
-            var ret = el.parentElement.getBoundingClientRect();
-            ret.top = 0;
-            ret.left = 0;
-            return ret;
-        }
-        return getVpPos(el.parentElement);
+  function getVpPos(el) {
+    if(el.parentElement.tagName === 'svg') {
+      var ret = el.parentElement.getBoundingClientRect();
+      ret.top = 0;
+      ret.left = 0;
+      return ret;
     }
+    return getVpPos(el.parentElement);
+  }
 
-    return {
-        top: elPos.top - vpPos.top,
-        left: elPos.left - vpPos.left,
-        width: elPos.width,
-        bottom: elPos.bottom - vpPos.top,
-        height: elPos.height,
-        right: elPos.right - vpPos.left
-    };
+  return {
+    top: elPos.top - vpPos.top,
+    left: elPos.left - vpPos.left,
+    width: elPos.width,
+    bottom: elPos.bottom - vpPos.top,
+    height: elPos.height,
+    right: elPos.right - vpPos.left
+  };
 
 };
 
 function numberWithCommas(x) {
-    num = x.toFixed(2);
-    var parts = num.toString().split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  num = x.toFixed(2);
+  var parts = num.toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-    return parts.join('.');
+  return parts.join('.');
 }
 
 
 var ExpressionBar = function (options) {
 	var self = this;
 	this.setDefaultOptions();
+  jQuery.extend(this.opt, options);
+  this.opt.sc = d3.scale.category20();
 
- jQuery.extend(this.opt, options);
- this.opt.sc = d3.scale.category20();
- this.loadExpression(this.opt.data);
- this.setupContainer();
- this.setupButtons();
- this.setupSVG();
+  this.setupContainer();
+  this.setupButtons();
+  this.setupProgressBar();
 
- this.sortOrder = [];
- 
+  this.loadExpression(this.opt.data);
+  this.setupSVG();
+  this.sortOrder = [];
+
 };
+
+ExpressionBar.prototype.setupProgressBar = function(){
+  pb_id =  this.opt.target + '_progressbar';
+  this.pb = jQuery( '#' + pb_id );
+  this.pb.attr("height", "20px");
+  this.pb.progressbar({
+    value: false
+  });
+  this.pb.hide(); 
+}
 
 ExpressionBar.prototype.setupSVG = function(){
-
- this.renderGroupSelectorColour();
- 
+ var self = this;
+ this.renderGroupSelectorColour(); 
  this.chart = d3.select('#'+this.chartSVGid).attr('width', this.opt.width);
  this.chartHead = d3.select('#'+this.chartSVGidHead).
-  attr('width', this.opt.width);
+ attr('width', this.opt.width);
  this.chartHead.attr('height', this.opt.headerOffset);
  this.chartFoot = d3.select('#'+this.chartSVGidFoot).
-  attr('width', this.opt.width);
+ attr('width', this.opt.width);
  this.chartFoot.attr('height', 20);
  this.barGroups = [];
+ 
+ this.chart.on("mousemove", function(e){
+  self.highlightRow(this);
+});
+ this.chart.on("mousemove", function(e){
+  self.highlightRow(this);
+});
+ this.chart.on("mouseenter", function(e){
+  self.showHighithRow();
+});
+ this.chart.on("mouseleave", function(e){
+  self.hideHidelightRow();
+});
+
+
 };
+
+
 
 ExpressionBar.prototype.setupButtons = function(){
  var self = this;
@@ -112,13 +139,13 @@ ExpressionBar.prototype.setupButtons = function(){
  this.groupSelectorColour = jQuery('#'+ this.opt.target+'_group');
  this.saveSVGButton = jQuery('#'+ this.opt.target+'_save');
  this.saveSVGButton.click(function(e) {
-    self.saveRenderedSVG();
- });
+  self.saveRenderedSVG();
+});
 
  this.savePNGButton = jQuery('#'+ this.opt.target+'_save_png');
  this.savePNGButton.click(function(e) {
-    self.saveRenderedPNG();
- });
+  self.saveRenderedPNG();
+});
 };
 
 ExpressionBar.prototype.setupContainer = function(){
@@ -134,41 +161,48 @@ ExpressionBar.prototype.setupContainer = function(){
   'height': self.opt.height + 'px',
   'overflow': 'scroll',
   'backgroundColor': self.opt.backgroundColor
- });
+});
  this.chartSVGid =this.opt.target+'_chart_svg';
  this.chartSVGidHead =this.opt.target+'_header_svg';
  this.chartSVGidFoot =this.opt.target+'_footer_svg';
  this.sortDivId = this.opt.target + '_sort_div';
-  
+
  this._container.append('Property: <select id="'+ 
   this.opt.target+'_property"></Select>');
  this._container.append('<button type="button" id="' +
   this.opt.target + '_save">Save as SVG</button>');
  this._container.append('<button type="button" id="' +
   this.opt.target + '_save_png">Save as PNG</button>');
-// this._container.append('<button type="button" id="' +
-//  this.opt.target + '_sort">Sort</button>');
-// this._container.append('<button type="button" id="' +
-//  this.opt.target + '_filter">Filter</button>');
+  this._container.append('<button type="button" id="' +
+  this.opt.target + '_save_data">Save data</button>');
+
+ this._container.append('<span id="'+this.opt.target +'_homSpan"><input id="' +  this.opt.target +
+  '_showHomoeologues" type="checkbox" name="showHomoeologues" value="show">Homoeologues </input> </span>')
+ this._container.append('<div id="' +
+  this.opt.target + '_progressbar" width="20px" height="20px"> </div>');
  this._container.append('<div id="' +
   this.opt.target + '_preferences"></div>');
- 
-
- 
-  this._container.append('<br/><svg id="' + 
+ this._container.append('<br/><svg id="' + 
   this.chartSVGidHead + '" ></svg>');
+ this._container.append('<div id="' + this.sortDivId + '" height="20px"></div><br/><br/>');
 
-  this._container.append('<div id="' + this.sortDivId + '" height="20px"></div><br/><br/>');
- 
  var central_str='<div style="overflow-y: auto;max-height:' + this.opt.height +'px; ">'
  central_str += '<svg id="' + this.chartSVGid + '" ></svg></div>'
 
  this._container.append(central_str);
 
- 
-
  this._container.append('<br/><svg id="' + 
   this.chartSVGidFoot + '" ></svg>');
+
+ jQuery( '#' + this.opt.target + '_save_data' ).on('click', function(evt) {
+    self.saveRenderedData(self);
+ });
+
+  jQuery( '#' + this.opt.target + '_showHomoeologues' ).on('change', function(evt) {
+    self.opt.showHomoeologues = this.checked;
+    self.refreshSVG(self);
+ });
+
 };
 
 ExpressionBar.prototype.setDefaultOptions = function(){
@@ -183,7 +217,7 @@ ExpressionBar.prototype.setDefaultOptions = function(){
    height: '500', 
    barHeight: 10,
    labelWidth: 500,
-   renderProperty: 'fpkm',
+   renderProperty: 'tpm',
    renderGroup: 'group',
    highlight: 'MyGene', 
    groupBy: 'groups', 
@@ -195,13 +229,14 @@ ExpressionBar.prototype.setDefaultOptions = function(){
 }
 
 ExpressionBar.prototype.setSelectedInJoinForm = function() {
-//  var inputGroup = this.joinForm.filter('[name=group]');
+
   var self = this;
   var groupByValue = this.opt.groupBy;
   if (groupByValue.constructor === Array) {
     for(var i in groupByValue){
+      var toSearch = groupByValue[i].replace(/ /g, "_")
       jQuery(this.joinForm)
-      .find('[name=factor][value=' + groupByValue[i] +']')
+      .find('[name=factor][value=' + toSearch +']')
       .prop('checked',true);
 
     }
@@ -212,8 +247,8 @@ ExpressionBar.prototype.setSelectedInJoinForm = function() {
   .prop('checked', this.opt.showHomoeologues).
   on('change', function(evt) {
     self.opt.showHomoeologues = this.checked;
-   });
-  
+  });
+
   jQuery(this.joinForm)
   .find('[name=group][value=' + groupByValue +']')
   .prop('checked',true); 
@@ -223,77 +258,61 @@ ExpressionBar.prototype.setSelectedInJoinForm = function() {
   .on('change', function(){self.toggleFactorCheckbox(self)}); 
 };
 
-ExpressionBar.prototype.toggleFactorCheckbox = function(self) {
-  var joinForm = self.joinForm;
-  var selectedCheckbox = jQuery(joinForm)
-    .find('[name=group]:checked');
-    
-   var factorOptions =  jQuery(joinForm).find('[name=factor]');
-   if(selectedCheckbox.val() === 'factors'){
-    factorOptions.prop('disabled', false);
-   }else{
-    factorOptions.prop('disabled', true);  
-   }
-};
 
 
 //Returns if we need to update the page or not. 
-ExpressionBar.prototype.updateGroupBy = function(self) {
-  var joinForm = self.joinForm;
-  var selectedCheckbox = jQuery(joinForm)
-    .find('[name=group]:checked');
-  var factorOptions =  jQuery(joinForm).find('[name=factor]:checked');  
+ExpressionBar.prototype.updateGroupBy = function(self) { 
   var oldGroupBy = self.opt.groupBy;
   var ret = true;
-  if(selectedCheckbox.val()  === 'factors'){
+  if(self.showFactors  == true){
     var facts = [];
-    factorOptions.each(function(){
-      facts.push(jQuery(this).val());
-    });
-    //TODO:Show an error in case the factors show an error
-    //To clarify the behaviour. maybe prevent the submission. 
+    for(var fo in self.data.defaultFactorOrder){
+      i = self.data.defaultFactorOrder[fo];
+      var name=self.opt.target + '_sorted_list_'+ i.split(' ').join('_');
+      var shbtn = jQuery('#showHide_' + name);
+      if(shbtn.data("selected")){
+        facts.push(shbtn.data("factor"));
+      }
+    }
     self.opt.groupBy = facts;
     if(facts.length == 0){
-      self.opt.groupBy = 'groups';
-      ret = false
+      self.opt.groupBy = 'ungrouped';
+      ret = false;
     }
-    
   }else{  
-    self.opt.groupBy = selectedCheckbox.val();
+    //self.opt.groupBy = selectedCheckbox.val();
+    ret = false;
   }  
   if(oldGroupBy == self.opt.groupBy){
-    ret = false
+    ret = false;
   }
-  return true;
+  return ret;
 };
 
 ExpressionBar.prototype.refreshSVG = function(self) {
-   var chart=self.chart;
-   console.log("refreshSVG");
-   //console.trace();
-   //self.svgFootContainer.selectAll("*").remove;
-   //self.factorTitle.selectAll("*").remove();
-   chart.selectAll("*").remove();
-   this.renderedData = false;
-   //self.setAvailableFactors();
-   self.prepareColorsForFactors();
-   self.render();
-   self.refresh();
+ var chart=self.chart;
+ 
+ chart.selectAll("*").remove();
+ this.renderedData = false;
+ self.prepareColorsForFactors();
+ self.render();
+ this.hideHidelightRow();
+ self.refresh();
 };
 
 ExpressionBar.prototype._getSortedKeys = function(obj) {
-    var keys = []; for(var key in obj) keys.push(key);
-    return keys.sort(function(a,b){return obj[a]-obj[b]});
+  var keys = []; for(var key in obj) keys.push(key);
+  return keys.sort(function(a,b){return obj[a]-obj[b]});
 };
 
 ExpressionBar.prototype._addSortPriority = function(factor, end){
   end = typeof end !== 'undefined' ? end : true;
   this._removeSortPriority(factor);
   if(end == true){
-     this.sortOrder.push(factor);
-  }else{
-     this.sortOrder.unshift(factor);
-  }
+   this.sortOrder.push(factor);
+ }else{
+   this.sortOrder.unshift(factor);
+ }
 }
 
 ExpressionBar.prototype._removeSortPriority = function(factor){
@@ -306,7 +325,9 @@ ExpressionBar.prototype._removeSortPriority = function(factor){
 
 ExpressionBar.prototype._refershSortedOrder = function(factor){
   var self = this;
-  var name=this.opt.target + '_sorted_list_'+ factor;
+
+  var find = factor.replace(/ /g, "_");
+  var name=this.opt.target + '_sorted_list_'+ find;
   jQuery('#'+ name  + ' div').each(function(e) {
     div = jQuery(this);
     var factor = div.data('factor');
@@ -314,14 +335,14 @@ ExpressionBar.prototype._refershSortedOrder = function(factor){
     self.renderedOrder[factor][value] = div.index();
   } 
   );
-  this._addSortPriority(factor)
+  this._addSortPriority(factor, false)
   this.sortRenderedGroups(this.sortOrder, this.renderedOrder);
   this.setFactorColor(factor);
   this.refresh();
 }
 
 ExpressionBar.prototype._updateFilteredFactors = function(sortDivId){
-  
+
   //This may not work when we have more than
   //checks = jQuery(":checkbox[id*='|']");
   var toSearch='#'+ sortDivId +' input:checkbox';
@@ -336,31 +357,96 @@ ExpressionBar.prototype._updateFilteredFactors = function(sortDivId){
   });
   this.refreshSVGEnabled = true;
 
+};
+
+ExpressionBar.prototype.toggleFactorCheckbox = function(shbtn){
+ //var shbtn = jQuery('#showHide_' + name);
+ var selected = shbtn.data("selected");
+ // shbtn
+ if(selected){
+  shbtn.data("selected", false);
+  shbtn.removeClass("ui-icon-circle-minus");
+  shbtn.addClass("ui-icon-circle-plus");
+}else{
+  shbtn.data("selected", true);
+  shbtn.removeClass("ui-icon-circle-plus");
+  shbtn.addClass("ui-icon-circle-minus");
 }
+};
+
+ExpressionBar.prototype.checkSelectedFactors = function(){
+  var self = this;
+  for(var fo in this.data.defaultFactorOrder){
+    i = this.data.defaultFactorOrder[fo];
+    var name=this.opt.target + '_sorted_list_'+ i.split(' ').join('_');
+    var shbtn = jQuery('#showHide_' + name);
+    var groupByValue = this.opt.groupBy;
+
+    shbtn.data("selected", false);
+    shbtn.data("factor", i);
+    //shbtn.click(function(){console.log(name + "")});
+    
+     shbtn.on("click", function(evt){
+     target = jQuery(this);
+     self.toggleFactorCheckbox(target);
+     self.updateGroupBy(self); 
+     self.refreshSVG(self);
+    });
+
+    if (groupByValue.constructor === Array) {
+      index = self.opt.groupBy.indexOf(i) 
+      self.showFactors = true;
+      if(index < 0 ){
+        if(shbtn.hasClass("ui-icon-circle-minus")){
+          shbtn.removeClass("ui-icon-circle-minus");
+          shbtn.addClass("ui-icon-circle-plus");
+        }          
+      }else{
+        if(shbtn.hasClass("ui-icon-circle-plus")){
+          shbtn.removeClass("ui-icon-circle-plus");
+          shbtn.addClass("ui-icon-circle-minus");
+        }
+        shbtn.data("selected", true);
+      }
+    }else{
+      if(shbtn.hasClass("ui-icon-circle-plus")){
+        shbtn.removeClass("ui-icon-circle-plus");
+        shbtn.addClass("ui-icon-circle-minus");
+      }
+    }
+  }
+};
+
 
 ExpressionBar.prototype.renderSortWindow = function(){
   var self = this;
   
   var listText = ''
- 
+
   var factorCount = 0;
-  for(i in this.renderedOrder){
+  for(fo in this.data.defaultFactorOrder){
+    i = this.data.defaultFactorOrder[fo];
+
     //var i = ri.split(' ').join('_');
     factorCount ++;
     var orderedKeys = this._getSortedKeys(this.renderedOrder[i]);
-//    listText += '<div style="max-height:150px;overflow-y: auto;">' ;
-    name=this.opt.target + '_sorted_list_'+ i.split(' ').join('_');;
-   
-//    listText += i;
-    listText += '<span id="span_' + name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" ></span>'
+    //    listText += '<div style="max-height:150px;overflow-y: auto;">' ;
+    name=this.opt.target + '_sorted_list_'+ i.split(' ').join('_');
+    //    listText += i;
+
+    
+    listText += '<span id="span_' + 
+    name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" ></span>'
+    listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus" ></span>'
+
     listText += '<div id="dialog_' + name + '" width="150px" \
     style="z-index:3; overflow:scroll; max-height:' + this.opt.height/2 +'px" >' ;
+
     listText += '<div id="all_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">all</div>';
     listText += '<div id="none_' + name +'"  onmouseover="this.style.cursor=\'pointer\';">none</div>';
-    
-    listText += '<div id="div_' + name + '">' ; 
+    listText += '<div id="div_' + name + '">' ;  
     listText += '<form id="' + name +'">';
-  
+
     //console.log(name);
     for(j in orderedKeys){
       var bgcolor = this.factorColors[i][orderedKeys[j]];
@@ -379,14 +465,14 @@ ExpressionBar.prototype.renderSortWindow = function(){
       data-value="' + orderedKeys[j] +'" \
       title="' + longFactorName +'"\
       >' ;
-
+      var toDisplay = longFactorName.length > 40 ?  orderedKeys[j] : longFactorName; 
       listText += '<input type="checkbox" id="' +shortId+'" \
       name="' +  shortId + '" \
       data-factor="'+ i +'" \
       data-value="' + orderedKeys[j] +'" \
       ' + checked + '/>';
-      listText += orderedKeys[j] + '</div>'  ;
-     
+      listText +=   toDisplay + '</div>'  ;
+
     }
     listText += '</form>' ;
     listText += "</div>" ;
@@ -394,9 +480,11 @@ ExpressionBar.prototype.renderSortWindow = function(){
   }
 
   this.sortDiv = jQuery('#'+this.sortDivId);
+  this.sortDiv.css("min-height","10px")
   this.sortDiv.tooltip({
-      track: true
-    });
+    track: true
+  });
+
   this.sortDiv.html(listText); 
   //this.sortDiv.css('column-count',factorCount);
   //this.sortDiv.css('height',factorCount * this.opt.barHeight *2);
@@ -413,33 +501,31 @@ ExpressionBar.prototype.renderSortWindow = function(){
       self2.refreshSVG(self2); 
 
     }
-    
   });
 
   checks.data("expression-bar", this);
   var xFact = 0;
-  for(var i in this.renderedOrder){
-    
+  for(var fo in this.data.defaultFactorOrder){
+    i = this.data.defaultFactorOrder[fo]
     var name=this.opt.target + '_sorted_list_'+ i.split(' ').join('_');
-    
     jQuery('#span_' + name).on("click", function(e){
       var nameinside = e.target.id.replace("span_", "dialog_")
       var sdialog = jQuery('#'+nameinside);
       sdialog.show();
       jQuery(document).mouseup(function (e){
-      var container = sdialog;
-
+        var container = sdialog;
       if (!container.is(e.target) // if the target of the click isn't the container...
           && container.has(e.target).length === 0) // ... nor a descendant of the container
       {
         container.hide();
       }
     });
-    
+
     })
 
     var s = jQuery('#'+ name);
     var sbtn = jQuery('#span_' + name);
+    var shbtn = jQuery('#showHide_' + name);
     var sdialog = jQuery('#dialog_' + name);
     var count = s.children().length;
     var sall = jQuery('#all_'+ name);
@@ -453,8 +539,8 @@ ExpressionBar.prototype.renderSortWindow = function(){
         
       });
       if(self.refreshSVGEnabled == true){
-          self.updateGroupBy(self);  
-          self.refreshSVG(self); 
+        self.updateGroupBy(self);  
+        self.refreshSVG(self); 
       }
 
     });
@@ -473,27 +559,42 @@ ExpressionBar.prototype.renderSortWindow = function(){
 
     });
 
+    s.css("text-align", "left");
+    s.css("max-width","100%;")
+    s.css(" overflow-x","hidden;")
+    s.sortable({
+      axis: "y",
+      update: function(event, ui) {
+        var factor = ui.item.data('factor');
+        var value  = ui.item.data('value');
+        var index  = ui.item.index();    
+        self._refershSortedOrder(factor);
+      }
+    });
+
     sbtn.attr('width', this.opt.barHeight    * 2 );
     sbtn.attr('height', this.opt.barHeight );
     sbtn.css("position", "absolute");
     sbtn.css("left", xFact + this.opt.groupBarWidth);
-    s.css("text-align", "left");
+    sbtn.css("top", "inherit");
 
+    var possbtn = sbtn.position();
 
-    s.sortable({
-      update: function(event, ui) {
-            var factor = ui.item.data('factor');
-            var value  = ui.item.data('value');
-            var index  = ui.item.index();    
-            self._refershSortedOrder(factor);
-        }
-    });
-   
+    shbtn.attr('width', this.opt.barHeight    * 2 );
+    shbtn.attr('height', this.opt.barHeight );
+    shbtn.css("position", "absolute");
+    shbtn.css("left", xFact + this.opt.groupBarWidth);
+    
+
+    shbtn.css("top", possbtn.top + 15);
+
+    
+
     sdialog.css("position", "absolute");
     sdialog.css("left", xFact );
     sdialog.css("background-color", "white");
-    //sdialog.css("top", "10px" );
-    sdialog.css("border", "outset")
+    sdialog.css("border", "outset");
+    sdialog.css("top", possbtn.top + 15);
     s.disableSelection();
     sdialog.hide();
     
@@ -505,55 +606,52 @@ ExpressionBar.prototype.renderSortWindow = function(){
 };
 
 
-ExpressionBar.prototype.renderMergeButton = function() {
+ExpressionBar.prototype.showHighlightedFactors = function(toShow, evt){
+  //console.log("TADA!");
+
+  //console.log(evt);
+  var factorNames = this.data.longFactorName;
   var self = this;
-  var formText='<div id="' + this.opt.target + '-join-form" title="Create new user">\
-  <form>\
-      <fieldset>\
-      <input type="checkbox" name="showHomoeologues" value="show">Homoeologues </input><br/>\
-      <input type="radio" name="group" value="ungrouped" checked> Ungrouped\
-      <input type="radio" name="group" value="groups"> Experiment\
-      <input type="radio" name="group" value="factors" > Factors</br>';
-  var formTextEnd = '<!-- Allow form submission with keyboard without duplicating the dialog button -->\
-     </fieldset>\
-  </form>\
-</div>'
+  for(key in toShow.factors){
 
-var checkboxes = '';
-this.factors.forEach(function(value, key, map){
-  checkboxes +=  '<input type="checkbox" name="factor" value="' + key +'"';
-  checkboxes += '>' + key + '</input>';
-});
+    var value = toShow.factors[key];
+    
+    var escaped_key = key.replace(/ /g, "_");
+    var label_div_id = self.opt.target + "_factor_label_" + escaped_key;
+    var colour_div_id = self.opt.target + "_factor_colour_" + escaped_key;
+    var label_full_div_id = self.opt.target + "_factor_full_label_" + escaped_key;
 
-var prefs = jQuery('#'+ this.opt.target + '_preferences');
-prefs.append(formText + checkboxes + formTextEnd);
-this.joinForm = jQuery('#'+ this.opt.target+'-join-form');
-this.setSelectedInJoinForm();
-this.toggleFactorCheckbox(this);
-this.joinForm.find( "input" ).on("change", function(event){
-  self.updateGroupBy(self);  
-  self.refreshSVG(self);
-});
-this.joinForm.find( "form" ).on( "submit", function( event ) {
-  event.preventDefault();
-  self.updateGroupBy(self);  
-  self.refreshSVG(self);   
- });  
+    var long_name = factorNames[key][value];
+    var colour = self.factorColors[key][value];
+    if(long_name.length > 28){
+      long_name = value;
+    }
+    jQuery("#" + label_div_id).text(long_name);
+    jQuery("#" + colour_div_id).css("background-color", colour);
+    jQuery("#" + label_full_div_id).show();
+  }
+
 };
 
+ExpressionBar.prototype.hideHighlightedFactors = function(){
+ this.factors.forEach(function(value, key, map){
+  var escaped_key = key.replace(/ /g, "_");
+  var label_full_div_id = self.opt.target + "_factor_full_label_" + escaped_key;
+  jQuery("#"+label_full_div_id).hide();
+});
+};
 
 ExpressionBar.prototype.renderPropertySelector = function(){
  var self = this;
  var groupOptions = this.data.values[this.opt.highlight];
- 
  jQuery.each(groupOptions, function(key,value) {   
    self.propertySelector
    .append(jQuery('<option></option>')
      .attr('value',key)
      .text(key)); 
  });
- this.propertySelector.val(this.opt.renderProperty);
 
+ this.propertySelector.val(this.opt.renderProperty);
  this.propertySelector.on('change', function(event) { 
    self.opt.renderProperty  = self.propertySelector.find(':selected').text();;
    self.refresh();
@@ -568,7 +666,7 @@ ExpressionBar.prototype.renderGroupSelectorColour = function(){
    self.groupSelectorColour
    .append(jQuery('<option></option>')
     .attr('value',key)
-     .text(value)); 
+    .text(value)); 
  });
  this.groupSelectorColour.val(this.opt.renderGroup);
 
@@ -580,21 +678,16 @@ ExpressionBar.prototype.renderGroupSelectorColour = function(){
 };
 
 ExpressionBar.prototype.saveRenderedPNG = function(){
- 
-var svgData = this.prepareSVGForSaving();
-
-var canvas = document.createElement( 'canvas' );
-canvas.height = this.opt.headerOffset + 20 + this.totalHeight ;
-canvas.width = this.opt.width;
-
-var ctx = canvas.getContext( '2d' );
-
-var img = new Image();
-img.width = this.opt.width;
-img.height = this.opt.headerOffset + 20 + this.totalHeight ;
-img.src = "data:image/svg+xml;base64," + btoa( svgData );
-
-img.onload = function() {
+  var svgData = this.prepareSVGForSaving();
+  var canvas = document.createElement( 'canvas' );
+  canvas.height = this.opt.headerOffset + 20 + this.totalHeight ;
+  canvas.width = this.opt.width;
+  var ctx = canvas.getContext( '2d' );
+  var img = new Image();
+  img.width = this.opt.width;
+  img.height = this.opt.headerOffset + 20 + this.totalHeight ;
+  img.src = "data:image/svg+xml;base64," + btoa( svgData );
+  img.onload = function() {
     ctx.drawImage(img, 0, 0);
     var canvasdata = canvas.toDataURL('image/png');
     var a = document.createElement('a');
@@ -602,16 +695,15 @@ img.onload = function() {
     a.href = canvasdata; 
     document.body.appendChild(a);
     a.click();
-};
-
+  };
 };
 
 ExpressionBar.prototype.prepareSVGForSaving = function(){
    //get svg element.
 
-  var svgHead = document.getElementById(this.chartSVGidHead);
-  var svg = document.getElementById(this.chartSVGid);
-  var svgFoot = document.getElementById(this.chartSVGidFoot);
+   var svgHead = document.getElementById(this.chartSVGidHead);
+   var svg = document.getElementById(this.chartSVGid);
+   var svgFoot = document.getElementById(this.chartSVGidFoot);
   //get svg source.
   
   var headHeight = svgHead.height.baseVal.value;
@@ -629,8 +721,6 @@ ExpressionBar.prototype.prepareSVGForSaving = function(){
   sourceFoot = sourceFoot.replace(/^<svg/, '<svg y="' + footHeight + '" ');
   var source = '<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" \
   font-family="' + self.opt.fontFamily + '" font-size="' + self.opt.barHeight + 'px" width="'+svg_width+'px" height="'+svg_height+'px" >'
-    
-
 
   source += sourceHead;
   source += sourceMain;
@@ -640,31 +730,73 @@ ExpressionBar.prototype.prepareSVGForSaving = function(){
   source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
 
   return source;
-}
+};
+
+ExpressionBar.prototype.saveRenderedData = function(self){
+  //console.log("saveRenderedData");
+
+  var toSave = self.renderedData;
+  var selectedFactors = self.selectedFactors;
+  var output = '';
+  for(fact in selectedFactors){
+   // console.log(fact);
+    output += fact + "\t"
+    vals = selectedFactors[fact];
+    for(v in vals){
+      if(vals[v]){
+        output += v + ",";
+      }
+    }
+    output += "\n";
+  }
+  var renderedProperty = self.opt.renderProperty ;
+  output += "\t";
+  for(gene in toSave ){
+    output += renderedProperty + "\t" + "SEM" + "\t";
+  }
+  var filename = renderedProperty +  "_";
+  output += "\n\t";
+  for(gene in toSave ){
+    output += toSave[gene][0].gene + "\t" + toSave[gene][0].gene + "\t";
+    filename += toSave[gene][0].gene + "_";
+  }
+  filename += ".tsv"
+  output += "\n";
+
+  var total = toSave[0].length
+  
+  for(var i = 0; i < total; i++){
+    output += toSave[0][i].name + "(n=" + total + ")\t";
+
+    for(gene in toSave ){
+      output += toSave[gene][i].value + "\t" + toSave[gene][i].stdev + "\t";
+    }
+    output += "\n";
+  }
+
+  self.saveTextFile(filename, output);
+};
 
 ExpressionBar.prototype.saveRenderedSVG = function(){
   var source = this.prepareSVGForSaving();
   //convert svg source to URI data scheme.
   var url = 'data:image/svg+xml;charset=utf-8,'+ encodeURIComponent(source);
 
-  //set url value to a element's href attribute.
-  //document.getElementById(this.opt.target + '_save').href = url;
-  //you can download svg file by right click menu.
   var pom = document.createElement('a');
   pom.href = url;
   pom.setAttribute('download', 'expVIP_'+Date.now()+'plot.svg');
   if (document.createEvent) {
-       var event = document.createEvent('MouseEvents');
-        event.initEvent('click', true, true);
-        pom.dispatchEvent(event);
-    }
-    else {
-      console.log("Create event not working");
-   }
-  if(pom.parentElement){
-    pom.parentElement.removeChild(pom);
-  }
- 
+   var event = document.createEvent('MouseEvents');
+   event.initEvent('click', true, true);
+   pom.dispatchEvent(event);
+ }
+ else {
+  console.log("Create event not working");
+}
+if(pom.parentElement){
+  pom.parentElement.removeChild(pom);
+}
+
 };
 
 
@@ -672,20 +804,24 @@ ExpressionBar.prototype.saveRenderedSVG = function(){
  * Sets a Map with the available factors and the values from the json
  * response. 
  */
-ExpressionBar.prototype.setAvailableFactors = function(){
+ ExpressionBar.prototype.setAvailableFactors = function(){
    var groups = this.data.factorOrder;
    this.renderedOrder = jQuery.extend(true, {},  this.data.factorOrder);
    this.selectedFactors = jQuery.extend(true, {},  this.data.selectedFactors);
+   var factorOrder = this.data.defaultFactorOrder;
+   //console.log(factorOrder);
    this.factors = new Map();
-   for (var g in groups) {
-      for(var k in groups[g]){
-        if(! this.factors.has(g)){
-          this.factors.set(g, new Set());
-        }
-        var current_set = this.factors.get(g);
-        current_set.add(k);
-      }  
-   }
+   for (var fo in factorOrder) {
+    var g = factorOrder[fo];
+    //console.log(g);
+    for(var k in groups[g]){
+      if(! this.factors.has(g)){
+        this.factors.set(g, new Set());
+      }
+      var current_set = this.factors.get(g);
+      current_set.add(k);
+    }  
+  }
 };
 
 ExpressionBar.prototype.loadExpression = function(url) {
@@ -693,14 +829,19 @@ ExpressionBar.prototype.loadExpression = function(url) {
     return ;
   }
   var self = this;
+  self.pb.show();
   d3.json(url, function(error, json) {
     if (error) {
       console.warn(error);
       return;
     }
     self.data = json;
+    if(typeof self.data.compare === "undefined"){
+      self.data.compare = "";
+    }
+    self.pb.hide();
     self.dataLoaded();
-  })
+  });
 };
 
 
@@ -724,18 +865,34 @@ ExpressionBar.prototype.getGroupFactor = function(o,groupBy){
 
 ExpressionBar.prototype.getGroupFactorDescription = function(o,groupBy){
   var factorArray = [];
-  for (var i in groupBy) {
-    factorArray[i] =  o.factors[groupBy[i]];
+  //console.log(o);
+  var factorNames = this.data.longFactorName;
+  //console.log(factorNames);
+  
+  var numOfFactors = groupBy.length;
+
+  for(var i in groupBy) {
+    //console.log(i);
+    var grpby = groupBy[i];
+    //console.log(grpby);
+
+    var curr_fact = factorNames[grpby];
+    var curr_short =  o.factors[groupBy[i]]; 
+    var curr_long = curr_fact[curr_short];
+    factorArray[i] = curr_long;
+    if(numOfFactors > 4 || curr_long.length > 15 ){
+      factorArray[i] = curr_short;
+    }
   };
-  return factorArray.join();
+  return factorArray.join(", ");
 };
 
 ExpressionBar.prototype.calculateStats = function(newObject){
-    var v = science.stats.mean(newObject.data);
-    var stdev = Math.sqrt(science.stats.variance(newObject.data));
-    newObject['value'] = v;
-    newObject['stdev'] = stdev;
-    
+  var v = science.stats.mean(newObject.data);
+  var stdev = Math.sqrt(science.stats.variance(newObject.data));
+  newObject['value'] = v;
+  newObject['stdev'] = stdev;
+
 };
 
 ExpressionBar.prototype._prepareSingleObject = function(index, oldObject){
@@ -754,13 +911,13 @@ ExpressionBar.prototype._prepareSingleObject = function(index, oldObject){
 };
 
 ExpressionBar.prototype._prepareGroupedByExperiment = function(index, group){
-   var newObject= {};
-   newObject.renderIndex = index;
-   newObject.id = index;
-   newObject.name = this.data.groups[group].description;
-   newObject.data = [];
-   newObject.factors = this.data.groups[group].factors;
-   return newObject;
+ var newObject= {};
+ newObject.renderIndex = index;
+ newObject.id = index;
+ newObject.name = this.data.groups[group].description;
+ newObject.data = [];
+ newObject.factors = this.data.groups[group].factors;
+ return newObject;
 };
 
 ExpressionBar.prototype._prepareGroupedByFactor = function(index, description){
@@ -811,7 +968,7 @@ ExpressionBar.prototype._fillGroupByExperiment = function(index, gene, property)
       newObject.id = i++;
       innerArray.push(newObject);
     }
-     
+
   }
   return innerArray;
 };
@@ -826,7 +983,7 @@ ExpressionBar.prototype._fillGroupByFactor = function(index, gene, property, gro
  var o;
  var i = index;
  for(o in g){  
-  
+
   var description = this.getGroupFactorDescription(g[o], groupBy);
   if(names.indexOf(description) === -1){
     var newObject = this._prepareGroupedByFactor(i++, description);
@@ -836,50 +993,47 @@ ExpressionBar.prototype._fillGroupByFactor = function(index, gene, property, gro
     groups[description] = newObject;
     names.push(description);
   }
- }
- i = index;
- for(o in e){
+}
+i = index;
+for(o in e){
+
+  var group = g[e[data[o].experiment].group];
+
+  if(!this._isFiltered(group)){
     var description = this.getGroupFactorDescription(g[e[o].group], groupBy);
-    var group = g[e[data[o].experiment].group];
-
-    if(!this._isFiltered(group)){
-      groups[description].data.push(data[o].value);
-    }
+    groups[description].data.push(data[o].value);
   }
-  for(o in groups){
-    var newObject = groups[o];
-    if( newObject.data.length == 0){
-      continue;
-    }
-    this.calculateStats(newObject);
-    if(!this._isFiltered(newObject)){
-      newObject.renderIndex = i;
-      newObject.id = i++;
-      innerArray.push(newObject);
-    }
+}
+for(o in groups){
+  var newObject = groups[o];
+  if( newObject.data.length == 0){
+    continue;
   }
-  return innerArray;
+  this.calculateStats(newObject);
+  if(!this._isFiltered(newObject)){
+    newObject.renderIndex = i;
+    newObject.id = i++;
+    innerArray.push(newObject);
+  }
+}
+return innerArray;
 };
-
-
-
 
 
 ExpressionBar.prototype.getGroupedData = function(property, groupBy){
   var dataArray = [];
-  
   for(var gene in this.data.values){
-    if(!this.opt.showHomoeologues && gene != this.data.gene){
+    if(!this.opt.showHomoeologues &&  ( gene != this.data.gene &&  gene !=  this.data.compare ) ) {
       continue;
     }
     var i = 0;
     if(groupBy == 'ungrouped'){
-       var innerArray = []; 
-       var data = this.data.values[gene][property];
-      for(var o in data) {  
-        var oldObject = data[o];
-        var newObject = this._prepareSingleObject(i, oldObject);
-        newObject.gene = gene;
+     var innerArray = []; 
+     var data = this.data.values[gene][property];
+     for(var o in data) {  
+      var oldObject = data[o];
+      var newObject = this._prepareSingleObject(i, oldObject);
+      newObject.gene = gene;
         //console.log(newObject);
         var filtered = this._isFiltered(newObject)
         if (! filtered){
@@ -919,11 +1073,11 @@ ExpressionBar.prototype.sortRenderedGroups = function(sortOrder, factorOrder){
     }
     if (factorOrder[o][a.factors[o]] < factorOrder[o][b.factors[o]]) {
      return -1;
-    };
-  }
-  return a.id > b.id  ? 1 : -1;
- });
-  
+   };
+ }
+ return a.id > b.id  ? 1 : -1;
+});
+
  for ( i = 0; i < sorted.length; i++) {
    sorted[i].renderIndex = i;
  };
@@ -932,7 +1086,7 @@ ExpressionBar.prototype.sortRenderedGroups = function(sortOrder, factorOrder){
     var obj = this.renderedData[i][sorted[j].id];
     obj.renderIndex = sorted[j].renderIndex;
   };
- };
+};
 };
 
 ExpressionBar.prototype.isFactorPresent = function(factor) {
@@ -946,6 +1100,10 @@ ExpressionBar.prototype.isFactorPresent = function(factor) {
   }
 };
 
+ExpressionBar.prototype.getDefaultColour = function(){
+  return this.opt.groupBy[0];
+}
+
 ExpressionBar.prototype.refreshBar = function(gene, i){
   var data = this.renderedData;
   var dat = data[i];
@@ -958,7 +1116,8 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
   var headerOffset  = 0;
   
   if(! this.isFactorPresent(colorFactor)){
-    colorFactor = 'renderGroup';
+    //colorFactor = 'renderGroup';
+    colorFactor = this.getDefaultColour();
   }
 
   var getY = function(d,j){
@@ -992,94 +1151,95 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
   
   var lines = bar.selectAll('line').transition().duration(1000).ease("cubic-in-out")
      // .attr('x1', gXOffset)
-      .attr('y1', function(d,j) {return getY(d,j) + (barHeight/2) })
-      .attr('y2', function(d,j) {return getY(d,j) + (barHeight/2) } )
-      .attr('x2', function(d,j) {
-        var ret =x(dat[j].value + dat[j].stdev); 
-        if(isNaN(ret)){
-          ret = 0;
-        }
-        return ret} )
-      .attr('x1', function(d,j) { 
-        var left = dat[j].value - dat[j].stdev;
-        if(isNaN(left)){
-          left = 0;
-        }
-        if(left < 0){
-          left = 0
-        }
+     .attr('y1', function(d,j) {return getY(d,j) + (barHeight/2.0) })
+     .attr('y2', function(d,j) {return getY(d,j) + (barHeight/2.0) } )
+     .attr('x2', function(d,j) {
+      var ret =x(dat[j].value + dat[j].stdev); 
+      if(isNaN(ret)){
+        ret = 0;
+      }
+      return ret} )
+     .attr('x1', function(d,j) { 
+      var left = dat[j].value - dat[j].stdev;
+      if(isNaN(left)){
+        left = 0;
+      }
+      if(left < 0){
+        left = 0
+      }
 
-        return x(left);
-      })
-      .attr('stroke-width', 2)
-      .attr('stroke', 'black');
+      return x(left);
+    })
+     .attr('stroke-width', 2)
+     .attr('stroke', 'black');
+   }; 
 
-}; 
 
-
-ExpressionBar.prototype.refresh = function(){
-  var chart=this.chart;
-  this.renderedData = this.getGroupedData(this.opt.renderProperty,this.opt.groupBy);
-  this.totalRenderedGenes = this.totalGenes;
-  if(!this.opt.showHomoeologues){
-    this.totalRenderedGenes = 1;
-  }
-  this.x.domain([0,this.maxInData()]);
-  var gene = this.opt.highlight;
-  for (var i in  this.renderedData) {
-    this.refreshBar(gene, i);
+   ExpressionBar.prototype.refresh = function(){
+    var chart=this.chart;
+    this.renderedData = this.getGroupedData(this.opt.renderProperty,this.opt.groupBy);
+    this.totalRenderedGenes = this.renderedData.length;
+    this.x.domain([0,this.maxInData()]);
+    var gene = this.opt.highlight;
+    for (var i in  this.renderedData) {
+      this.refreshBar(gene, i);
+    };
+    this.refreshTitles();
+    this.refreshScale();
   };
-  this.refreshTitles();
-  this.refreshScale();
-};
 
-ExpressionBar.prototype.renderGeneBar = function( i){
-  var data = this.renderedData;
-  var dat = data[i];
-  var render_width = this.calculateBarWidth();
-  var barHeight = this.opt.barHeight;
-  var labelWidth = this.opt.labelWidth;
-  var x=this.x;
-  var sc = this.opt.sc;
-  var blockWidth = (this.opt.width - this.opt.labelWidth) / this.totalRenderedGenes;
-  var gXOffset = (blockWidth * i) + labelWidth;
-  bar = this.barGroup.append('g');
-  bar.attr('transform', 'translate(' + gXOffset  + ',' + barHeight + ')');
-  var gene = '';
-  
-  for(var j in  dat){
-    var d = dat[j];
-    var y = (barHeight * d.renderIndex  ) ;
-    bar.append('rect')
-    .attr('y', y)
-    .attr('height', barHeight - 2)
-    .attr('fill', 'white')
-    .attr('width', x(0))
-    .on('mouseenter', function(da,k){
+  ExpressionBar.prototype.renderGeneBar = function( i){
+    var data = this.renderedData;
+    var dat = data[i];
+    var render_width = this.calculateBarWidth();
+    var barHeight = this.opt.barHeight;
+    var labelWidth = this.opt.labelWidth;
+    var x=this.x;
+    var sc = this.opt.sc;
+    var blockWidth = (this.opt.width - this.opt.labelWidth) / this.totalRenderedGenes;
+    var gXOffset = (blockWidth * i) + labelWidth;
+    bar = this.barGroup.append('g');
+    bar.attr('transform', 'translate(' + gXOffset  + ',' + barHeight + ')');
+    var gene = '';
 
-      var pos = d3.select(this).position(this);
-      //This uses the position relative to the svg of the container to figure out
-      //the index. I tried to get the index from the function or the context, but it
-      //didn't work.  
-      var index = ((pos.top ) / self.opt.barHeight)-1;
-      currentData = self.renderedData;
-      var tooltip =  self.opt.renderProperty + ': ' + numberWithCommas(currentData[i][index].value);
-      self.showTooltip(tooltip, this)})  
-    .on('mouseleave', function(){self.hideTooltip()});
-   
-    bar.append('line').attr('x1', 0)
+    for(var j in  dat){
+      var d = dat[j];
+      var y = (barHeight * d.renderIndex  ) ;
+
+      var rect = bar.append('rect')
+      .attr('y', y)
+      .attr('height', barHeight - 2)
+      .attr('fill', 'white')
+      .attr('width', x(0))
+      .on('mouseenter', function(da,k){
+        var pos = d3.select(this).position(this);
+        var index = ((pos.top ) / self.opt.barHeight)-1;
+        var tooltip =  self.opt.renderProperty + ': ' +
+        numberWithCommas(da.value) ;
+        self.showTooltip(tooltip, this);
+        self.showHighlightedFactors(da, this);
+      }
+      )
+      .on('mouseleave', function(){
+        self.hideTooltip();
+        self.hideHighlightedFactors();
+      });
+      
+      rect.data([d]); //Bind the data to the rect
+
+      bar.append('line').attr('x1', 0)
       .attr('y1', y + (barHeight/2))
       .attr('x2', 0)
       .attr('y2', y + (barHeight/2) )
-      .attr('stroke-width', 2)
+      .attr('stroke-width', 1)
       .attr('stroke', 'black');
-  }
- 
-};
+    }
+
+  };
 
 
-ExpressionBar.prototype.calculateBarWidth = function(){  
-  var availableWidth = this.opt.width - this.opt.labelWidth
+  ExpressionBar.prototype.calculateBarWidth = function(){  
+    var availableWidth = this.opt.width - this.opt.labelWidth
   var widthPerBar = (availableWidth / this.totalRenderedGenes ) - 10; // 10 px of border. maybe dynamic?
   return widthPerBar;
 };
@@ -1102,14 +1262,14 @@ ExpressionBar.prototype.prepareColorsForFactors = function(){
   this.totalColors = 8
   self = this;
   var colors = [
-    colorbrewer['Pastel2'][this.totalColors],
-    colorbrewer['Accent'][this.totalColors],
-    colorbrewer['Dark2'][this.totalColors],
-    colorbrewer['Set1'][this.totalColors],
-    colorbrewer['Set2'][this.totalColors],
-    colorbrewer['Paired'][this.totalColors],
-    colorbrewer['Pastel1'][this.totalColors], 
-    colorbrewer['Set3'][this.totalColors]
+  colorbrewer['Pastel2'][this.totalColors],
+  colorbrewer['Accent'][this.totalColors],
+  colorbrewer['Dark2'][this.totalColors],
+  colorbrewer['Set1'][this.totalColors],
+  colorbrewer['Set2'][this.totalColors],
+  colorbrewer['Paired'][this.totalColors],
+  colorbrewer['Pastel1'][this.totalColors], 
+  colorbrewer['Set3'][this.totalColors]
   ];
   this.factorColors= new Map();  
   var i = 0;  
@@ -1140,9 +1300,9 @@ ExpressionBar.prototype.refreshTitles = function(){
 
   this.titleGroup.selectAll('text').transition().duration(1000).ease("cubic-in-out")
   .attr('y', function(d,i){
-     var pos = arr[i].renderIndex ; 
-    return (((pos + 1 ) * barHeight) - 5 ) + headerOffset;
-  });
+   var pos = arr[i].renderIndex ; 
+   return (((pos + 1 ) * barHeight)) + headerOffset;
+ });
 
 };
 
@@ -1152,30 +1312,30 @@ ExpressionBar.prototype.renderGeneTitles = function(i){
    var dat = data[i];
    if (typeof dat === 'undefined') { 
     return ;
-   }
-    if (typeof dat[0] === 'undefined') { 
+  }
+  if (typeof dat[0] === 'undefined') { 
     return ;
-   }
-   var render_width = this.calculateBarWidth();
-   var barHeight = this.opt.barHeight;
-   var labelWidth = this.opt.labelWidth;
-   var x=this.x;
-   var sc = this.opt.sc;
-   var blockWidth = (this.opt.width - this.opt.labelWidth) / this.totalRenderedGenes;
-   var gXOffset = (blockWidth * i) + labelWidth;
-   bar = this.factorTitle.append('g');
-   bar.attr('transform', 'translate(' + gXOffset  + ',' + barHeight + ')');
-   var gene = dat[0].gene;
-   var weight = 100;
-   var decoration = ''
-   if(gene == this.data.gene){
-      weight = 900;
-      decoration = 'underline';
-   } 
+  }
+  var render_width = this.calculateBarWidth();
+  var barHeight = this.opt.barHeight;
+  var labelWidth = this.opt.labelWidth;
+  var x=this.x;
+  var sc = this.opt.sc;
+  var blockWidth = (this.opt.width - this.opt.labelWidth) / this.totalRenderedGenes;
+  var gXOffset = (blockWidth * i) + labelWidth;
+  bar = this.factorTitle.append('g');
+  bar.attr('transform', 'translate(' + gXOffset  + ',' + barHeight + ')');
+  var gene = dat[0].gene;
+  var weight = 100;
+  var decoration = ''
+  if(gene == this.data.gene){
+    weight = 900;
+    decoration = 'underline';
+  } 
 
-   bar.append('text')
-   .attr('x',0)
-    .attr('y', 10)
+  bar.append('text')
+  .attr('x',0)
+  .attr('y', 10)
     //  .attr('dx', '.35em')
     .attr('width', blockWidth)
     .attr('height', barHeight)
@@ -1184,10 +1344,10 @@ ExpressionBar.prototype.renderGeneTitles = function(i){
     .attr('text-decoration', decoration)
     .text(gene); 
 
-};
+  };
 
-ExpressionBar.prototype.refreshScale = function(){
-  var axisScale = this.x;
+  ExpressionBar.prototype.refreshScale = function(){
+    var axisScale = this.x;
 //  console.log(axisScale);
   //Create the Axis
   var xAxis = d3.svg.axis().scale(axisScale).ticks(3);
@@ -1195,7 +1355,7 @@ ExpressionBar.prototype.refreshScale = function(){
   var toUpdate = this.svgFootContainer.selectAll("g.x.axis")
   //console.log(toUpdate);
   toUpdate.transition().duration(1000).ease("cubic-in-out").call(xAxis);//ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
-                    
+
 }
 
 ExpressionBar.prototype.renderScales = function(i){
@@ -1208,10 +1368,10 @@ ExpressionBar.prototype.renderScales = function(i){
 //  console.log(axisScale);
   //Create the Axis
   var xAxis = d3.svg.axis()
-                     .scale(axisScale).ticks(3);
+  .scale(axisScale).ticks(3);
   //Create an SVG group Element for the Axis elements and call the xAxis function
   var xAxisGroup = this.svgFootContainer.append("g").attr("class", "x axis")
-                                .call(xAxis);
+  .call(xAxis);
 
   var blockWidth = (this.opt.width - this.opt.labelWidth) / this.totalRenderedGenes;                            
   var gXOffset = (blockWidth * i) + this.opt.labelWidth;                              
@@ -1229,16 +1389,16 @@ ExpressionBar.prototype.renderFactorTitles = function(){
   var self = this;
   this.factors.forEach(function(value, key, map){
     self.factorTitle.append('text')
-     .attr('y', xFact)
-     .attr('dx', '-2.0em')
-     .attr('dy', '1em')
-     .attr('transform', function(d) {
-         return 'rotate(-90)' 
-      })
+    .attr('y', xFact)
+    .attr('dx', '-2.0em')
+    .attr('dy', '1em')
+    .attr('transform', function(d) {
+     return 'rotate(-90)' 
+   })
      //.style('font-size','10px') 
      .text(key);
-    xFact += self.opt.groupBarWidth;
-  });
+     xFact += self.opt.groupBarWidth;
+   });
 };
 
 ExpressionBar.prototype.renderTitles = function(){
@@ -1257,11 +1417,13 @@ ExpressionBar.prototype.renderTitles = function(){
     var pos = arr[i].renderIndex ; 
     this.titleGroup.append('text')
     .attr('x',titleSetOffset)
-    .attr('y', (((pos + 1 ) * barHeight) -5 ) + headerOffset)
+    .attr('y', (((pos + 1 ) * barHeight)  ) + headerOffset)
     .attr('dx', '.35em')
     .attr('height', barHeight - 2)
-    .on('click', function(){self.setFactorColor('renderGroup')})
-    .text(arr[i].name + '(n=' + arr[i].data.length +  ')');
+    .on('click', function(){
+      self.setFactorColor('renderGroup')
+    })
+    .text(arr[i].name + ' (n=' + arr[i].data.length +  ')');
     var xFact = 0;
     this.factors.forEach(function(value, key, map){
       var factorValue = arr[i].factors[key];
@@ -1284,7 +1446,7 @@ ExpressionBar.prototype.renderTitles = function(){
           self.sortRenderedGroups(self.sortOrder, self.renderedOrder);
           self.setFactorColor(key);
           self.refresh();
-         })
+        })
         .on('mouseleave', function(){self.hideTooltip()});
         rect.attr('opacity', 1.0);
       }
@@ -1310,34 +1472,71 @@ ExpressionBar.prototype.renderTooltip = function(){
   .attr('visibility', 'hidden')
 };
 
+ExpressionBar.prototype.renderSelection = function(){
+  var barHeight = this.opt.barHeight;
+  this.selectionBox = this.chart.append('rect')
+  .attr('y', 10)
+  .attr('height', barHeight )
+  .attr('width', this.opt.width)
+  .attr('fill', 'lightgray')
+  .attr('font-size', 10)
+
+//  .attr('visibility', 'hidden')
+};
+
+ExpressionBar.prototype.highlightRow = function(target){
+  var d3SVG = d3.select(target);
+  var mouse = d3.mouse(target);
+  var index = Math.floor(mouse[1]/self.opt.barHeight);
+  if(index == 0){
+    index = 1;
+  }
+  var elements = this.renderedData[0].length;
+  if(index > elements ){
+    index = elements;
+  }
+  var pos = index  * this.opt.barHeight;
+  this.selectionBox.attr('y', pos); 
+}
+
+ExpressionBar.prototype.showHighithRow = function(){
+ this.selectionBox.attr('visibility', 'visible'); 
+}
+
+ExpressionBar.prototype.hideHidelightRow = function(){
+  this.selectionBox .attr('visibility', 'hidden');
+}
+
+
+
 ExpressionBar.prototype.showTooltip = function(mouseovertext, evt) {
-    var tooltip = this.tooltip;
-    var coordinates = [0, 0];
-    coordinates = d3.mouse(evt);
+  var tooltip = this.tooltip;
+  var coordinates = [0, 0];
+  coordinates = d3.mouse(evt);
 
-    var svgPosition = d3.select(evt).position(this);
-    var x = svgPosition.left + 11  ;
-    var y = svgPosition.top +  27 ;
- 
-    var svg1 = document.getElementById(this.chartSVGid);
-    var bBox = svg1.getBBox();
- 
-    max =  bBox.height - this.opt.barHeight;
-    if(y > max){
-      y = max;
-    }
+  var svgPosition = d3.select(evt).position(this);
+  var x = svgPosition.left + 11  ;
+  var y = svgPosition.top +  27 ;
 
-    tooltip.attr('x', x);
-    tooltip.attr('y', y);
-    tooltip.text(mouseovertext);
-    var textBox = tooltip.node().getBBox();
-    var padding = 2;
-    this.tooltipBox.attr('x', textBox.x - padding);
-    this.tooltipBox.attr('y', textBox.y - padding);
-    this.tooltipBox.attr('width', textBox.width + (padding*2))
-    this.tooltipBox.attr('height', textBox.height + (padding*2))
-    tooltip.attr('visibility', 'visible');
-    this.tooltipBox.attr('visibility', 'visible');
+  var svg1 = document.getElementById(this.chartSVGid);
+  var bBox = svg1.getBBox();
+
+  max =  bBox.height - this.opt.barHeight;
+  if(y > max){
+    y = max;
+  }
+
+  tooltip.attr('x', x);
+  tooltip.attr('y', y);
+  tooltip.text(mouseovertext);
+  var textBox = tooltip.node().getBBox();
+  var padding = 2;
+  this.tooltipBox.attr('x', textBox.x - padding);
+  this.tooltipBox.attr('y', textBox.y - padding);
+  this.tooltipBox.attr('width', textBox.width + (padding*2))
+  this.tooltipBox.attr('height', textBox.height + (padding*2))
+  tooltip.attr('visibility', 'visible');
+  this.tooltipBox.attr('visibility', 'visible');
 }
 
 ExpressionBar.prototype.hideTooltip = function() {
@@ -1345,6 +1544,15 @@ ExpressionBar.prototype.hideTooltip = function() {
   this.tooltipBox.attr('visibility', 'hidden');
 }
 
+ExpressionBar.prototype.saveTextFile = function(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
 
 ExpressionBar.prototype.render = function() {
   var chart=this.chart;
@@ -1355,16 +1563,13 @@ ExpressionBar.prototype.render = function() {
   var labelWidth = this.opt.labelWidth
   var groupBy = this.opt.renderGroup;
   this.totalGenes = Object.keys(this.data.values).length; 
-  this.totalRenderedGenes = this.totalGenes;
-  if(!this.opt.showHomoeologues){
-    this.totalRenderedGenes = 1;
-  }
+  this.totalRenderedGenes = data.length;
+
   var barWidth = this.calculateBarWidth();
   this.renderedData = data;
   this.x = d3.scale.linear().range([0, barWidth]);
   this.x.domain([0,this.maxInData()])
   var x=this.x;
-
 
   this.totalHeight = barHeight * (data[0].length + 2 )  ;
   chart.attr('height', this.totalHeight );
@@ -1372,6 +1577,7 @@ ExpressionBar.prototype.render = function() {
   this.chartFoot.selectAll("*").remove();
   this.chartHead.selectAll("*").remove();
   
+  this.renderSelection(); 
   this.renderFactorTitles();
   this.renderTitles();
   this.barGroup = chart.append('g');
@@ -1382,8 +1588,8 @@ ExpressionBar.prototype.render = function() {
     this.renderGeneTitles(i);
     this.renderScales(i);
   }
+
   this.renderTooltip(); 
-  
 };
 
 
@@ -1392,9 +1598,16 @@ ExpressionBar.prototype.dataLoaded = function(){
   this.prepareColorsForFactors();
   this.refreshSVG(this);
   this.renderPropertySelector();
-  this.renderMergeButton();
-  this.renderSortWindow();
   
+  this.renderSortWindow();
+  this.checkSelectedFactors();
+
+  if(typeof this.data.compare === "undefined" || this.data.compare.length == 0){
+     jQuery( '#' + this.opt.target + '_homSpan' ).show();
+  }else{
+     jQuery( '#' + this.opt.target + '_homSpan' ).hide();
+  }
+
 };
 
 
