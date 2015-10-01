@@ -63,7 +63,7 @@ class GenesController < ApplicationController
   def show
     session[:studies] = params[:studies] if  params[:studies] 
     studies = session[:studies]
-    conmpare = ""
+    compare = ""
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
