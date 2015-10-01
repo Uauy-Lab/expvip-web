@@ -18,7 +18,11 @@ class GenesController < ApplicationController
      # logger.debug params
       @gene =  Gene.find_by(:name=>gene_name)
       @gene = Gene.find_by(:gene=>gene_name) unless  @gene
-      redirect_to :back and return unless @gene   
+      unless @gene
+        flash[:error] = "Gene not found: #{gene_name}"
+        redirect_to :back
+        return    
+      end
       #"commit" "Compare" 
       #TODO: Show error message on the way back.
 
@@ -26,6 +30,12 @@ class GenesController < ApplicationController
       session[:studies] = params[:studies] if  params[:studies] 
 
       if params[:commit] == "Compare"
+
+        unless @compare
+          flash[:error] = "Gene to compare not found: #{params[:compare]}"
+          redirect_to :back
+          return
+        end    
         redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name 
       else
         redirect_to  action: "show", id: @gene.id, studies: params[:studies]
@@ -64,10 +74,24 @@ class GenesController < ApplicationController
     session[:studies] = params[:studies] if  params[:studies] 
     studies = session[:studies]
     compare = ""
+    alert = ""
+    homs = Homology.where("Gene_id = :gene", {gene: @gene.id}).first
+    hom_counts = homs.total
+    if hom_counts != 3
+      alert += "#{@gene.name} has #{hom_counts - 1} homoeologues \n"
+    end
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
+      hom_counts = Homology.where("Gene_id = :gene", {gene: @compare.id}).count
+      if hom_counts != 3
+        alert += "#{@compare.name} has #{hom_counts - 1} homoeologues\n"
+      end
       compare = @compare.transcript
+    end
+  
+    if alert.size > 0
+       flash[:info] = "#{alert}"
     end
 
     @args = {studies: studies, compare: compare }.to_query
@@ -115,13 +139,13 @@ class GenesController < ApplicationController
 
   # DELETE /genes/1
   # DELETE /genes/1.json
-  def destroy
-    @gene.destroy
-    respond_to do |format|
-      format.html { redirect_to genes_url, notice: 'Gene was successfully destroyed.' }
-      format.json { head :no_content }
-    end
-  end
+  #def destroy
+    #@gene.destroy
+  #  respond_to do |format|
+      #format.html { redirect_to genes_url, notice: 'Gene was successfully destroyed.' }
+      #format.json { head :no_content }
+  #  end
+  #end
 
   private
     # Use callbacks to share common setup or constraints between actions.

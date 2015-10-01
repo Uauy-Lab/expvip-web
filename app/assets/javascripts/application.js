@@ -34,6 +34,13 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
+  $(".alert-error").on("click", function(event) { 
+    $(this).hide();
+  });
+  $(".alert-info").on("click", function(event) { 
+    $(this).hide();
+  });
+
 });
 
 $(document).ready(ready);
