@@ -680,15 +680,18 @@ ExpressionBar.prototype.renderGroupSelectorColour = function(){
 ExpressionBar.prototype.saveRenderedPNG = function(){
   var svgData = this.prepareSVGForSaving();
   var canvas = document.createElement( 'canvas' );
-  canvas.height = this.opt.headerOffset + 20 + this.totalHeight ;
-  canvas.width = this.opt.width;
+  var scaleBy = 10;
+  canvas.height = scaleBy * ( this.opt.headerOffset + 20 + this.totalHeight );
+  canvas.width = scaleBy *  this.opt.width;
   var ctx = canvas.getContext( '2d' );
   var img = new Image();
-  img.width = this.opt.width;
-  img.height = this.opt.headerOffset + 20 + this.totalHeight ;
+  
+  //img.width = this.opt.width * scaleBy; 
+  //img.height = (this.opt.headerOffset + 20 + this.totalHeight) * scaleBy ;
   img.src = "data:image/svg+xml;base64," + btoa( svgData );
+  img.style='width:100%'
   img.onload = function() {
-    ctx.drawImage(img, 0, 0);
+    ctx.drawImage(img, 0, 0, canvas.width , canvas.height);
     var canvasdata = canvas.toDataURL('image/png');
     var a = document.createElement('a');
     a.download = 'expVIP_'+Date.now()+'.png';
@@ -720,7 +723,9 @@ ExpressionBar.prototype.prepareSVGForSaving = function(){
   sourceMain = sourceMain.replace(/^<svg/, '<svg y="' + headHeight + '" ');
   sourceFoot = sourceFoot.replace(/^<svg/, '<svg y="' + footHeight + '" ');
   var source = '<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" \
-  font-family="' + self.opt.fontFamily + '" font-size="' + self.opt.barHeight + 'px" width="'+svg_width+'px" height="'+svg_height+'px" >'
+  font-family="' + self.opt.fontFamily + '" font-size="' + self.opt.barHeight + 'px" \
+  width="'+ svg_width  +'px" height="' + svg_height   + 'px" \
+  viewbox="0 0 ' + svg_width + ' '   + svg_height + '">'
 
   source += sourceHead;
   source += sourceMain;
@@ -766,7 +771,7 @@ ExpressionBar.prototype.saveRenderedData = function(self){
   var total = toSave[0].length
   
   for(var i = 0; i < total; i++){
-    output += toSave[0][i].name + "(n=" + total + ")\t";
+    output += toSave[0][i].name + "(n=" + toSave[0][i].data.length  + ")\t";
 
     for(gene in toSave ){
       output += toSave[gene][i].value + "\t" + toSave[gene][i].stdev + "\t";
