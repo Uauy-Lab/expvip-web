@@ -88,7 +88,6 @@ class GenesController < ApplicationController
 
   # GET /genes/new
   def new
-    @gene = Gene.new
   end
 
   # GET /genes/1/edit
@@ -98,31 +97,11 @@ class GenesController < ApplicationController
   # POST /genes
   # POST /genes.json
   def create
-    @gene = Gene.new(gene_params)
-
-    respond_to do |format|
-      if @gene.save
-        format.html { redirect_to @gene, notice: 'Gene was successfully created.' }
-        format.json { render :show, status: :created, location: @gene }
-      else
-        format.html { render :new }
-        format.json { render json: @gene.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
   # PATCH/PUT /genes/1
   # PATCH/PUT /genes/1.json
   def update
-    respond_to do |format|
-      if @gene.update(gene_params)
-        format.html { redirect_to @gene, notice: 'Gene was successfully updated.' }
-        format.json { render :show, status: :ok, location: @gene }
-      else
-        format.html { render :edit }
-        format.json { render json: @gene.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
   # DELETE /genes/1
