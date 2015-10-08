@@ -43,8 +43,8 @@ namespace :load_data do
 		  		#experiment.age = row["Age"]
 		  		#experiment.stress = row["Stress/disease"]
 		  		experiment.accession = row["run_accession"]
-          experiment.total_reads = row["Total reads"].to_i
-          experiment.mapped_reads = row["Mapped reads"].to_i
+          experiment.total_reads = row["Total reads"].to_i if row["Total reads"]
+          experiment.mapped_reads = row["Mapped reads"].to_i if row["Mapped reads"] 
           experiment.study = study
 		  		experiment.save!
 
@@ -107,8 +107,9 @@ namespace :load_data do
     			g = Gene.new 
     			g.gene_set = gene_set
     			g.name = arr.shift
-				arr.each { |e| g.add_field(e) }
-				g.save!
+				  
+          arr.each { |e| g.add_field(e) }
+				  g.save!
   			end
 		end
   	end

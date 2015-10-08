@@ -1,9 +1,45 @@
 # README #
 
+##Requirements ##
+exVIP requires to have installed ```ruby 2.1``` or later. 
+
+* ```ruby 2.1``` or newer
+* ```MySQL 5.5``` or newer. May work with other Databases, but it hasn't been tested
+* ```Kallisto 0.42.3``` Optional. You need to get it from [here](http://pachterlab.github.io/kallisto/) and set it up in your ```$PATH```. *** Kallisto is free for non commercial use. Refer to the license in it's website ***
+
+
+## Getting exVIP ##
+
+
+To load the required gems, run ```bundle install``
+
+##Setting up the database ##
+If you are using the provided VM, you can skip this step, as it is already setup. 
+
+expVIP is developed on ```MySQL 5.5```. However, other databases may work as the queries are generated using ```ActiveRecord```. To set your database, you need to modify the file ```config/database.yml``` with the relevant information.
+
+```yml
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  database: "expvip"
+  username: expvipUSR
+  password: expvipPWD
+  host: 127.0.0.1
+  port: 3306
+```
+
+You need to create the database in ```MySQL```. However, the tables can be created directly with the following ```rake``` task: 
+
+```sh
+rake db:migrate
+```
+
 
 ##Loading data ##
 
 To laod data in the database, a set of rake tasks is provded. 
+
 
 ###Available factors and their order. 
 The first thing to do is to setup the available factors. Each file looks like:
@@ -49,7 +85,7 @@ done
 ```
 ###Experiment Metadata ###
 
-The second step is to load the experiment meta data. Currently, a tab separated file is the input and it must contain the following columns with the header named exactly as stated:
+The second step is to load the experiment meta data. Currently, a tab separated file is the input and it **must** contain the following columns with the header named exactly as stated:
 
 * **secondary\_study\_accession**
 * **run\_accession**
@@ -71,12 +107,13 @@ The second step is to load the experiment meta data. Currently, a tab separated 
 * **High level stress/disease**
 
 
-
 The rake task is :
 
 ```sh
 rake load_data:metadata[metadata.txt]
 ```
+
+If ```Mapped reads``` and ```Total reads``` are missing, you need to run the ```Kallisto``` mapping from the ```rake``` task. 
 
 ### Loading the gene sets ###
 Before loading the actual expression, it is necesary to load the gene models. Currently, only the fasta file with the cdna from ensembl is supported. The fasta header should contain the following fields, besides the gene name (first string in the header).
@@ -90,6 +127,22 @@ Before loading the actual expression, it is necesary to load the gene models. Cu
 ```sh
 rake load_data:ensembl_genes[IWGSC2.26,/Triticum_aestivum.IWGSC2.26.cdna.all.fa]
 ```
+
+The fasta file looks like:
+
+```
+>Traes_5BL_3FC5BA305.1 cdna:novel scaffold:IWGSC2:IWGSC_CSS_5BL_scaff_1082268:5:199:-1 gene:Traes_5BL_3FC5BA305 transcript:Traes_5BL_3FC5BA305.1
+TGCTGCTGCTAGGCTTGAAGAGGTTGCTGGCAAGCTCCAGTCTGCTCGGCAGCTCATTCA
+GAGGGGCTGTGAGGAGTGCCCCAAGAACGAGGATGTTTGGTTCGAGGCATGCCGGTTGGC
+TAGCCCAGATGAGTCAAAGGCAGTAATTGCCAGGGGTGTGAAGGCAATTCCCAACTCTGT
+GAAGCTGTGGCTGCA
+>Traes_6BL_9BB648D51.1 cdna:novel scaffold:IWGSC2:IWGSC_CSS_6BL_scaff_430516:302:1741:-1 gene:Traes_6BL_9BB648D51 transcript:Traes_6BL_9BB648D51.1
+TCCCTATCTGTTTCCTTGGCAGCTCCCTGATCCAATCGATCCATCAGGGCTCGACTAACT
+TCTTCCAGCGCCTCTTCAGCGCGGGAGATCTACCAGCGTCGGCGGAGGGGCGTAGGTGCA
+GGCGTGCAGCCCAAGTCCGCACCCGGCTCTAGGTTTCTGCTAATCTTCTTCCACCTGTGA
+TACGCGCTCCGGGGCTAGGAGCACTCGTTGCCGGCTGCCTCGTGCTCGGAATGGCGGATG
+```
+
 #Loading the homologies
 In order to show the homoeologues, a file with the homoeologies must bue loaded. The file is tab separated with the following format:
 
@@ -103,7 +156,7 @@ Traes_2AL_1368BE0AD	Traes_2AL_1368BE0AD	Traes_2BL_CD459994C1		2	A
 
 Note that the gene names are not the same as the transcript names, they correspond to the gene name. The file can be genrated with ensembl compara, using the following query:
 
-```
+```sql
 SELECT 
 	homology_member.homology_id, cigar_line, perc_cov, perc_id, perc_pos, 
 	gene_member.stable_id as genes, 
@@ -131,11 +184,26 @@ rake load_data:homology[IWGSC2.26,/homology.txt]
 
 ###Loading values ###
 
+
+#### Single big table ####
 The values are stored in a single long table. This allows to get new values, should we want to.  In order to load the data, the task ```load_data:values``` is provided. The table must contain a column ```target_id``` that has the gene name, as the first field in the fasta file used for the mapping. The rest of the columns most contain a header with the accession of the experiment. Each row represents a value. All the values in the table must be from the same time. For exaple, to load the TPMs, the following command is used. 
 
 ```sh
-rake "load_data:values[First run,IWGSC2.26,fpkm,edited_final_output_tpm.txt]"
+rake "load_data:values[First run,IWGSC2.26,tpm,edited_final_output_tpm.txt]"
 ```
+
+
+#### Running Kallisto ####
+
+You can load the data directly to the database provided that you generated the ```Kallisto``` index on your reference:
+
+
+```
+kallisto index --index=Triticum_aestivum.IWGSC2.26.cdna.all.fa.kallisto.k31 Triticum_aestivum.IWGSC2.26.cdna.all.fa
+```
+
+You can modify the index options as you find it suitable.
+
 
 
 

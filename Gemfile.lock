@@ -149,8 +149,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bio (>= 1.4.3)
-  bio-kallisto (>= 0.1.0)
+  bio (~> 1.4.3)
+  bio-kallisto (~> 0.1.0)
   byebug
   coffee-rails (~> 4.1.0)
   jbuilder (~> 2.0)

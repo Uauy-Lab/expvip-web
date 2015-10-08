@@ -82,9 +82,7 @@ genes.each_pair do |name, gene|
 		h.rows.each do |r|  
 			g = r["gene"]
 			total_homs += 1 unless g.name == name
-			#puts g.chromosome
 			if g.chromosome
-			#	puts g.chromosome
 				to_print[g.genome_index] = g.name if g.group == group
 			end
 		end

@@ -25,9 +25,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'mysql2' 
 
-gem "bio", ">= 1.4.3"
+gem "bio", "~> 1.4.3"
 
-gem "bio-kallisto", ">= 0.1.0"
+gem "bio-kallisto", "~> 0.1.0"
 
 gem 'jquery-ui-rails'
 
