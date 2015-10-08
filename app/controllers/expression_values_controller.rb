@@ -228,16 +228,17 @@ class ExpressionValuesController < ApplicationController
   end
 
   def getDefaultOrder 
+    #This should be a table in the DB at some point
     defOrder = [
         "study",
-        "High level age", 
-        "Age", 
         "High level tissue",
         "Tissue",
-        "High level variety",
-        "Variety",
+        "High level age", 
+        "Age", 
         "High level Stress-disease", 
         "Stress-disease"
+        "High level variety",
+        "Variety"
     ]
     return defOrder
   end
