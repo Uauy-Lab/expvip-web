@@ -17,9 +17,7 @@ namespace :updatenames do
 		puts "Updating studies"
 		ActiveRecord::Base.transaction do
 			CSV.foreach(args[:filename], :headers=>true, :col_sep=>",") do |row|
-				#puts row.inspect
 				study = Study.find_by(:accession=>row["secondary_study_accession"])
-				#puts study.inspect
 				study.title=row["study_title"]
 				study.save!
 			end

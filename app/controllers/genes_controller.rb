@@ -75,25 +75,13 @@ class GenesController < ApplicationController
     studies = session[:studies]
     compare = ""
     alert = ""
-    homs = Homology.where("Gene_id = :gene", {gene: @gene.id}).first
-    hom_counts = homs.total
-    if hom_counts != 3
-      alert += "#{@gene.name} has #{hom_counts - 1} homoeologues \n"
-    end
+   
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
-      hom_counts = Homology.where("Gene_id = :gene", {gene: @compare.id}).count
-      if hom_counts != 3
-        alert += "#{@compare.name} has #{hom_counts - 1} homoeologues\n"
-      end
       compare = @compare.transcript
     end
   
-    if alert.size > 0
-       flash[:info] = "#{alert}"
-    end
-
     @args = {studies: studies, compare: compare }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end
