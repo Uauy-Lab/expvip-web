@@ -78,7 +78,7 @@ Alternatively, a single file with all the factors on the same columns can be use
 To load several files of factors do the following:
 
 ```sh
-for f in ./FactorOrders/*.tsv; do 
+for f in ./test/default_setup/FactorOrders/*.tsv; do 
 	rake load_data:factor[$f]; 
 done
 
@@ -99,8 +99,8 @@ The second step is to load the experiment meta data. Currently, a tab separated 
 * **Manuscript**
 * **Group\_for\_averaging**
 * **Group\_number\_for\_averaging**
-* **Total reads**	
-* **Mapped reads**
+* **Total reads**	(optional)
+* **Mapped reads**  (optional)
 * **High level variety**
 * **High level tissue**
 * **High level age**
@@ -110,7 +110,7 @@ The second step is to load the experiment meta data. Currently, a tab separated 
 The rake task is :
 
 ```sh
-rake load_data:metadata[metadata.txt]
+rake load_data:metadata[./test/default_setup/metadata.txt]
 ```
 
 If ```Mapped reads``` and ```Total reads``` are missing, you need to run the ```Kallisto``` mapping from the ```rake``` task. 

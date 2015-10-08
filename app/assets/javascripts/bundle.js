@@ -96,7 +96,7 @@ var ExpressionBar = function (options) {
 ExpressionBar.prototype.setupProgressBar = function(){
   pb_id =  this.opt.target + '_progressbar';
   this.pb = jQuery( '#' + pb_id );
-  this.pb.attr("height", "20px");
+  this.pb.attr("min-height", "20px");
   this.pb.progressbar({
     value: false
   });
@@ -106,13 +106,27 @@ ExpressionBar.prototype.setupProgressBar = function(){
 ExpressionBar.prototype.setupSVG = function(){
  var self = this;
  this.renderGroupSelectorColour(); 
- this.chart = d3.select('#'+this.chartSVGid).attr('width', this.opt.width);
+ this.chart = d3.select('#'+this.chartSVGid).
+ attr('width', this.opt.width).
+ style('font-family', self.opt.fontFamily).
+ style( 'font-size', self.opt.barHeight + 'px');
+ 
  this.chartHead = d3.select('#'+this.chartSVGidHead).
- attr('width', this.opt.width);
+ attr('width', this.opt.width).
+ style('font-family', self.opt.fontFamily).
+ style( 'font-size', self.opt.barHeight + 'px');
+
+ //css({'font-family': self.opt.fontFamily, 
+ // 'font-size': self.opt.barHeight + 'px'});
+
  this.chartHead.attr('height', this.opt.headerOffset);
  this.chartFoot = d3.select('#'+this.chartSVGidFoot).
  attr('width', this.opt.width);
- this.chartFoot.attr('height', 20);
+ this.chartFoot.attr('height', 20).
+ style('font-family', self.opt.fontFamily).
+ style( 'font-size', self.opt.barHeight + 'px');
+
+
  this.barGroups = [];
  
  this.chart.on("mousemove", function(e){
@@ -152,8 +166,6 @@ ExpressionBar.prototype.setupContainer = function(){
  var self = this;
  this._container = jQuery('#'+self.opt.target);
  this._container.css({
-  'font-family': self.opt.fontFamily, 
-  'font-size': self.opt.barHeight + 'px',
   'text-align': 'center',
   'vertical-align':'top',
   'display': 'table-cell',
@@ -167,7 +179,7 @@ ExpressionBar.prototype.setupContainer = function(){
  this.chartSVGidFoot =this.opt.target+'_footer_svg';
  this.sortDivId = this.opt.target + '_sort_div';
 
- this._container.append('Property: <select id="'+ 
+ this._container.append('Expression unit: <select id="'+ 
   this.opt.target+'_property"></Select>');
  this._container.append('<button type="button" id="' +
   this.opt.target + '_save">Save as SVG</button>');
@@ -680,7 +692,7 @@ ExpressionBar.prototype.renderGroupSelectorColour = function(){
 ExpressionBar.prototype.saveRenderedPNG = function(){
   var svgData = this.prepareSVGForSaving();
   var canvas = document.createElement( 'canvas' );
-  var scaleBy = 10;
+  var scaleBy = 4;
   canvas.height = scaleBy * ( this.opt.headerOffset + 20 + this.totalHeight );
   canvas.width = scaleBy *  this.opt.width;
   var ctx = canvas.getContext( '2d' );
@@ -1156,8 +1168,8 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
   
   var lines = bar.selectAll('line').transition().duration(1000).ease("cubic-in-out")
      // .attr('x1', gXOffset)
-     .attr('y1', function(d,j) {return getY(d,j) + (barHeight/2.0) })
-     .attr('y2', function(d,j) {return getY(d,j) + (barHeight/2.0) } )
+     .attr('y1', function(d,j) {return getY(d,j) + ((barHeight-2)/2.0) })
+     .attr('y2', function(d,j) {return getY(d,j) + ((barHeight-2)/2.0) } )
      .attr('x2', function(d,j) {
       var ret =x(dat[j].value + dat[j].stdev); 
       if(isNaN(ret)){
@@ -1174,9 +1186,7 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
       }
 
       return x(left);
-    })
-     .attr('stroke-width', 2)
-     .attr('stroke', 'black');
+    });
    }; 
 
 
@@ -1236,7 +1246,7 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
       .attr('y1', y + (barHeight/2))
       .attr('x2', 0)
       .attr('y2', y + (barHeight/2) )
-      .attr('stroke-width', 1)
+      .attr('stroke-width', 1 )
       .attr('stroke', 'black');
     }
 
@@ -1351,14 +1361,11 @@ ExpressionBar.prototype.renderGeneTitles = function(i){
 
   };
 
-  ExpressionBar.prototype.refreshScale = function(){
-    var axisScale = this.x;
-//  console.log(axisScale);
-  //Create the Axis
+ExpressionBar.prototype.refreshScale = function(){
+  var axisScale = this.x;
   var xAxis = d3.svg.axis().scale(axisScale).ticks(3);
 
   var toUpdate = this.svgFootContainer.selectAll("g.x.axis")
-  //console.log(toUpdate);
   toUpdate.transition().duration(1000).ease("cubic-in-out").call(xAxis);//ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
 
 }
@@ -1375,13 +1382,13 @@ ExpressionBar.prototype.renderScales = function(i){
   var xAxis = d3.svg.axis()
   .scale(axisScale).ticks(3);
   //Create an SVG group Element for the Axis elements and call the xAxis function
-  var xAxisGroup = this.svgFootContainer.append("g").attr("class", "x axis")
+  var xAxisGroup = this.svgFootContainer.append("g")
   .call(xAxis);
 
   var blockWidth = (this.opt.width - this.opt.labelWidth) / this.totalRenderedGenes;                            
   var gXOffset = (blockWidth * i) + this.opt.labelWidth;                              
+  
   xAxisGroup.attr('transform', 'translate(' + gXOffset  + ',0)');
-  xAxisGroup.attr('dx', '.1em')
 
 };
 
