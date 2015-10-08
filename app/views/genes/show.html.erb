@@ -3,8 +3,9 @@
 <p>
 
  <strong>Gene:</strong>
- <%= @gene.gene %>
  
+ <%= @gene.gene %>
+ <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
 <% if @compare %>
  <strong>Compare:</strong>
  <%= @compare.gene %>   

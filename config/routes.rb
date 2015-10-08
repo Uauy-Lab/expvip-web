@@ -4,10 +4,10 @@ Rails.application.routes.draw do
   root 'wellcome#default'
   get 'wellcome/search_gene'
 
-  resources :expression_values
-  resources :type_of_values
-  resources :meta_experiments
-  resources :gene_sets
+ # resources :expression_values
+ # resources :type_of_values
+ # resources :meta_experiments
+ # resources :gene_sets
   resources :genes  do
     collection do
       get 'autocomplete'
@@ -29,12 +29,12 @@ Rails.application.routes.draw do
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
   # Example resource route (maps HTTP verbs to controller actions automatically):
-  resources :species
-  resources :studies
-  resources :varieties
-  resources :tissues
-  resources :experiments
-  resources :experiment_groups
+#  resources :species
+#  resources :studies
+#  resources :varieties
+#  resources :tissues
+#  resources :experiments
+#  resources :experiment_groups
 
   
 end

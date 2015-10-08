@@ -236,7 +236,7 @@ class ExpressionValuesController < ApplicationController
         "High level age", 
         "Age", 
         "High level Stress-disease", 
-        "Stress-disease"
+        "Stress-disease",
         "High level variety",
         "Variety"
     ]
