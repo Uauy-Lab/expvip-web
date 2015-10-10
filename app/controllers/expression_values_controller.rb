@@ -244,12 +244,14 @@ class ExpressionValuesController < ApplicationController
   end
 
   def getValuesForHomologues(gene)
-
     values = Hash.new
     Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
        values[h.A.name] = getValuesForGene(h.A) if h.A
        values[h.B.name] = getValuesForGene(h.B) if h.B
        values[h.D.name] = getValuesForGene(h.D) if h.D
+    end
+    if values.size == 0
+      values[gene.name]    = getValuesForGene(gene)
     end
     return values
   end
@@ -276,9 +278,7 @@ class ExpressionValuesController < ApplicationController
     experiments, groups = getExperimentGroups
     values = Hash.new
     params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
-
-    if compare
-      
+    if compare  
       values = getValuesToCompare(gene, compare)
       ret["compare"] = params["compare"]
     else

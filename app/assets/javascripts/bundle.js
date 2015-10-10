@@ -119,26 +119,26 @@ ExpressionBar.prototype.setupSVG = function(){
  //css({'font-family': self.opt.fontFamily, 
  // 'font-size': self.opt.barHeight + 'px'});
 
- this.chartHead.attr('height', this.opt.headerOffset);
- this.chartFoot = d3.select('#'+this.chartSVGidFoot).
- attr('width', this.opt.width);
- this.chartFoot.attr('height', 20).
- style('font-family', self.opt.fontFamily).
- style( 'font-size', self.opt.barHeight + 'px');
+this.chartHead.attr('height', this.opt.headerOffset);
+this.chartFoot = d3.select('#'+this.chartSVGidFoot).
+attr('width', this.opt.width);
+this.chartFoot.attr('height', 20).
+style('font-family', self.opt.fontFamily).
+style( 'font-size', self.opt.barHeight + 'px');
 
 
- this.barGroups = [];
- 
- this.chart.on("mousemove", function(e){
+this.barGroups = [];
+
+this.chart.on("mousemove", function(e){
   self.highlightRow(this);
 });
- this.chart.on("mousemove", function(e){
+this.chart.on("mousemove", function(e){
   self.highlightRow(this);
 });
- this.chart.on("mouseenter", function(e){
+this.chart.on("mouseenter", function(e){
   self.showHighithRow();
 });
- this.chart.on("mouseleave", function(e){
+this.chart.on("mouseleave", function(e){
   self.hideHidelightRow();
 });
 
@@ -185,7 +185,7 @@ ExpressionBar.prototype.setupContainer = function(){
   this.opt.target + '_save">Save as SVG</button>');
  this._container.append('<button type="button" id="' +
   this.opt.target + '_save_png">Save as PNG</button>');
-  this._container.append('<button type="button" id="' +
+ this._container.append('<button type="button" id="' +
   this.opt.target + '_save_data">Save data</button>');
 
  this._container.append('<span id="'+this.opt.target +'_homSpan"><input id="' +  this.opt.target +
@@ -207,13 +207,13 @@ ExpressionBar.prototype.setupContainer = function(){
   this.chartSVGidFoot + '" ></svg>');
 
  jQuery( '#' + this.opt.target + '_save_data' ).on('click', function(evt) {
-    self.saveRenderedData(self);
- });
+  self.saveRenderedData(self);
+});
 
-  jQuery( '#' + this.opt.target + '_showHomoeologues' ).on('change', function(evt) {
-    self.opt.showHomoeologues = this.checked;
-    self.refreshSVG(self);
- });
+ jQuery( '#' + this.opt.target + '_showHomoeologues' ).on('change', function(evt) {
+  self.opt.showHomoeologues = this.checked;
+  self.refreshSVG(self);
+});
 
 };
 
@@ -231,7 +231,7 @@ ExpressionBar.prototype.setDefaultOptions = function(){
    labelWidth: 500,
    renderProperty: 'tpm',
    renderGroup: 'group',
-   highlight: 'MyGene', 
+   highlight: null, 
    groupBy: 'groups', 
    groupBarWidth: 20, 
    colorFactor: 'renderGroup', 
@@ -398,12 +398,12 @@ ExpressionBar.prototype.checkSelectedFactors = function(){
     shbtn.data("factor", i);
     //shbtn.click(function(){console.log(name + "")});
     
-     shbtn.on("click", function(evt){
+    shbtn.on("click", function(evt){
      target = jQuery(this);
      self.toggleFactorCheckbox(target);
      self.updateGroupBy(self); 
      self.refreshSVG(self);
-    });
+   });
 
     if (groupByValue.constructor === Array) {
       index = self.opt.groupBy.indexOf(i) 
@@ -448,11 +448,12 @@ ExpressionBar.prototype.renderSortWindow = function(){
 
     
     listText += '<span id="span_' + 
-    name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" ></span>'
-    listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus" ></span>'
+    name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" title="Filter/reorder" ></span>'
+    listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus"\
+    title="Display/Hide Category"  ></span>'
 
-    listText += '<div id="dialog_' + name + '" width="150px" \
-    style="z-index:3; overflow:scroll; max-height:' + this.opt.height/2 +'px" >' ;
+    listText += '<div id="dialog_' + name + '"  \
+    style="z-index:3; overflow:auto; min-width:250px; max-height:' + this.opt.height/2 +'px" >' ;
 
     listText += '<div id="all_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">all</div>';
     listText += '<div id="none_' + name +'"  onmouseover="this.style.cursor=\'pointer\';">none</div>';
@@ -511,7 +512,6 @@ ExpressionBar.prototype.renderSortWindow = function(){
     if(self2.refreshSVGEnabled == true){
       self2.updateGroupBy(self2);  
       self2.refreshSVG(self2); 
-
     }
   });
 
@@ -533,7 +533,7 @@ ExpressionBar.prototype.renderSortWindow = function(){
       }
     });
 
-    })
+    });
 
     var s = jQuery('#'+ name);
     var sbtn = jQuery('#span_' + name);
@@ -596,20 +596,22 @@ ExpressionBar.prototype.renderSortWindow = function(){
     shbtn.attr('height', this.opt.barHeight );
     shbtn.css("position", "absolute");
     shbtn.css("left", xFact + this.opt.groupBarWidth);
-    
+    //shbtn.tooltip({
+    //  track: false
+    //});
 
-    shbtn.css("top", possbtn.top + 15);
+shbtn.css("top", possbtn.top + 15);
 
-    
 
-    sdialog.css("position", "absolute");
-    sdialog.css("left", xFact );
-    sdialog.css("background-color", "white");
-    sdialog.css("border", "outset");
-    sdialog.css("top", possbtn.top + 15);
-    s.disableSelection();
-    sdialog.hide();
-    
+
+sdialog.css("position", "absolute");
+sdialog.css("left", xFact );
+sdialog.css("background-color", "white");
+sdialog.css("border", "outset");
+sdialog.css("top", possbtn.top + 15);
+s.disableSelection();
+sdialog.hide();
+
     //sdialog.on("mouseleave", function(){sdialog.hide()})
     
     xFact += self.opt.groupBarWidth;
@@ -654,17 +656,25 @@ ExpressionBar.prototype.hideHighlightedFactors = function(){
 };
 
 ExpressionBar.prototype.renderPropertySelector = function(){
- var self = this;
- var groupOptions = this.data.values[this.opt.highlight];
- jQuery.each(groupOptions, function(key,value) {   
-   self.propertySelector
-   .append(jQuery('<option></option>')
-     .attr('value',key)
-     .text(key)); 
- });
+  var self = this;
+  var groupOptions = this.data.values[this.data.gene];
+  if(this.opt.highlight){
+    groupOptions = this.data.values[this.opt.highlight];
+  }else{
+    groupOptions = this.data.values[this.data.gene];
+  }
+  if (typeof groupOptions === 'undefined') { 
+    return ;
+  }
+  jQuery.each(groupOptions, function(key,value) {   
+    self.propertySelector
+    .append(jQuery('<option></option>')
+      .attr('value',key)
+      .text(key)); 
+  });
 
- this.propertySelector.val(this.opt.renderProperty);
- this.propertySelector.on('change', function(event) { 
+  this.propertySelector.val(this.opt.renderProperty);
+  this.propertySelector.on('change', function(event) { 
    self.opt.renderProperty  = self.propertySelector.find(':selected').text();;
    self.refresh();
  } );
@@ -755,43 +765,51 @@ ExpressionBar.prototype.saveRenderedData = function(self){
   var toSave = self.renderedData;
   var selectedFactors = self.selectedFactors;
   var output = '';
+  var factorNames = this.data.longFactorName;
   for(fact in selectedFactors){
    // console.log(fact);
-    output += fact + "\t"
-    vals = selectedFactors[fact];
-    for(v in vals){
-      if(vals[v]){
-        output += v + ",";
-      }
+   output += fact + "\t"
+   vals = selectedFactors[fact];
+   var curr_fact = factorNames[fact];
+   for(v in vals){
+    if(vals[v]){
+
+      curr_long = curr_fact[v];
+      output +=  curr_long + ", ";
     }
-    output += "\n";
   }
-  var renderedProperty = self.opt.renderProperty ;
-  output += "\t";
-  for(gene in toSave ){
-    output += renderedProperty + "\t" + "SEM" + "\t";
-  }
-  var filename = renderedProperty +  "_";
-  output += "\n\t";
-  for(gene in toSave ){
-    output += toSave[gene][0].gene + "\t" + toSave[gene][0].gene + "\t";
-    filename += toSave[gene][0].gene + "_";
-  }
-  filename += ".tsv"
   output += "\n";
+}
+var renderedProperty = self.opt.renderProperty ;
+output += "\t";
+for(gene in toSave ){
+  output += renderedProperty + "\t" + "SEM" + "\t";
+}
+var filename = renderedProperty +  "_";
+output += "\n\t";
+for(gene in toSave ){
+  output += toSave[gene][0].gene + "\t" + toSave[gene][0].gene + "\t";
+  filename += toSave[gene][0].gene + "_";
+}
+filename += ".tsv"
+output += "\n";
 
-  var total = toSave[0].length
-  
-  for(var i = 0; i < total; i++){
-    output += toSave[0][i].name + "(n=" + toSave[0][i].data.length  + ")\t";
+var total = toSave[0].length
 
-    for(gene in toSave ){
-      output += toSave[gene][i].value + "\t" + toSave[gene][i].stdev + "\t";
-    }
-    output += "\n";
+for(var i = 0; i < total; i++){
+  var name = toSave[0][i].name
+  if(toSave[0][i].longDescription){
+    name = toSave[0][i].longDescription
   }
+  output +=  name + "(n=" + toSave[0][i].data.length  + ")\t";
 
-  self.saveTextFile(filename, output);
+  for(gene in toSave ){
+    output += toSave[gene][i].value + "\t" + toSave[gene][i].stdev + "\t";
+  }
+  output += "\n";
+}
+
+self.saveTextFile(filename, output);
 };
 
 ExpressionBar.prototype.saveRenderedSVG = function(){
@@ -882,27 +900,48 @@ ExpressionBar.prototype.getGroupFactor = function(o,groupBy){
 
 ExpressionBar.prototype.getGroupFactorDescription = function(o,groupBy){
   var factorArray = [];
-  //console.log(o);
   var factorNames = this.data.longFactorName;
   //console.log(factorNames);
   
   var numOfFactors = groupBy.length;
-
+  var arr_offset = 0;
   for(var i in groupBy) {
-    //console.log(i);
     var grpby = groupBy[i];
-    //console.log(grpby);
+
+    //TODO: This is a patch. We should have a list of elements that we don't want to display
+    if(grpby == "study"){
+      arr_offset ++;
+      continue;
+    }
 
     var curr_fact = factorNames[grpby];
     var curr_short =  o.factors[groupBy[i]]; 
     var curr_long = curr_fact[curr_short];
-    factorArray[i] = curr_long;
+    factorArray[i - arr_offset ] = curr_long;
     if(numOfFactors > 4 || curr_long.length > 15 ){
-      factorArray[i] = curr_short;
+      factorArray[i - arr_offset ] = curr_short;
     }
   };
   return factorArray.join(", ");
 };
+
+ExpressionBar.prototype.getGroupFactorLongDescription = function(o,groupBy){
+  var factorArray = [];
+  var factorNames = this.data.longFactorName;
+  //console.log(factorNames);
+  
+  var numOfFactors = groupBy.length;
+  for(var i in groupBy) {
+    var grpby = groupBy[i];
+    var curr_fact = factorNames[grpby];
+    var curr_short =  o.factors[groupBy[i]]; 
+    var curr_long = curr_fact[curr_short];
+    factorArray[i] = curr_long;
+    
+  };
+  return factorArray.join(", ");
+};
+
 
 ExpressionBar.prototype.calculateStats = function(newObject){
   var v = science.stats.mean(newObject.data);
@@ -1002,9 +1041,11 @@ ExpressionBar.prototype._fillGroupByFactor = function(index, gene, property, gro
  for(o in g){  
 
   var description = this.getGroupFactorDescription(g[o], groupBy);
+  var longDescription = this.getGroupFactorLongDescription(g[o], groupBy);
   if(names.indexOf(description) === -1){
     var newObject = this._prepareGroupedByFactor(i++, description);
     newObject.gene = gene;
+    newObject.longDescription = longDescription;
     var factorValues = this.getGroupFactor(g[o], groupBy);
     newObject.factors = factorValues;
     groups[description] = newObject;
@@ -1013,7 +1054,10 @@ ExpressionBar.prototype._fillGroupByFactor = function(index, gene, property, gro
 }
 i = index;
 for(o in e){
-
+  if(typeof data[o] === 'undefined' ){
+    continue; //This is for the cases when the data is set up but not defined
+  }
+  //console.log(g);
   var group = g[e[data[o].experiment].group];
 
   if(!this._isFiltered(group)){
@@ -1230,7 +1274,7 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
         var pos = d3.select(this).position(this);
         var index = ((pos.top ) / self.opt.barHeight)-1;
         var tooltip =  self.opt.renderProperty + ': ' +
-        numberWithCommas(da.value) ;
+        numberWithCommas(da.value) + ', sem: ' + numberWithCommas(da.stdev)  ;
         self.showTooltip(tooltip, this);
         self.showHighlightedFactors(da, this);
       }
@@ -1361,11 +1405,11 @@ ExpressionBar.prototype.renderGeneTitles = function(i){
 
   };
 
-ExpressionBar.prototype.refreshScale = function(){
-  var axisScale = this.x;
-  var xAxis = d3.svg.axis().scale(axisScale).ticks(3);
+  ExpressionBar.prototype.refreshScale = function(){
+    var axisScale = this.x;
+    var xAxis = d3.svg.axis().scale(axisScale).ticks(3);
 
-  var toUpdate = this.svgFootContainer.selectAll("g.x.axis")
+    var toUpdate = this.svgFootContainer.selectAll("g.x.axis")
   toUpdate.transition().duration(1000).ease("cubic-in-out").call(xAxis);//ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
 
 }
@@ -1497,6 +1541,9 @@ ExpressionBar.prototype.renderSelection = function(){
 };
 
 ExpressionBar.prototype.highlightRow = function(target){
+  if(typeof this.renderedData[0] === 'undefined'){
+    return;
+  }
   var d3SVG = d3.select(target);
   var mouse = d3.mouse(target);
   var index = Math.floor(mouse[1]/self.opt.barHeight);
@@ -1582,8 +1629,12 @@ ExpressionBar.prototype.render = function() {
   this.x = d3.scale.linear().range([0, barWidth]);
   this.x.domain([0,this.maxInData()])
   var x=this.x;
+  if(data[0]){ 
+    this.totalHeight = barHeight * (data[0].length + 2 );
+  }else{
+    this.totalHeight = 100;
+  }
 
-  this.totalHeight = barHeight * (data[0].length + 2 )  ;
   chart.attr('height', this.totalHeight );
 
   this.chartFoot.selectAll("*").remove();
@@ -1615,10 +1666,10 @@ ExpressionBar.prototype.dataLoaded = function(){
   this.checkSelectedFactors();
 
   if(typeof this.data.compare === "undefined" || this.data.compare.length == 0){
-     jQuery( '#' + this.opt.target + '_homSpan' ).show();
-  }else{
-     jQuery( '#' + this.opt.target + '_homSpan' ).hide();
-  }
+   jQuery( '#' + this.opt.target + '_homSpan' ).show();
+ }else{
+   jQuery( '#' + this.opt.target + '_homSpan' ).hide();
+ }
 
 };
 
