@@ -136,6 +136,7 @@ namespace :load_data do
        CSV.foreach(args[:filename], :headers=>true, :col_sep=>"\t") do |row|
         h = Homology.new
         #Gene A B D Group Genome
+      
         h.gene = genes[row["Gene"]]
         h.A = genes[row["A"]]
         h.B = genes[row["B"]]
@@ -164,7 +165,6 @@ namespace :load_data do
       meta_exp.gene_set = gene_set
       #TODO: add validation if any of the find_by is null
 
-
   		#genes_arr = Gene.connection.select_all("SELECT * FROM clients WHERE id = '1'")
   		genes = Hash.new
   		Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
@@ -183,11 +183,13 @@ namespace :load_data do
         #puts meta_exp.inspect
   			#gene = Gene.find_by(:name=>row["target_id"])
         gene_name = row["target_id"]
-  			gene = genes[row["target_id"]]
+  			gene = genes[gene_name]
   			#puts gene.inspect
   			row.delete("target_id")
   			row.to_hash.each_pair do |name, val| 
   				val = val.to_f
+          raise  "Experiment #{name} not found " unless experiments[name]
+          raise  "Gene #{gene_name} not found in gene set #{args[:gene_set]} " unless gene
           str = "(#{experiments[name]},#{gene},#{meta_exp.id},#{value_type.id},#{val},NOW(),NOW())"
           inserts.push str          
   			end
