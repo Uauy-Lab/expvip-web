@@ -136,12 +136,12 @@ namespace :load_data do
        CSV.foreach(args[:filename], :headers=>true, :col_sep=>"\t") do |row|
         h = Homology.new
         #Gene A B D Group Genome
-        h.Gene = genes[row["Gene"]]
+        h.gene = genes[row["Gene"]]
         h.A = genes[row["A"]]
         h.B = genes[row["B"]]
         h.D = genes[row["D"]]
-        h.Genome = row["Genome"]
-        h.Group = row["Group"]
+        h.genome = row["Genome"]
+        h.group = row["Group"]
         h.save!
         count += 1
         if count % 10000 == 0
@@ -204,8 +204,6 @@ namespace :load_data do
       sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
       #puts sql
       conn.execute sql
-      inserts = Array.new
   	end
   end
-
 end
