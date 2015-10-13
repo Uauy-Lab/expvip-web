@@ -1,0 +1,45 @@
+factor	order	name	short
+Variety	1	Chinese Spring	CS
+Variety	2	Holdfast	Hold
+Variety	3	TAM107	TAM
+Variety	4	Banks	Banks
+Variety	5	Avocet S	Avoc
+Variety	6	Sevin	Sevin
+Variety	7	Bobwhite	Bobw
+Variety	8	GPC RNAi Bobwhite	GPC
+Variety	9	P271	P271
+Variety	10	Chinese Spring NIL CSTP	CSNIL
+Variety	11	HTS-1	HTS-1
+Variety	12	N9134	N9134
+Variety	13	synthetic hexaploid (mother Triticum turgidum ssp dicoccon accession PI94655, father Aegilops tauschii ssp strangulata accession AS2404)	synth
+Variety	14	CM-82036	CM
+Variety	15	NIL1 from CM-82036 BC5 in Remus	CM_1
+Variety	16	NIL2 from CM-82036 BC5 in Remus	CM_2
+Variety	17	NIL3 from CM-82036 BC5 in Remus	CM_3
+Variety	18	NIL4 from CM-82036 BC5 in Remus	CM_4
+Variety	19	Baxter -4A dormancy QTL	Baxt
+Variety	20	Chara -4A dormancy QTL	Chara
+Variety	21	Westonia -4A dormancy QTL	Westo
+Variety	22	Yipti +4A dormancy QTL	Yipti
+Variety	23	NIL 0362 +4A dormancy QTL	0362+
+Variety	24	NIL 0807 +4A dormancy QTL	0807+
+Variety	25	NIL 1038 +4A dormancy QTL	1038+
+Variety	26	NIL 1275 +4A dormancy QTL	1275+
+Variety	27	NIL 1516 +4A dormancy QTL	1516+
+Variety	28	NIL 0807 -4A dormancy QTL	0807-
+Variety	29	NIL 1038 -4A dormancy QTL	1038-
+Variety	30	NIL 1275 -4A dormancy QTL	1275-
+Variety	31	NIL 0362 -4A dormancy QTL	0362-
+Variety	32	NIL 1516 -4A dormancy QTL	1516-
+Variety	33	Chinese Spring, N1AT1B	N1ATB
+Variety	34	Chinese Spring, N1AT1D	N1ATD
+Variety	35	Chinese Spring, N1BT1A	N1BTA
+Variety	36	Chinese Spring, N1BT1D	N1BTD
+Variety	37	Chinese Spring, N1DT1A	N1DTA
+Variety	38	Chinese Spring, N1DT1B	N1DTB
+Variety	39	Chinese Spring, N5AT5B	N5ATB
+Variety	40	Chinese Spring, N5AT5D	N5ATD
+Variety	41	Chinese Spring, N5BT5A	N5BTA
+Variety	42	Chinese Spring, N5BT5D	N5BTD
+Variety	43	Chinese Spring, N5DT5A	N5DTA
+Variety	44	Chinese Spring, N5DT5B	N5DTB

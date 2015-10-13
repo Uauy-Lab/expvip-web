@@ -9,7 +9,7 @@
 <% if @compare %>
  <strong>Compare:</strong>
  <%= @compare.gene %>   
-
+ <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
 
 <div id="bar_expression_viewer"> </div>

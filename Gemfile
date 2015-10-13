@@ -31,6 +31,10 @@ gem "bio-kallisto", "~> 0.1.0"
 
 gem 'jquery-ui-rails'
 
+gem 'markdown-rails'
+
+gem 'redcarpet'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

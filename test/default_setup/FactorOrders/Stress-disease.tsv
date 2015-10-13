@@ -1,0 +1,24 @@
+factor	order	name	short
+Stress-disease	1	none	none
+Stress-disease	2	mock inoculation 30 hours	mo30h
+Stress-disease	3	mock inoculation 50 hours	mo50h
+Stress-disease	4	Fusarium graminearum inoculation 30 hours	fu30h
+Stress-disease	5	Fusarium graminearum inoculation 50 hours	fu50h
+Stress-disease	6	stripe rust pathogen CYR31 24 hours	sr24h
+Stress-disease	7	stripe rust pathogen CYR31 48 hours	sr48h
+Stress-disease	8	stripe rust pathogen CYR31 72 hours	sr72h
+Stress-disease	9	stripe rust mixture 6/14 days	sr6+d
+Stress-disease	10	Powdery mildew pathogen E09 24 hours	pm24h
+Stress-disease	11	Powdery mildew pathogen E09 48 hours	pm48h
+Stress-disease	12	Powdery mildew pathogen E09 72 hours	pm72h
+Stress-disease	13	Septoria tritici 4 days	st4d
+Stress-disease	14	Septoria tritici 10 days	st10d
+Stress-disease	15	Septoria tritici 13 days	st13d
+Stress-disease	16	1 hour of drought stress	ds1h
+Stress-disease	17	6 hour of drought stress	ds6h
+Stress-disease	18	1 hour of heat stress	hs1h
+Stress-disease	19	6 hour of heat stress	hs6h
+Stress-disease	20	1 hour of drought&heat combined stress	dhs1h
+Stress-disease	21	6 hour of drought&heat combined stress	dhs6h
+Stress-disease	22	Phosphorous starvation 10 days	P-10d
+Stress-disease	23	GPC RNAi 	GPC-

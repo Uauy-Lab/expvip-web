@@ -1,0 +1,5 @@
+factor	order	name	short
+High level stress-disease	1	none	none
+High level stress-disease	2	disease	dis
+High level stress-disease	3	abiotic	abio
+High level stress-disease	4	transgenic	trans

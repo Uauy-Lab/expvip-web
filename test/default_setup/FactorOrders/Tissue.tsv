@@ -1,0 +1,21 @@
+factor	order	name	short
+Tissue	1	grain	grain
+Tissue	2	whole endosperm	w_en
+Tissue	3	starchy endosperm	s_en
+Tissue	4	aleurone layer and starchy endosperm	al_e
+Tissue	5	starchy endosperm + seed coat	e_sc
+Tissue	6	seed coat	sc
+Tissue	7	aleurone layer	al
+Tissue	8	transfer cells	tc
+Tissue	9	pistil	pist
+Tissue	10	pistillody stamen	ps
+Tissue	11	stamen	sta
+Tissue	12	spike	spike
+Tissue	13	spikelets (only using palea, lemma and rachis)	s_let
+Tissue	14	seedling	see
+Tissue	15	shoots	shoot
+Tissue	16	leaves	lea
+Tissue	17	2nd leaf	2_lea
+Tissue	18	flag leaf	f_lea
+Tissue	19	stem	stem
+Tissue	20	roots	root
