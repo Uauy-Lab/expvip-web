@@ -72,7 +72,7 @@ namespace :load_data do
 	  	end
   end
 
-  desc "Loads the metadata from the metadata file"
+  desc "Change the name of the studies"
   task :fixStudyExpression, [:filename]  => :environment do |t, args|
       puts "FixingStudies"
 

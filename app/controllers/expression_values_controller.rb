@@ -215,7 +215,7 @@ class ExpressionValuesController < ApplicationController
   def getDefaultSelection 
        defSelection = {
         "Age"=> false, 
-        "High level Stress-disease"=> true, 
+        "High level stress-disease"=> true, 
         "High level age"=> true, 
         "High level tissue"=>true,
         "High level variety"=>true,
@@ -235,7 +235,7 @@ class ExpressionValuesController < ApplicationController
         "Tissue",
         "High level age", 
         "Age", 
-        "High level Stress-disease", 
+        "High level stress-disease", 
         "Stress-disease",
         "High level variety",
         "Variety"
