@@ -26,7 +26,7 @@ namespace :kallisto do
 			count_type = TypeOfValue.find_or_create_by(:name=>"count")
 
 			puts "Running Kallisto..."
-			#Bio::Kallisto.map(index:kallistoIndex, fastq:files, output_dir:tmp_output)
+			Bio::Kallisto.map(index:kallistoIndex, fastq:files, output_dir:tmp_output)
 			puts "Loading gene names(#{gene_set.name})..."
 			genes = Hash.new
 			Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
