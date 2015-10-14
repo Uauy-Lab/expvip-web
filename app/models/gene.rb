@@ -1,6 +1,8 @@
 class Gene < ActiveRecord::Base
 	belongs_to :gene_set
-
+	has_many :expression_values;
+	has_many :type_of_value , through: :expression_values
+	has_many :experiment , through: :expression_values
 	def add_field(text)
 		arr = text.split(":", 2)
 		#puts arr.inspect

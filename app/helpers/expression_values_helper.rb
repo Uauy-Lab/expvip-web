@@ -7,10 +7,7 @@ module ExpressionValuesHelper
 		values = Array.new
 		count = 0
 		last_gene = ""
-		ExpressionValue.joins(:gene, :type_of_value, :experiment ).
-			where(type_of_values: { name: expressionUnit }).
-			order("genes.name DESC , accession DESC").
-			pluck('genes.name as gene, accession, value').each do |row|
+		ExpressionValue.find_expressions_for_unit(expressionUnit) do |row|
 				current_gene = row[0]
 				last_gene = row[0] if last_gene == ""
 				if(count == 0 and  current_gene == last_gene)
@@ -22,6 +19,8 @@ module ExpressionValuesHelper
 					yield headers if count == 0
 					yield values
 					values = Array.new
+					puts "#{count} genes done" if(count %1000 == 0)
+
 					count += 1
 				end
 				values << row[2]
@@ -29,7 +28,7 @@ module ExpressionValuesHelper
 				
 
 		end
-
+		puts "#{count} genes exported" 
 	end
 
 end

@@ -4,6 +4,32 @@ class ExpressionValue < ActiveRecord::Base
   belongs_to :meta_experiment
   belongs_to :type_of_value
 
+  def  self.find_expressions_for_unit(unit) 
+
+  	offset = 0
+	limit = 1000
+	result = true
+	while(result)
+	  	sql=%{SELECT 
+		genes.name as name ,
+		accession, value, genes.id, experiments.id
+		FROM 
+			`expression_values` 
+		INNER JOIN `genes` ON `genes`.`id` = `expression_values`.`gene_id` 
+		INNER JOIN `type_of_values` ON `type_of_values`.`id` = `expression_values`.`type_of_value_id` 
+		INNER JOIN `experiments` ON `experiments`.`id` = `expression_values`.`experiment_id` 
+		WHERE 
+			`type_of_values`.`name` = '#{unit}'  
+		ORDER BY genes.id DESC ,  experiments.id DESC 
+		LIMIT #{limit} OFFSET #{offset} ; }
+		offset += limit
+		ExpressionValue.find_by_sql(sql).each do |vals|
+			row = [vals.name, vals.accession, vals.value]
+			yield row
+		end
+	end
+  end
+
   def self.find_expression_for_gene(gene_id)
   	sql=%{SELECT 
     gene_id,
@@ -39,6 +65,8 @@ ORDER by
 	studies.id,
 	experiments.id
 ; }
+
+
 	rows = ExpressionValue.find_by_sql sql
 	ret = Hash.new 
 	ret[:experiments] = Hash.new
