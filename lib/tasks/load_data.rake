@@ -59,6 +59,7 @@ namespace :load_data do
               v = row[f]
               factor = Factor.find_by factor: f, description:v
               #puts "#{f}:#{v}:#{factor}"
+              raise "#{f}:#{v} not found!. Make #{v} was loaded in the factors\n"
               experiment_group.factors << factor
             end
           end

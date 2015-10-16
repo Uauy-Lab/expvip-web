@@ -915,6 +915,10 @@ ExpressionBar.prototype.getGroupFactorDescription = function(o,groupBy){
     }
 
     var curr_fact = factorNames[grpby];
+    //console.log(grpby);
+    //console.log(i)
+    //console.log(groupBy);
+    //console.log( o.factors);
     var curr_short =  o.factors[groupBy[i]]; 
     var curr_long = curr_fact[curr_short];
     factorArray[i - arr_offset ] = curr_long;
@@ -1199,7 +1203,6 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
     }
     return x(val);
   })
-  
   .attr('fill', function(d,j){
     var ret = sc(dat[j].id%20);
     if(colorFactor != 'renderGroup'){
@@ -1208,8 +1211,12 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
     return ret;     
   })
   .attr('y', getY )
-  ;
-  
+  .each(function(r,j){
+    var d = dat[j];
+    var rect = d3.select(this);
+    rect.data([d]); 
+  });
+   
   var lines = bar.selectAll('line').transition().duration(1000).ease("cubic-in-out")
      // .attr('x1', gXOffset)
      .attr('y1', function(d,j) {return getY(d,j) + ((barHeight-2)/2.0) })
@@ -1228,17 +1235,16 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
       if(left < 0){
         left = 0
       }
-
       return x(left);
     });
    }; 
-
 
    ExpressionBar.prototype.refresh = function(){
     var chart=this.chart;
     this.renderedData = this.getGroupedData(this.opt.renderProperty,this.opt.groupBy);
     this.totalRenderedGenes = this.renderedData.length;
     this.x.domain([0,this.maxInData()]);
+    
     var gene = this.opt.highlight;
     for (var i in  this.renderedData) {
       this.refreshBar(gene, i);
@@ -1264,7 +1270,6 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
     for(var j in  dat){
       var d = dat[j];
       var y = (barHeight * d.renderIndex  ) ;
-
       var rect = bar.append('rect')
       .attr('y', y)
       .attr('height', barHeight - 2)
@@ -1285,14 +1290,13 @@ ExpressionBar.prototype.refreshBar = function(gene, i){
       });
       
       rect.data([d]); //Bind the data to the rect
-
       bar.append('line').attr('x1', 0)
       .attr('y1', y + (barHeight/2))
       .attr('x2', 0)
       .attr('y2', y + (barHeight/2) )
       .attr('stroke-width', 1 )
       .attr('stroke', 'black');
-    }
+    };
 
   };
 
@@ -1408,9 +1412,12 @@ ExpressionBar.prototype.renderGeneTitles = function(i){
   ExpressionBar.prototype.refreshScale = function(){
     var axisScale = this.x;
     var xAxis = d3.svg.axis().scale(axisScale).ticks(3);
-
     var toUpdate = this.svgFootContainer.selectAll("g.x.axis")
-  toUpdate.transition().duration(1000).ease("cubic-in-out").call(xAxis);//ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
+
+    toUpdate.transition()
+     .duration(1000)
+     .ease("cubic-in-out")
+     .call(xAxis);//ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
 
 }
 
@@ -1421,13 +1428,12 @@ ExpressionBar.prototype.renderScales = function(i){
   this.svgFootContainer.attr("height", 40);
 
   var axisScale = this.x;
-//  console.log(axisScale);
   //Create the Axis
   var xAxis = d3.svg.axis()
   .scale(axisScale).ticks(3);
   //Create an SVG group Element for the Axis elements and call the xAxis function
   var xAxisGroup = this.svgFootContainer.append("g")
-  .call(xAxis);
+  .call(xAxis).attr("class", "x axis");
 
   var blockWidth = (this.opt.width - this.opt.labelWidth) / this.totalRenderedGenes;                            
   var gXOffset = (blockWidth * i) + this.opt.labelWidth;                              
