@@ -36,7 +36,7 @@ namespace :load_data do
 		  		#tissue = Tissue.find_or_create_by(:name=>row["Tissue"])
 
 		  		#We need to validate that it doesn't exist. Maybe make the accessions primary keys. 
-		  		experiment = Experiment.new
+		  		experiment = Experiment.find_or_create_by(:accession => row["run_accession"] )
 		  		experiment.accession = row["run_accession"]
           #experiment.variety = variety
 		  		#experiment.tissue = tissue
