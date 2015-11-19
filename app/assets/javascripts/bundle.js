@@ -124,6 +124,7 @@ ExpressionBar.prototype.restoreDisplayOptions = function(){
   this._restoreProperty('renderedOrder');
   this._restoreProperty('selectedFactors');
   this._restoreProperty('showHomoeologues');
+  this._restoreProperty('colorFactor');
   // should we add an option to the orders?
   // this can tide up this bit
   if(typeof this.opt.sortOrder !== 'undefined'){
@@ -1627,6 +1628,7 @@ ExpressionBar.prototype.renderTitles = function(){
 
 ExpressionBar.prototype.setFactorColor = function(factor){
   this.opt.colorFactor = factor;
+  this._storeValue('colorFactor', factor);
 };
 
 ExpressionBar.prototype.renderTooltip = function(){
