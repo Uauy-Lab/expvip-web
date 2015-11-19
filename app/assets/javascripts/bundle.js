@@ -82,7 +82,7 @@ var ExpressionBar = function (options) {
 	this.setDefaultOptions();
   jQuery.extend(this.opt, options);
   this.opt.sc = d3.scale.category20();
-
+  this.opt.defaultGroupBy = this.opt.groupBy;
   this.setupContainer();
   this.setupButtons();
   this.setupProgressBar();
@@ -91,17 +91,63 @@ var ExpressionBar = function (options) {
   this.setupSVG();
   this.sortOrder = [];
 
+  if(this.opt.restoreDisplayOptions){
+    this.restoreDisplayOptions();
+  }
+};
+
+ExpressionBar.prototype._restoreProperty = function(key){
+  var stored = this._retrieveValue(key);
+  if(stored){
+    this.opt[key] = stored;
+  }
+}; 
+
+ExpressionBar.prototype.restoreDefaults = function(){
+  this._removeValue('groupBy');
+  this._removeValue('renderProperty');
+  this._removeValue('sortOrder');
+  this._removeValue('renderedOrder');
+  this._removeValue('selectedFactors');
+  this._removeValue('showHomoeologues');
+  this.opt.groupBy = this.opt.defaultGroupBy;
+  this.opt.selectedFactors = this.data.selectedFactors;
+  this.sortOrder = [];
+  this.dataLoaded(); 
+  this.refresh();
+};
+
+ExpressionBar.prototype.restoreDisplayOptions = function(){
+  this._restoreProperty('groupBy');
+  this._restoreProperty('renderProperty');
+  this._restoreProperty('sortOrder');
+  this._restoreProperty('renderedOrder');
+  this._restoreProperty('selectedFactors');
+  this._restoreProperty('showHomoeologues');
+  // should we add an option to the orders?
+  // this can tide up this bit
+  if(typeof this.opt.sortOrder !== 'undefined'){
+    this.sortOrder = this.opt.sortOrder;   
+  }
+
+  var hom_checked = false;  
+  if(this.opt.showHomoeologues){
+    hom_checked = true;
+  }
+  jQuery( '#' + this.opt.target + '_showHomoeologues' )
+  .prop('checked', hom_checked);
+  //this.renderedOrder= this.opt.renderedOrder;
 };
 
 ExpressionBar.prototype.setupProgressBar = function(){
-  pb_id =  this.opt.target + '_progressbar';
-  this.pb = jQuery( '#' + pb_id );
-  this.pb.attr("min-height", "20px");
+  var progressBarId  =  this.opt.target + '_progressbar';
+  this.pb = jQuery( '#' + progressBarId );
+  this.pb.attr('min-height', '20px');
   this.pb.progressbar({
     value: false
   });
   this.pb.hide(); 
-}
+};
 
 ExpressionBar.prototype.setupSVG = function(){
  var self = this;
@@ -129,16 +175,16 @@ style( 'font-size', self.opt.barHeight + 'px');
 
 this.barGroups = [];
 
-this.chart.on("mousemove", function(e){
+this.chart.on('mousemove', function(e){
   self.highlightRow(this);
 });
-this.chart.on("mousemove", function(e){
+this.chart.on('mousemove', function(e){
   self.highlightRow(this);
 });
-this.chart.on("mouseenter", function(e){
+this.chart.on('mouseenter', function(e){
   self.showHighithRow();
 });
-this.chart.on("mouseleave", function(e){
+this.chart.on('mouseleave', function(e){
   self.hideHidelightRow();
 });
 
@@ -187,16 +233,20 @@ ExpressionBar.prototype.setupContainer = function(){
   this.opt.target + '_save_png">Save as PNG</button>');
  this._container.append('<button type="button" id="' +
   this.opt.target + '_save_data">Save data</button>');
+ this._container.append('<button type="button" id="' +
+  this.opt.target + '_restore_defaults">Restore Defaults</button>');
 
- this._container.append('<span id="'+this.opt.target +'_homSpan"><input id="' +  this.opt.target +
-  '_showHomoeologues" type="checkbox" name="showHomoeologues" value="show">Homoeologues </input> </span>')
+ this._container.append('<span id="'+this.opt.target +'_homSpan">\
+  <input id="' +  this.opt.target + '_showHomoeologues" type="checkbox"\
+  name="showHomoeologues" value="show">Homoeologues </input> </span>');
  this._container.append('<div id="' +
   this.opt.target + '_progressbar" width="20px" height="20px"> </div>');
  this._container.append('<div id="' +
   this.opt.target + '_preferences"></div>');
  this._container.append('<br/><svg id="' + 
   this.chartSVGidHead + '" ></svg>');
- this._container.append('<div id="' + this.sortDivId + '" height="20px"></div><br/><br/>');
+ this._container.append('<div id="' + this.sortDivId +
+  '" height="20px"></div><br/><br/>');
 
  var central_str='<div style="overflow-y: auto;max-height:' + this.opt.height +'px; ">'
  central_str += '<svg id="' + this.chartSVGid + '" ></svg></div>'
@@ -208,11 +258,18 @@ ExpressionBar.prototype.setupContainer = function(){
 
  jQuery( '#' + this.opt.target + '_save_data' ).on('click', function(evt) {
   self.saveRenderedData(self);
-});
+ });
 
- jQuery( '#' + this.opt.target + '_showHomoeologues' ).on('change', function(evt) {
+ jQuery( '#' + this.opt.target + '_restore_defaults' ).on('click', function(evt) {
+  self.restoreDefaults();
+ });
+
+
+ jQuery( '#' + this.opt.target + '_showHomoeologues' ).
+ on('change', function(evt) {
   self.opt.showHomoeologues = this.checked;
   self.refreshSVG(self);
+  self._storeValue('showHomoeologues',this.checked);
 });
 
 };
@@ -231,6 +288,7 @@ ExpressionBar.prototype.setDefaultOptions = function(){
    labelWidth: 500,
    renderProperty: 'tpm',
    renderGroup: 'group',
+   restoreDisplayOptions: true,
    highlight: null, 
    groupBy: 'groups', 
    groupBarWidth: 20, 
@@ -246,7 +304,7 @@ ExpressionBar.prototype.setSelectedInJoinForm = function() {
   var groupByValue = this.opt.groupBy;
   if (groupByValue.constructor === Array) {
     for(var i in groupByValue){
-      var toSearch = groupByValue[i].replace(/ /g, "_")
+      var toSearch = groupByValue[i].replace(/ /g, '_')
       jQuery(this.joinForm)
       .find('[name=factor][value=' + toSearch +']')
       .prop('checked',true);
@@ -282,11 +340,13 @@ ExpressionBar.prototype.updateGroupBy = function(self) {
       i = self.data.defaultFactorOrder[fo];
       var name=self.opt.target + '_sorted_list_'+ i.split(' ').join('_');
       var shbtn = jQuery('#showHide_' + name);
-      if(shbtn.data("selected")){
-        facts.push(shbtn.data("factor"));
+      if(shbtn.data('selected')){
+        facts.push(shbtn.data('factor'));
       }
     }
+
     self.opt.groupBy = facts;
+
     if(facts.length == 0){
       self.opt.groupBy = 'ungrouped';
       ret = false;
@@ -298,13 +358,19 @@ ExpressionBar.prototype.updateGroupBy = function(self) {
   if(oldGroupBy == self.opt.groupBy){
     ret = false;
   }
+  if(ret){
+    //sessionStorage.setItem( this.opt.target + 'groupBy' , self.opt.groupBy);  
+    this._storeValue('groupBy', self.opt.groupBy);
+  }
+  
+  
   return ret;
 };
 
 ExpressionBar.prototype.refreshSVG = function(self) {
  var chart=self.chart;
  
- chart.selectAll("*").remove();
+ chart.selectAll('*').remove();
  this.renderedData = false;
  self.prepareColorsForFactors();
  self.render();
@@ -321,24 +387,24 @@ ExpressionBar.prototype._addSortPriority = function(factor, end){
   end = typeof end !== 'undefined' ? end : true;
   this._removeSortPriority(factor);
   if(end == true){
-   this.sortOrder.push(factor);
- }else{
-   this.sortOrder.unshift(factor);
- }
-}
+    this.sortOrder.push(factor);
+  }else{
+    this.sortOrder.unshift(factor);
+  }
+  this._storeValue('sortOrder', this.sortOrder);
+};
 
 ExpressionBar.prototype._removeSortPriority = function(factor){
   var index = this.sortOrder.indexOf(factor);
   if (index > -1) {
     this.sortOrder.splice(index, 1);
   }
-}
-
+};
 
 ExpressionBar.prototype._refershSortedOrder = function(factor){
   var self = this;
 
-  var find = factor.replace(/ /g, "_");
+  var find = factor.replace(/ /g, '_');
   var name=this.opt.target + '_sorted_list_'+ find;
   jQuery('#'+ name  + ' div').each(function(e) {
     div = jQuery(this);
@@ -347,11 +413,14 @@ ExpressionBar.prototype._refershSortedOrder = function(factor){
     self.renderedOrder[factor][value] = div.index();
   } 
   );
-  this._addSortPriority(factor, false)
+  this._addSortPriority(factor, false);
+ 
+  this._storeValue('renderedOrder', this.renderedOrder);
+
   this.sortRenderedGroups(this.sortOrder, this.renderedOrder);
   this.setFactorColor(factor);
   this.refresh();
-}
+};
 
 ExpressionBar.prototype._updateFilteredFactors = function(sortDivId){
 
@@ -367,24 +436,42 @@ ExpressionBar.prototype._updateFilteredFactors = function(sortDivId){
     value = src.data('value');
     self.selectedFactors[factor][value] = this.checked; 
   });
+  this._storeValue('selectedFactors', this.selectedFactors);
   this.refreshSVGEnabled = true;
 
 };
 
 ExpressionBar.prototype.toggleFactorCheckbox = function(shbtn){
  //var shbtn = jQuery('#showHide_' + name);
- var selected = shbtn.data("selected");
+ var selected = shbtn.data('selected');
  // shbtn
  if(selected){
-  shbtn.data("selected", false);
-  shbtn.removeClass("ui-icon-circle-minus");
-  shbtn.addClass("ui-icon-circle-plus");
+  shbtn.data('selected', false); 
+  shbtn.removeClass('ui-icon-circle-minus');
+  shbtn.addClass('ui-icon-circle-plus');
 }else{
-  shbtn.data("selected", true);
-  shbtn.removeClass("ui-icon-circle-plus");
-  shbtn.addClass("ui-icon-circle-minus");
+  shbtn.data('selected', true);
+  shbtn.removeClass('ui-icon-circle-plus');
+  shbtn.addClass('ui-icon-circle-minus');
 }
 };
+
+
+ExpressionBar.prototype._storeValue = function(key, value){
+  var val = JSON.stringify(value);
+  sessionStorage.setItem(this.opt.target + "_" + key, val);
+};
+
+ExpressionBar.prototype._removeValue = function(key, value){
+  sessionStorage.removeItem(this.opt.target + "_" + key);
+  this.opt['key'] = null;
+};
+
+ExpressionBar.prototype._retrieveValue = function(key){
+  var val = sessionStorage.getItem(this.opt.target + "_" + key);
+  return JSON.parse(val); 
+};
+
 
 ExpressionBar.prototype.checkSelectedFactors = function(){
   var self = this;
@@ -394,36 +481,34 @@ ExpressionBar.prototype.checkSelectedFactors = function(){
     var shbtn = jQuery('#showHide_' + name);
     var groupByValue = this.opt.groupBy;
 
-    shbtn.data("selected", false);
-    shbtn.data("factor", i);
-    //shbtn.click(function(){console.log(name + "")});
-    
-    shbtn.on("click", function(evt){
+    shbtn.data('selected', false);
+    shbtn.data('factor', i);  
+    shbtn.on('click', function(evt){
      target = jQuery(this);
      self.toggleFactorCheckbox(target);
      self.updateGroupBy(self); 
      self.refreshSVG(self);
-   });
+    });
 
     if (groupByValue.constructor === Array) {
       index = self.opt.groupBy.indexOf(i) 
       self.showFactors = true;
       if(index < 0 ){
-        if(shbtn.hasClass("ui-icon-circle-minus")){
-          shbtn.removeClass("ui-icon-circle-minus");
-          shbtn.addClass("ui-icon-circle-plus");
+        if(shbtn.hasClass('ui-icon-circle-minus')){
+          shbtn.removeClass('ui-icon-circle-minus');
+          shbtn.addClass('ui-icon-circle-plus');
         }          
       }else{
-        if(shbtn.hasClass("ui-icon-circle-plus")){
-          shbtn.removeClass("ui-icon-circle-plus");
-          shbtn.addClass("ui-icon-circle-minus");
+        if(shbtn.hasClass('ui-icon-circle-plus')){
+          shbtn.removeClass('ui-icon-circle-plus');
+          shbtn.addClass('ui-icon-circle-minus');
         }
-        shbtn.data("selected", true);
+        shbtn.data('selected', true);
       }
     }else{
-      if(shbtn.hasClass("ui-icon-circle-plus")){
-        shbtn.removeClass("ui-icon-circle-plus");
-        shbtn.addClass("ui-icon-circle-minus");
+      if(shbtn.hasClass('ui-icon-circle-plus')){
+        shbtn.removeClass('ui-icon-circle-plus');
+        shbtn.addClass('ui-icon-circle-minus');
       }
     }
   }
@@ -432,7 +517,12 @@ ExpressionBar.prototype.checkSelectedFactors = function(){
 
 ExpressionBar.prototype.renderSortWindow = function(){
   var self = this;
-  
+  var selectedFactors = this.data.selectedFactors;
+
+  if(typeof this.opt.selectedFactors !== 'undefined' ){
+    selectedFactors = this.opt.selectedFactors;
+  }
+
   var listText = ''
 
   var factorCount = 0;
@@ -446,7 +536,6 @@ ExpressionBar.prototype.renderSortWindow = function(){
     name=this.opt.target + '_sorted_list_'+ i.split(' ').join('_');
     //    listText += i;
 
-    
     listText += '<span id="span_' + 
     name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" title="Filter/reorder" ></span>'
     listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus"\
@@ -466,7 +555,8 @@ ExpressionBar.prototype.renderSortWindow = function(){
       var longFactorName = this.data.longFactorName[i][orderedKeys[j]];
       var shortId = i.split(' ').join('_') + '|' + orderedKeys[j];
       var checked = '';
-      if(this.data.selectedFactors[i][orderedKeys[j]]){
+//      console.log(orderedKeys[j] + ": " + longFactorName);
+      if(selectedFactors[i][orderedKeys[j]]){
         checked = 'checked';
       }
 
@@ -543,10 +633,10 @@ ExpressionBar.prototype.renderSortWindow = function(){
     var sall = jQuery('#all_'+ name);
     var snone = jQuery('#none_'+ name);
     
-    sall.on("click", function(e){
-      var nameinside = e.target.id.replace("all_", "");
+    sall.on('click', function(e){
+      var nameinside = e.target.id.replace('all_', '');
       jQuery('#'+ nameinside +' input:checkbox').each(function() {
-        jQuery(this).prop( "checked", true ); // do your staff with each checkbox
+        jQuery(this).prop( 'checked', true ); // do your staff with each checkbox
         self._updateFilteredFactors(self.sortDivId );
         
       });
@@ -558,10 +648,10 @@ ExpressionBar.prototype.renderSortWindow = function(){
     });
 
 
-    snone.on("click", function(e){
-      var nameinside = e.target.id.replace("none_", "");
+    snone.on('click', function(e){
+      var nameinside = e.target.id.replace('none_', '');
       jQuery('#'+ nameinside +' input:checkbox').each(function() {
-        jQuery(this).prop( "checked", false ); // do your staff with each checkbox
+        jQuery(this).prop( 'checked', false ); // do your staff with each checkbox
         self._updateFilteredFactors(self.sortDivId );    
       });
       if(self.refreshSVGEnabled == true){
@@ -571,9 +661,9 @@ ExpressionBar.prototype.renderSortWindow = function(){
 
     });
 
-    s.css("text-align", "left");
-    s.css("max-width","100%;")
-    s.css(" overflow-x","hidden;")
+    s.css('text-align', 'left');
+    s.css('max-width','100%;')
+    s.css('overflow-x','hidden;')
     s.sortable({
       axis: "y",
       update: function(event, ui) {
@@ -586,29 +676,29 @@ ExpressionBar.prototype.renderSortWindow = function(){
 
     sbtn.attr('width', this.opt.barHeight    * 2 );
     sbtn.attr('height', this.opt.barHeight );
-    sbtn.css("position", "absolute");
-    sbtn.css("left", xFact + this.opt.groupBarWidth);
-    sbtn.css("top", "inherit");
+    sbtn.css('position', 'absolute');
+    sbtn.css('left', xFact + this.opt.groupBarWidth);
+    sbtn.css('top', 'inherit');
 
     var possbtn = sbtn.position();
 
     shbtn.attr('width', this.opt.barHeight    * 2 );
     shbtn.attr('height', this.opt.barHeight );
-    shbtn.css("position", "absolute");
-    shbtn.css("left", xFact + this.opt.groupBarWidth);
+    shbtn.css('position', 'absolute');
+    shbtn.css('left', xFact + this.opt.groupBarWidth);
     //shbtn.tooltip({
     //  track: false
     //});
 
-shbtn.css("top", possbtn.top + 15);
+shbtn.css('top', possbtn.top + 15);
 
 
 
-sdialog.css("position", "absolute");
-sdialog.css("left", xFact );
-sdialog.css("background-color", "white");
-sdialog.css("border", "outset");
-sdialog.css("top", possbtn.top + 15);
+sdialog.css('position', 'absolute');
+sdialog.css('left', xFact );
+sdialog.css('background-color', 'white');
+sdialog.css('border', 'outset');
+sdialog.css('top', possbtn.top + 15);
 s.disableSelection();
 sdialog.hide();
 
@@ -630,28 +720,28 @@ ExpressionBar.prototype.showHighlightedFactors = function(toShow, evt){
 
     var value = toShow.factors[key];
     
-    var escaped_key = key.replace(/ /g, "_");
-    var label_div_id = self.opt.target + "_factor_label_" + escaped_key;
-    var colour_div_id = self.opt.target + "_factor_colour_" + escaped_key;
-    var label_full_div_id = self.opt.target + "_factor_full_label_" + escaped_key;
+    var escaped_key = key.replace(/ /g, '_');
+    var label_div_id = self.opt.target + '_factor_label_' + escaped_key;
+    var colour_div_id = self.opt.target + '_factor_colour_' + escaped_key;
+    var label_full_div_id = self.opt.target + '_factor_full_label_' + escaped_key;
 
     var long_name = factorNames[key][value];
     var colour = self.factorColors[key][value];
     if(long_name.length > 28){
       long_name = value;
     }
-    jQuery("#" + label_div_id).text(long_name);
-    jQuery("#" + colour_div_id).css("background-color", colour);
-    jQuery("#" + label_full_div_id).show();
+    jQuery('#' + label_div_id).text(long_name);
+    jQuery('#' + colour_div_id).css('background-color', colour);
+    jQuery('#' + label_full_div_id).show();
   }
 
 };
 
 ExpressionBar.prototype.hideHighlightedFactors = function(){
  this.factors.forEach(function(value, key, map){
-  var escaped_key = key.replace(/ /g, "_");
-  var label_full_div_id = self.opt.target + "_factor_full_label_" + escaped_key;
-  jQuery("#"+label_full_div_id).hide();
+  var escaped_key = key.replace(/ /g, '_');
+  var label_full_div_id = self.opt.target + '_factor_full_label_' + escaped_key;
+  jQuery('#'+label_full_div_id).hide();
 });
 };
 
@@ -666,6 +756,9 @@ ExpressionBar.prototype.renderPropertySelector = function(){
   if (typeof groupOptions === 'undefined') { 
     return ;
   }
+  self.propertySelector
+    .find('option')
+    .remove();
   jQuery.each(groupOptions, function(key,value) {   
     self.propertySelector
     .append(jQuery('<option></option>')
@@ -676,6 +769,7 @@ ExpressionBar.prototype.renderPropertySelector = function(){
   this.propertySelector.val(this.opt.renderProperty);
   this.propertySelector.on('change', function(event) { 
    self.opt.renderProperty  = self.propertySelector.find(':selected').text();;
+   self._storeValue('renderProperty', self.opt.renderProperty);
    self.refresh();
  } );
 
@@ -841,8 +935,23 @@ if(pom.parentElement){
  */
  ExpressionBar.prototype.setAvailableFactors = function(){
    var groups = this.data.factorOrder;
-   this.renderedOrder = jQuery.extend(true, {},  this.data.factorOrder);
-   this.selectedFactors = jQuery.extend(true, {},  this.data.selectedFactors);
+
+   var fo = this.data.factorOrder;
+   var sf = this.data.selectedFactors;
+   var opt_fo = this.opt.renderedOrder;
+   var opt_sf = this.opt.selectedFactors;
+
+   if( typeof opt_fo !== 'undefined'){
+    fo = this.opt.renderedOrder;
+   }
+
+   if(typeof opt_sf !== 'undefined' ){
+    sf = this.opt.selectedFactors;
+   }
+
+
+   this.renderedOrder = jQuery.extend(true, {}, fo);
+   this.selectedFactors = jQuery.extend(true, {},  sf);
    var factorOrder = this.data.defaultFactorOrder;
    //console.log(factorOrder);
    this.factors = new Map();
@@ -908,19 +1017,18 @@ ExpressionBar.prototype.getGroupFactorDescription = function(o,groupBy){
   for(var i in groupBy) {
     var grpby = groupBy[i];
 
-    //TODO: This is a patch. We should have a list of elements that we don't want to display
+    // TODO: This is a patch.
+    // We should have a list of elements that we don't
+    // want to display
     if(grpby == "study"){
       arr_offset ++;
       continue;
     }
 
     var curr_fact = factorNames[grpby];
-    //console.log(grpby);
-    //console.log(i)
-    //console.log(groupBy);
-    //console.log( o.factors);
     var curr_short =  o.factors[groupBy[i]]; 
     var curr_long = curr_fact[curr_short];
+    
     factorArray[i - arr_offset ] = curr_long;
     if(numOfFactors > 4 || curr_long.length > 15 ){
       factorArray[i - arr_offset ] = curr_short;
@@ -1474,7 +1582,6 @@ ExpressionBar.prototype.renderTitles = function(){
   var titleSetOffset = this.factors.size  * this.opt.groupBarWidth;
   var factorWidth = this.opt.groupBarWidth - 2; 
   
-
   for(i in arr){
     var pos = arr[i].renderIndex ; 
     this.titleGroup.append('text')
@@ -1547,6 +1654,9 @@ ExpressionBar.prototype.renderSelection = function(){
 };
 
 ExpressionBar.prototype.highlightRow = function(target){
+  if(typeof this.renderedData === 'undefined'){
+    return;
+  }
   if(typeof this.renderedData[0] === 'undefined'){
     return;
   }
@@ -1672,11 +1782,16 @@ ExpressionBar.prototype.dataLoaded = function(){
   this.checkSelectedFactors();
 
   if(typeof this.data.compare === "undefined" || this.data.compare.length == 0){
-   jQuery( '#' + this.opt.target + '_homSpan' ).show();
- }else{
-   jQuery( '#' + this.opt.target + '_homSpan' ).hide();
- }
-
+    jQuery( '#' + this.opt.target + '_homSpan' ).show();
+  }else{
+    jQuery( '#' + this.opt.target + '_homSpan' ).hide();
+  }
+ 
+  if(typeof this.opt.sortOrder !== 'undefined'){
+    this.sortRenderedGroups(this.sortOrder, this.renderedOrder);
+    //TODO: add an option to remove the annimation on the initial load
+    this.refresh(); 
+  }
 };
 
 
@@ -2309,7 +2424,7 @@ module.exports = require('./colorbrewer.js');
 },{"./colorbrewer.js":6}],8:[function(require,module,exports){
 !function() {
   var d3 = {
-    version: "3.5.6"
+    version: "3.5.9"
   };
   var d3_arraySlice = [].slice, d3_array = function(list) {
     return d3_arraySlice.call(list);
@@ -2940,10 +3055,7 @@ module.exports = require('./colorbrewer.js');
     prefix: d3_nsPrefix,
     qualify: function(name) {
       var i = name.indexOf(":"), prefix = name;
-      if (i >= 0) {
-        prefix = name.slice(0, i);
-        name = name.slice(i + 1);
-      }
+      if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
       return d3_nsPrefix.hasOwnProperty(prefix) ? {
         space: d3_nsPrefix[prefix],
         local: name
@@ -3154,12 +3266,14 @@ module.exports = require('./colorbrewer.js');
       if (key) {
         var nodeByKeyValue = new d3_Map(), keyValues = new Array(n), keyValue;
         for (i = -1; ++i < n; ) {
-          if (nodeByKeyValue.has(keyValue = key.call(node = group[i], node.__data__, i))) {
-            exitNodes[i] = node;
-          } else {
-            nodeByKeyValue.set(keyValue, node);
+          if (node = group[i]) {
+            if (nodeByKeyValue.has(keyValue = key.call(node, node.__data__, i))) {
+              exitNodes[i] = node;
+            } else {
+              nodeByKeyValue.set(keyValue, node);
+            }
+            keyValues[i] = keyValue;
           }
-          keyValues[i] = keyValue;
         }
         for (i = -1; ++i < m; ) {
           if (!(node = nodeByKeyValue.get(keyValue = key.call(groupData, nodeData = groupData[i], i)))) {
@@ -3171,7 +3285,7 @@ module.exports = require('./colorbrewer.js');
           nodeByKeyValue.set(keyValue, true);
         }
         for (i = -1; ++i < n; ) {
-          if (nodeByKeyValue.get(keyValues[i]) !== true) {
+          if (i in keyValues && nodeByKeyValue.get(keyValues[i]) !== true) {
             exitNodes[i] = group[i];
           }
         }
@@ -3363,7 +3477,7 @@ module.exports = require('./colorbrewer.js');
       group = d3_array(d3_selectAll(nodes, d3_document));
       group.parentNode = d3_document.documentElement;
     } else {
-      group = nodes;
+      group = d3_array(nodes);
       group.parentNode = null;
     }
     return d3_selection([ group ]);
@@ -3542,7 +3656,7 @@ module.exports = require('./colorbrewer.js');
         function ended() {
           if (!position(parent, dragId)) return;
           dragSubject.on(move + dragName, null).on(end + dragName, null);
-          dragRestore(dragged && d3.event.target === target);
+          dragRestore(dragged);
           dispatch({
             type: "dragend"
           });
@@ -3594,18 +3708,22 @@ module.exports = require('./colorbrewer.js');
   }
   var ρ = Math.SQRT2, ρ2 = 2, ρ4 = 4;
   d3.interpolateZoom = function(p0, p1) {
-    var ux0 = p0[0], uy0 = p0[1], w0 = p0[2], ux1 = p1[0], uy1 = p1[1], w1 = p1[2];
-    var dx = ux1 - ux0, dy = uy1 - uy0, d2 = dx * dx + dy * dy, d1 = Math.sqrt(d2), b0 = (w1 * w1 - w0 * w0 + ρ4 * d2) / (2 * w0 * ρ2 * d1), b1 = (w1 * w1 - w0 * w0 - ρ4 * d2) / (2 * w1 * ρ2 * d1), r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0), r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1), dr = r1 - r0, S = (dr || Math.log(w1 / w0)) / ρ;
-    function interpolate(t) {
-      var s = t * S;
-      if (dr) {
-        var coshr0 = d3_cosh(r0), u = w0 / (ρ2 * d1) * (coshr0 * d3_tanh(ρ * s + r0) - d3_sinh(r0));
+    var ux0 = p0[0], uy0 = p0[1], w0 = p0[2], ux1 = p1[0], uy1 = p1[1], w1 = p1[2], dx = ux1 - ux0, dy = uy1 - uy0, d2 = dx * dx + dy * dy, i, S;
+    if (d2 < ε2) {
+      S = Math.log(w1 / w0) / ρ;
+      i = function(t) {
+        return [ ux0 + t * dx, uy0 + t * dy, w0 * Math.exp(ρ * t * S) ];
+      };
+    } else {
+      var d1 = Math.sqrt(d2), b0 = (w1 * w1 - w0 * w0 + ρ4 * d2) / (2 * w0 * ρ2 * d1), b1 = (w1 * w1 - w0 * w0 - ρ4 * d2) / (2 * w1 * ρ2 * d1), r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0), r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1);
+      S = (r1 - r0) / ρ;
+      i = function(t) {
+        var s = t * S, coshr0 = d3_cosh(r0), u = w0 / (ρ2 * d1) * (coshr0 * d3_tanh(ρ * s + r0) - d3_sinh(r0));
         return [ ux0 + u * dx, uy0 + u * dy, w0 * coshr0 / d3_cosh(ρ * s + r0) ];
-      }
-      return [ ux0 + t * dx, uy0 + t * dy, w0 * Math.exp(ρ * s) ];
+      };
     }
-    interpolate.duration = S * 1e3;
-    return interpolate;
+    i.duration = S * 1e3;
+    return i;
   };
   d3.behavior.zoom = function() {
     var view = {
@@ -3675,8 +3793,9 @@ module.exports = require('./colorbrewer.js');
       view = {
         x: view.x,
         y: view.y,
-        k: +_
+        k: null
       };
+      scaleTo(+_);
       rescale();
       return zoom;
     };
@@ -3775,7 +3894,7 @@ module.exports = require('./colorbrewer.js');
       }), center0 = null;
     }
     function mousedowned() {
-      var that = this, target = d3.event.target, dispatch = event.of(that, arguments), dragged = 0, subject = d3.select(d3_window(that)).on(mousemove, moved).on(mouseup, ended), location0 = location(d3.mouse(that)), dragRestore = d3_event_dragSuppress(that);
+      var that = this, dispatch = event.of(that, arguments), dragged = 0, subject = d3.select(d3_window(that)).on(mousemove, moved).on(mouseup, ended), location0 = location(d3.mouse(that)), dragRestore = d3_event_dragSuppress(that);
       d3_selection_interrupt.call(that);
       zoomstarted(dispatch);
       function moved() {
@@ -3785,7 +3904,7 @@ module.exports = require('./colorbrewer.js');
       }
       function ended() {
         subject.on(mousemove, null).on(mouseup, null);
-        dragRestore(dragged && d3.event.target === target);
+        dragRestore(dragged);
         zoomended(dispatch);
       }
     }
@@ -4007,9 +4126,8 @@ module.exports = require('./colorbrewer.js');
     return v < 16 ? "0" + Math.max(0, v).toString(16) : Math.min(255, v).toString(16);
   }
   function d3_rgb_parse(format, rgb, hsl) {
-    format = format.toLowerCase();
     var r = 0, g = 0, b = 0, m1, m2, color;
-    m1 = /([a-z]+)\((.*)\)/.exec(format);
+    m1 = /([a-z]+)\((.*)\)/.exec(format = format.toLowerCase());
     if (m1) {
       m2 = m1[2].split(",");
       switch (m1[1]) {
@@ -4424,17 +4542,19 @@ module.exports = require('./colorbrewer.js');
   };
   d3.csv = d3.dsv(",", "text/csv");
   d3.tsv = d3.dsv("	", "text/tab-separated-values");
-  var d3_timer_queueHead, d3_timer_queueTail, d3_timer_interval, d3_timer_timeout, d3_timer_active, d3_timer_frame = this[d3_vendorSymbol(this, "requestAnimationFrame")] || function(callback) {
+  var d3_timer_queueHead, d3_timer_queueTail, d3_timer_interval, d3_timer_timeout, d3_timer_frame = this[d3_vendorSymbol(this, "requestAnimationFrame")] || function(callback) {
     setTimeout(callback, 17);
   };
-  d3.timer = function(callback, delay, then) {
+  d3.timer = function() {
+    d3_timer.apply(this, arguments);
+  };
+  function d3_timer(callback, delay, then) {
     var n = arguments.length;
     if (n < 2) delay = 0;
     if (n < 3) then = Date.now();
     var time = then + delay, timer = {
       c: callback,
       t: time,
-      f: false,
       n: null
     };
     if (d3_timer_queueTail) d3_timer_queueTail.n = timer; else d3_timer_queueHead = timer;
@@ -4444,7 +4564,8 @@ module.exports = require('./colorbrewer.js');
       d3_timer_interval = 1;
       d3_timer_frame(d3_timer_step);
     }
-  };
+    return timer;
+  }
   function d3_timer_step() {
     var now = d3_timer_mark(), delay = d3_timer_sweep() - now;
     if (delay > 24) {
@@ -4463,22 +4584,21 @@ module.exports = require('./colorbrewer.js');
     d3_timer_sweep();
   };
   function d3_timer_mark() {
-    var now = Date.now();
-    d3_timer_active = d3_timer_queueHead;
-    while (d3_timer_active) {
-      if (now >= d3_timer_active.t) d3_timer_active.f = d3_timer_active.c(now - d3_timer_active.t);
-      d3_timer_active = d3_timer_active.n;
+    var now = Date.now(), timer = d3_timer_queueHead;
+    while (timer) {
+      if (now >= timer.t && timer.c(now - timer.t)) timer.c = null;
+      timer = timer.n;
     }
     return now;
   }
   function d3_timer_sweep() {
     var t0, t1 = d3_timer_queueHead, time = Infinity;
     while (t1) {
-      if (t1.f) {
-        t1 = t0 ? t0.n = t1.n : d3_timer_queueHead = t1.n;
-      } else {
+      if (t1.c) {
         if (t1.t < time) time = t1.t;
         t1 = (t0 = t1).n;
+      } else {
+        t1 = t0 ? t0.n = t1.n : d3_timer_queueHead = t1.n;
       }
     }
     d3_timer_queueTail = t0;
@@ -4493,7 +4613,7 @@ module.exports = require('./colorbrewer.js');
   var d3_formatPrefixes = [ "y", "z", "a", "f", "p", "n", "µ", "m", "", "k", "M", "G", "T", "P", "E", "Z", "Y" ].map(d3_formatPrefix);
   d3.formatPrefix = function(value, precision) {
     var i = 0;
-    if (value) {
+    if (value = +value) {
       if (value < 0) value *= -1;
       if (precision) value = d3.round(value, d3_format_precision(value, precision));
       i = 1 + Math.floor(1e-12 + Math.log(value) / Math.LN10);
@@ -4843,7 +4963,8 @@ module.exports = require('./colorbrewer.js');
         if (i != string.length) return null;
         if ("p" in d) d.H = d.H % 12 + d.p * 12;
         var localZ = d.Z != null && d3_date !== d3_date_utc, date = new (localZ ? d3_date_utc : d3_date)();
-        if ("j" in d) date.setFullYear(d.y, 0, d.j); else if ("w" in d && ("W" in d || "U" in d)) {
+        if ("j" in d) date.setFullYear(d.y, 0, d.j); else if ("W" in d || "U" in d) {
+          if (!("w" in d)) d.w = "W" in d ? 1 : 0;
           date.setFullYear(d.y, 0, 1);
           date.setFullYear(d.y, 0, "W" in d ? (d.w + 6) % 7 + d.W * 7 - (date.getDay() + 5) % 7 : d.w + d.U * 7 - (date.getDay() + 6) % 7);
         } else date.setFullYear(d.y, d.m, d.d);
@@ -8295,54 +8416,68 @@ module.exports = require('./colorbrewer.js');
     f: 0
   };
   d3.interpolateTransform = d3_interpolateTransform;
-  function d3_interpolateTransform(a, b) {
-    var s = [], q = [], n, A = d3.transform(a), B = d3.transform(b), ta = A.translate, tb = B.translate, ra = A.rotate, rb = B.rotate, wa = A.skew, wb = B.skew, ka = A.scale, kb = B.scale;
-    if (ta[0] != tb[0] || ta[1] != tb[1]) {
-      s.push("translate(", null, ",", null, ")");
+  function d3_interpolateTransformPop(s) {
+    return s.length ? s.pop() + "," : "";
+  }
+  function d3_interpolateTranslate(ta, tb, s, q) {
+    if (ta[0] !== tb[0] || ta[1] !== tb[1]) {
+      var i = s.push("translate(", null, ",", null, ")");
       q.push({
-        i: 1,
+        i: i - 4,
         x: d3_interpolateNumber(ta[0], tb[0])
       }, {
-        i: 3,
+        i: i - 2,
         x: d3_interpolateNumber(ta[1], tb[1])
       });
     } else if (tb[0] || tb[1]) {
       s.push("translate(" + tb + ")");
-    } else {
-      s.push("");
     }
-    if (ra != rb) {
+  }
+  function d3_interpolateRotate(ra, rb, s, q) {
+    if (ra !== rb) {
       if (ra - rb > 180) rb += 360; else if (rb - ra > 180) ra += 360;
       q.push({
-        i: s.push(s.pop() + "rotate(", null, ")") - 2,
+        i: s.push(d3_interpolateTransformPop(s) + "rotate(", null, ")") - 2,
         x: d3_interpolateNumber(ra, rb)
       });
     } else if (rb) {
-      s.push(s.pop() + "rotate(" + rb + ")");
+      s.push(d3_interpolateTransformPop(s) + "rotate(" + rb + ")");
     }
-    if (wa != wb) {
+  }
+  function d3_interpolateSkew(wa, wb, s, q) {
+    if (wa !== wb) {
       q.push({
-        i: s.push(s.pop() + "skewX(", null, ")") - 2,
+        i: s.push(d3_interpolateTransformPop(s) + "skewX(", null, ")") - 2,
         x: d3_interpolateNumber(wa, wb)
       });
     } else if (wb) {
-      s.push(s.pop() + "skewX(" + wb + ")");
+      s.push(d3_interpolateTransformPop(s) + "skewX(" + wb + ")");
     }
-    if (ka[0] != kb[0] || ka[1] != kb[1]) {
-      n = s.push(s.pop() + "scale(", null, ",", null, ")");
+  }
+  function d3_interpolateScale(ka, kb, s, q) {
+    if (ka[0] !== kb[0] || ka[1] !== kb[1]) {
+      var i = s.push(d3_interpolateTransformPop(s) + "scale(", null, ",", null, ")");
       q.push({
-        i: n - 4,
+        i: i - 4,
         x: d3_interpolateNumber(ka[0], kb[0])
       }, {
-        i: n - 2,
+        i: i - 2,
         x: d3_interpolateNumber(ka[1], kb[1])
       });
-    } else if (kb[0] != 1 || kb[1] != 1) {
-      s.push(s.pop() + "scale(" + kb + ")");
+    } else if (kb[0] !== 1 || kb[1] !== 1) {
+      s.push(d3_interpolateTransformPop(s) + "scale(" + kb + ")");
     }
-    n = q.length;
+  }
+  function d3_interpolateTransform(a, b) {
+    var s = [], q = [];
+    a = d3.transform(a), b = d3.transform(b);
+    d3_interpolateTranslate(a.translate, b.translate, s, q);
+    d3_interpolateRotate(a.rotate, b.rotate, s, q);
+    d3_interpolateSkew(a.skew, b.skew, s, q);
+    d3_interpolateScale(a.scale, b.scale, s, q);
+    a = b = null;
     return function(t) {
-      var i = -1, o;
+      var i = -1, n = q.length, o;
       while (++i < n) s[(o = q[i]).i] = o.x(t);
       return s.join("");
     };
@@ -8514,7 +8649,7 @@ module.exports = require('./colorbrewer.js');
     return chord;
   };
   d3.layout.force = function() {
-    var force = {}, event = d3.dispatch("start", "tick", "end"), size = [ 1, 1 ], drag, alpha, friction = .9, linkDistance = d3_layout_forceLinkDistance, linkStrength = d3_layout_forceLinkStrength, charge = -30, chargeDistance2 = d3_layout_forceChargeDistance2, gravity = .1, theta2 = .64, nodes = [], links = [], distances, strengths, charges;
+    var force = {}, event = d3.dispatch("start", "tick", "end"), timer, size = [ 1, 1 ], drag, alpha, friction = .9, linkDistance = d3_layout_forceLinkDistance, linkStrength = d3_layout_forceLinkStrength, charge = -30, chargeDistance2 = d3_layout_forceChargeDistance2, gravity = .1, theta2 = .64, nodes = [], links = [], distances, strengths, charges;
     function repulse(node) {
       return function(quad, x1, _, x2) {
         if (quad.point !== node) {
@@ -8538,6 +8673,7 @@ module.exports = require('./colorbrewer.js');
     }
     force.tick = function() {
       if ((alpha *= .99) < .005) {
+        timer = null;
         event.end({
           type: "end",
           alpha: alpha = 0
@@ -8555,7 +8691,7 @@ module.exports = require('./colorbrewer.js');
           l = alpha * strengths[i] * ((l = Math.sqrt(l)) - distances[i]) / l;
           x *= l;
           y *= l;
-          t.x -= x * (k = s.weight / (t.weight + s.weight));
+          t.x -= x * (k = s.weight + t.weight ? s.weight / (s.weight + t.weight) : .5);
           t.y -= y * k;
           s.x += x * (k = 1 - k);
           s.y += y * k;
@@ -8651,13 +8787,21 @@ module.exports = require('./colorbrewer.js');
       if (!arguments.length) return alpha;
       x = +x;
       if (alpha) {
-        if (x > 0) alpha = x; else alpha = 0;
+        if (x > 0) {
+          alpha = x;
+        } else {
+          timer.c = null, timer.t = NaN, timer = null;
+          event.start({
+            type: "end",
+            alpha: alpha = 0
+          });
+        }
       } else if (x > 0) {
         event.start({
           type: "start",
           alpha: alpha = x
         });
-        d3.timer(force.tick);
+        timer = d3_timer(force.tick);
       }
       return force;
     };
@@ -8911,7 +9055,7 @@ module.exports = require('./colorbrewer.js');
     function pie(data) {
       var n = data.length, values = data.map(function(d, i) {
         return +value.call(pie, d, i);
-      }), a = +(typeof startAngle === "function" ? startAngle.apply(this, arguments) : startAngle), da = (typeof endAngle === "function" ? endAngle.apply(this, arguments) : endAngle) - a, p = Math.min(Math.abs(da) / n, +(typeof padAngle === "function" ? padAngle.apply(this, arguments) : padAngle)), pa = p * (da < 0 ? -1 : 1), k = (da - n * pa) / d3.sum(values), index = d3.range(n), arcs = [], v;
+      }), a = +(typeof startAngle === "function" ? startAngle.apply(this, arguments) : startAngle), da = (typeof endAngle === "function" ? endAngle.apply(this, arguments) : endAngle) - a, p = Math.min(Math.abs(da) / n, +(typeof padAngle === "function" ? padAngle.apply(this, arguments) : padAngle)), pa = p * (da < 0 ? -1 : 1), sum = d3.sum(values), k = sum ? (da - n * pa) / sum : 0, index = d3.range(n), arcs = [], v;
       if (sort != null) index.sort(sort === d3_layout_pieSortByValue ? function(i, j) {
         return values[j] - values[i];
       } : function(i, j) {
@@ -9624,10 +9768,8 @@ module.exports = require('./colorbrewer.js');
     }
     function treemap(d) {
       var nodes = stickies || hierarchy(d), root = nodes[0];
-      root.x = 0;
-      root.y = 0;
-      root.dx = size[0];
-      root.dy = size[1];
+      root.x = root.y = 0;
+      if (root.value) root.dx = size[0], root.dy = size[1]; else root.dx = root.dy = 0;
       if (stickies) hierarchy.revalue(root);
       scale([ root ], root.dx * root.dy / root.value);
       (stickies ? stickify : squarify)(root);
@@ -10291,11 +10433,16 @@ module.exports = require('./colorbrewer.js');
       } else {
         x2 = y2 = 0;
       }
-      if ((rc = Math.min(Math.abs(r1 - r0) / 2, +cornerRadius.apply(this, arguments))) > .001) {
+      if (da > ε && (rc = Math.min(Math.abs(r1 - r0) / 2, +cornerRadius.apply(this, arguments))) > .001) {
         cr = r0 < r1 ^ cw ? 0 : 1;
-        var oc = x3 == null ? [ x2, y2 ] : x1 == null ? [ x0, y0 ] : d3_geom_polygonIntersect([ x0, y0 ], [ x3, y3 ], [ x1, y1 ], [ x2, y2 ]), ax = x0 - oc[0], ay = y0 - oc[1], bx = x1 - oc[0], by = y1 - oc[1], kc = 1 / Math.sin(Math.acos((ax * bx + ay * by) / (Math.sqrt(ax * ax + ay * ay) * Math.sqrt(bx * bx + by * by))) / 2), lc = Math.sqrt(oc[0] * oc[0] + oc[1] * oc[1]);
+        var rc1 = rc, rc0 = rc;
+        if (da < π) {
+          var oc = x3 == null ? [ x2, y2 ] : x1 == null ? [ x0, y0 ] : d3_geom_polygonIntersect([ x0, y0 ], [ x3, y3 ], [ x1, y1 ], [ x2, y2 ]), ax = x0 - oc[0], ay = y0 - oc[1], bx = x1 - oc[0], by = y1 - oc[1], kc = 1 / Math.sin(Math.acos((ax * bx + ay * by) / (Math.sqrt(ax * ax + ay * ay) * Math.sqrt(bx * bx + by * by))) / 2), lc = Math.sqrt(oc[0] * oc[0] + oc[1] * oc[1]);
+          rc0 = Math.min(rc, (r0 - lc) / (kc - 1));
+          rc1 = Math.min(rc, (r1 - lc) / (kc + 1));
+        }
         if (x1 != null) {
-          var rc1 = Math.min(rc, (r1 - lc) / (kc + 1)), t30 = d3_svg_arcCornerTangents(x3 == null ? [ x2, y2 ] : [ x3, y3 ], [ x0, y0 ], r1, rc1, cw), t12 = d3_svg_arcCornerTangents([ x1, y1 ], [ x2, y2 ], r1, rc1, cw);
+          var t30 = d3_svg_arcCornerTangents(x3 == null ? [ x2, y2 ] : [ x3, y3 ], [ x0, y0 ], r1, rc1, cw), t12 = d3_svg_arcCornerTangents([ x1, y1 ], [ x2, y2 ], r1, rc1, cw);
           if (rc === rc1) {
             path.push("M", t30[0], "A", rc1, ",", rc1, " 0 0,", cr, " ", t30[1], "A", r1, ",", r1, " 0 ", 1 - cw ^ d3_svg_arcSweep(t30[1][0], t30[1][1], t12[1][0], t12[1][1]), ",", cw, " ", t12[1], "A", rc1, ",", rc1, " 0 0,", cr, " ", t12[0]);
           } else {
@@ -10305,7 +10452,7 @@ module.exports = require('./colorbrewer.js');
           path.push("M", x0, ",", y0);
         }
         if (x3 != null) {
-          var rc0 = Math.min(rc, (r0 - lc) / (kc - 1)), t03 = d3_svg_arcCornerTangents([ x0, y0 ], [ x3, y3 ], r0, -rc0, cw), t21 = d3_svg_arcCornerTangents([ x2, y2 ], x1 == null ? [ x0, y0 ] : [ x1, y1 ], r0, -rc0, cw);
+          var t03 = d3_svg_arcCornerTangents([ x0, y0 ], [ x3, y3 ], r0, -rc0, cw), t21 = d3_svg_arcCornerTangents([ x2, y2 ], x1 == null ? [ x0, y0 ] : [ x1, y1 ], r0, -rc0, cw);
           if (rc === rc0) {
             path.push("L", t21[0], "A", rc0, ",", rc0, " 0 0,", cr, " ", t21[1], "A", r0, ",", r0, " 0 ", cw ^ d3_svg_arcSweep(t21[1][0], t21[1][1], t03[1][0], t03[1][1]), ",", 1 - cw, " ", t03[1], "A", rc0, ",", rc0, " 0 0,", cr, " ", t03[0]);
           } else {
@@ -10387,7 +10534,7 @@ module.exports = require('./colorbrewer.js');
     return (x0 - x1) * y0 - (y0 - y1) * x0 > 0 ? 0 : 1;
   }
   function d3_svg_arcCornerTangents(p0, p1, r1, rc, cw) {
-    var x01 = p0[0] - p1[0], y01 = p0[1] - p1[1], lo = (cw ? rc : -rc) / Math.sqrt(x01 * x01 + y01 * y01), ox = lo * y01, oy = -lo * x01, x1 = p0[0] + ox, y1 = p0[1] + oy, x2 = p1[0] + ox, y2 = p1[1] + oy, x3 = (x1 + x2) / 2, y3 = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, d2 = dx * dx + dy * dy, r = r1 - rc, D = x1 * y2 - x2 * y1, d = (dy < 0 ? -1 : 1) * Math.sqrt(r * r * d2 - D * D), cx0 = (D * dy - dx * d) / d2, cy0 = (-D * dx - dy * d) / d2, cx1 = (D * dy + dx * d) / d2, cy1 = (-D * dx + dy * d) / d2, dx0 = cx0 - x3, dy0 = cy0 - y3, dx1 = cx1 - x3, dy1 = cy1 - y3;
+    var x01 = p0[0] - p1[0], y01 = p0[1] - p1[1], lo = (cw ? rc : -rc) / Math.sqrt(x01 * x01 + y01 * y01), ox = lo * y01, oy = -lo * x01, x1 = p0[0] + ox, y1 = p0[1] + oy, x2 = p1[0] + ox, y2 = p1[1] + oy, x3 = (x1 + x2) / 2, y3 = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, d2 = dx * dx + dy * dy, r = r1 - rc, D = x1 * y2 - x2 * y1, d = (dy < 0 ? -1 : 1) * Math.sqrt(Math.max(0, r * r * d2 - D * D)), cx0 = (D * dy - dx * d) / d2, cy0 = (-D * dx - dy * d) / d2, cx1 = (D * dy + dx * d) / d2, cy1 = (-D * dx + dy * d) / d2, dx0 = cx0 - x3, dy0 = cy0 - y3, dx1 = cx1 - x3, dy1 = cy1 - y3;
     if (dx0 * dx0 + dy0 * dy0 > dx1 * dx1 + dy1 * dy1) cx0 = cx1, cy0 = cy1;
     return [ [ cx0 - ox, cy0 - oy ], [ cx0 * r1 / r, cy0 * r1 / r ] ];
   }
@@ -10459,10 +10606,10 @@ module.exports = require('./colorbrewer.js');
     value.closed = /-closed$/.test(key);
   });
   function d3_svg_lineLinear(points) {
-    return points.join("L");
+    return points.length > 1 ? points.join("L") : points + "Z";
   }
   function d3_svg_lineLinearClosed(points) {
-    return d3_svg_lineLinear(points) + "Z";
+    return points.join("L") + "Z";
   }
   function d3_svg_lineStep(points) {
     var i = 0, n = points.length, p = points[0], path = [ p[0], ",", p[1] ];
@@ -10484,7 +10631,7 @@ module.exports = require('./colorbrewer.js');
     return points.length < 4 ? d3_svg_lineLinear(points) : points[1] + d3_svg_lineHermite(points.slice(1, -1), d3_svg_lineCardinalTangents(points, tension));
   }
   function d3_svg_lineCardinalClosed(points, tension) {
-    return points.length < 3 ? d3_svg_lineLinear(points) : points[0] + d3_svg_lineHermite((points.push(points[0]), 
+    return points.length < 3 ? d3_svg_lineLinearClosed(points) : points[0] + d3_svg_lineHermite((points.push(points[0]), 
     points), d3_svg_lineCardinalTangents([ points[points.length - 2] ].concat(points, [ points[1] ]), tension));
   }
   function d3_svg_lineCardinal(points, tension) {
@@ -10920,9 +11067,11 @@ module.exports = require('./colorbrewer.js');
   var d3_selection_interrupt = d3_selection_interruptNS(d3_transitionNamespace());
   function d3_selection_interruptNS(ns) {
     return function() {
-      var lock, active;
-      if ((lock = this[ns]) && (active = lock[lock.active])) {
-        if (--lock.count) delete lock[lock.active]; else delete this[ns];
+      var lock, activeId, active;
+      if ((lock = this[ns]) && (active = lock[activeId = lock.active])) {
+        active.timer.c = null;
+        active.timer.t = NaN;
+        if (--lock.count) delete lock[activeId]; else delete this[ns];
         lock.active += .5;
         active.event && active.event.interrupt.call(this, this.__data__, active.index);
       }
@@ -11177,12 +11326,68 @@ module.exports = require('./colorbrewer.js');
     var lock = node[ns] || (node[ns] = {
       active: 0,
       count: 0
-    }), transition = lock[id];
+    }), transition = lock[id], time, timer, duration, ease, tweens;
+    function schedule(elapsed) {
+      var delay = transition.delay;
+      timer.t = delay + time;
+      if (delay <= elapsed) return start(elapsed - delay);
+      timer.c = start;
+    }
+    function start(elapsed) {
+      var activeId = lock.active, active = lock[activeId];
+      if (active) {
+        active.timer.c = null;
+        active.timer.t = NaN;
+        --lock.count;
+        delete lock[activeId];
+        active.event && active.event.interrupt.call(node, node.__data__, active.index);
+      }
+      for (var cancelId in lock) {
+        if (+cancelId < id) {
+          var cancel = lock[cancelId];
+          cancel.timer.c = null;
+          cancel.timer.t = NaN;
+          --lock.count;
+          delete lock[cancelId];
+        }
+      }
+      timer.c = tick;
+      d3_timer(function() {
+        if (timer.c && tick(elapsed || 1)) {
+          timer.c = null;
+          timer.t = NaN;
+        }
+        return 1;
+      }, 0, time);
+      lock.active = id;
+      transition.event && transition.event.start.call(node, node.__data__, i);
+      tweens = [];
+      transition.tween.forEach(function(key, value) {
+        if (value = value.call(node, node.__data__, i)) {
+          tweens.push(value);
+        }
+      });
+      ease = transition.ease;
+      duration = transition.duration;
+    }
+    function tick(elapsed) {
+      var t = elapsed / duration, e = ease(t), n = tweens.length;
+      while (n > 0) {
+        tweens[--n].call(node, e);
+      }
+      if (t >= 1) {
+        transition.event && transition.event.end.call(node, node.__data__, i);
+        if (--lock.count) delete lock[id]; else delete node[ns];
+        return 1;
+      }
+    }
     if (!transition) {
-      var time = inherit.time;
+      time = inherit.time;
+      timer = d3_timer(schedule, 0, time);
       transition = lock[id] = {
         tween: new d3_Map(),
         time: time,
+        timer: timer,
         delay: inherit.delay,
         duration: inherit.duration,
         ease: inherit.ease,
@@ -11190,49 +11395,6 @@ module.exports = require('./colorbrewer.js');
       };
       inherit = null;
       ++lock.count;
-      d3.timer(function(elapsed) {
-        var delay = transition.delay, duration, ease, timer = d3_timer_active, tweened = [];
-        timer.t = delay + time;
-        if (delay <= elapsed) return start(elapsed - delay);
-        timer.c = start;
-        function start(elapsed) {
-          if (lock.active > id) return stop();
-          var active = lock[lock.active];
-          if (active) {
-            --lock.count;
-            delete lock[lock.active];
-            active.event && active.event.interrupt.call(node, node.__data__, active.index);
-          }
-          lock.active = id;
-          transition.event && transition.event.start.call(node, node.__data__, i);
-          transition.tween.forEach(function(key, value) {
-            if (value = value.call(node, node.__data__, i)) {
-              tweened.push(value);
-            }
-          });
-          ease = transition.ease;
-          duration = transition.duration;
-          d3.timer(function() {
-            timer.c = tick(elapsed || 1) ? d3_true : tick;
-            return 1;
-          }, 0, time);
-        }
-        function tick(elapsed) {
-          if (lock.active !== id) return 1;
-          var t = elapsed / duration, e = ease(t), n = tweened.length;
-          while (n > 0) {
-            tweened[--n].call(node, e);
-          }
-          if (t >= 1) {
-            transition.event && transition.event.end.call(node, node.__data__, i);
-            return stop();
-          }
-        }
-        function stop() {
-          if (--lock.count) delete lock[id]; else delete node[ns];
-          return 1;
-        }
-      }, 0, time);
     }
   }
   d3.svg.axis = function() {
@@ -11286,7 +11448,7 @@ module.exports = require('./colorbrewer.js');
     };
     axis.ticks = function() {
       if (!arguments.length) return tickArguments_;
-      tickArguments_ = arguments;
+      tickArguments_ = d3_array(arguments);
       return axis;
     };
     axis.tickValues = function(x) {
@@ -11808,8 +11970,7 @@ module.exports = require('./colorbrewer.js');
   d3.xml = d3_xhrType(function(request) {
     return request.responseXML;
   });
-  if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
-  this.d3 = d3;
+  if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
 },{}],9:[function(require,module,exports){
 var jQuery = require('jquery');
