@@ -274,10 +274,8 @@ class ExpressionValuesController < ApplicationController
     gene = Gene.find params["gene_id"]
     compare = Gene.find_by name: params["compare"] if params["compare"]
 
-    factorOrder, longFactorName, selectedFactors = getFactorOrder 
-    experiments, groups = getExperimentGroups
     values = Hash.new
-    params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
+    
     if compare  
       values = getValuesToCompare(gene, compare)
       ret["compare"] = params["compare"]
@@ -285,18 +283,29 @@ class ExpressionValuesController < ApplicationController
       values = getValuesForHomologues(gene)
     end
 
-    ret["gene"]= gene.name
-    ret["factorOrder"]= factorOrder
-    ret["longFactorName"]= longFactorName
-    
-    ret["selectedFactors"]= selectedFactors
-    ret["defaultFactorSelection"] = getDefaultSelection
-    ret["defaultFactorOrder"] = getDefaultOrder
-    
-    ret["experiments"] = experiments
-    ret["groups"] = groups
-    ret["values"] = values
+    add_ret_values(ret, params)
+    respond_to do |format|
+      format.json {render json: ret}
+    end
 
+  end
+
+    def genes
+
+    ret = Hash.new 
+   
+    values = Hash.new
+   
+   
+    
+
+    params["genes"] . each do |e| 
+      gene = Gene.find_by name: e
+      values[e] = getValuesForGene(gene)  
+    end
+
+    ret["values"] = values
+    add_ret_values(ret, params)
     respond_to do |format|
       format.json {render json: ret}
     end
@@ -304,6 +313,29 @@ class ExpressionValuesController < ApplicationController
   end
 
   private
+
+    def add_ret_values(ret, params)
+
+
+      factorOrder, longFactorName, selectedFactors = getFactorOrder 
+      experiments, groups = getExperimentGroups
+
+      params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
+      
+
+
+      ret["factorOrder"]= factorOrder
+      ret["longFactorName"]= longFactorName
+    
+     ret["selectedFactors"]= selectedFactors
+      ret["defaultFactorSelection"] = getDefaultSelection
+      ret["defaultFactorOrder"] = getDefaultOrder
+    
+      ret["experiments"] = experiments
+      ret["groups"] = groups
+
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_expression_value
       @expression_value = ExpressionValue.find(params[:id])
