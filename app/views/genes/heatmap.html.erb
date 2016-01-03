@@ -1,38 +1,20 @@
 
 <p>
 In the heatmap
-<div id="heatmap_div"> </div>
-<%= params["genes_heatmap"] %>
-<div id="inchlib"></div>
+<div id="bar_expression_viewer"> </div>
+
 <script type="text/javascript">
-$(document).ready(function() { //run when the whole page is loaded
-            window.inchlib = new InCHlib({ //instantiate InCHlib
-                target: "inchlib", //ID of a target HTML element
-                //metadata: true, //turn on the metadata 
-                column_metadata: true, //turn on the column metadata 
-                max_height: 2000, //set maximum height of visualization in pixels
-                width: 1000, //set width of visualization in pixels
-                heatmap_colors: "BuYl", //set color scale for clustered data
-                metadata_colors: "Reds", //set color scale for metadata
-                column_metadata_colors: "Greens",
-                //dendrogram: false,
-                //metadata: true, 
-                draw_row_ids: true, 
-                //count_column: true
-                column_metadata_row_height: 10, 
-                target: "inchlib",
-                dendrogram: false,
-                metadata: true,
-                min_row_height: 20,
-                heatmap_header: false, 
-               // fixed_row_id_size: true,
-                draw_row_ids: true,
-                "navigation_toggle": {"color_scale": false, "distance_scale": false, "export_button": false, "filter_button": false, "hint_button": false}
-            });
-
-            inchlib.read_data_from_file("../../expression_values/inchworm/prepare.json?genes=Traes_4AL_F99FCB25F.1,Traes_4AL_DD1B27086.2,Traes_4AL_65DF744B71.3,Traes_4AL_F18648C49.1,Traes_4AL_02AE47773.1,Traes_4AL_2EBB63DBA.2,Traes_4AL_1C557F688.1,Traes_4AL_BFAB568BF.1"); //read input json file
-            inchlib.draw(); //draw cluster heatmap
-        });
-
-</script>
-</p>
+  var container_div="bar_expression_viewer";
+  var data_url = "<%=raw "../../expression_values/genes.json?#{@args}"%>" ;
+  var eb =  new biovisexpressionbar.ExpressionBar({
+    target: container_div,
+    data: data_url,
+    renderProperty: 'count', 
+    fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
+    groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
+    barHeight:10,
+    width:1000,
+    headerOffset:100,
+    plot:'HeatMap'
+  });
+  </script>

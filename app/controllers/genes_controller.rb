@@ -4,11 +4,15 @@ class GenesController < ApplicationController
   # GET /genes
   # GET /genes.json
   def index
-    
+    puts "Index: #{params}"
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
-
+    if params[:genes_heatmap]
+       genes = params[:genes_heatmap].split(",")
+       redirect_to action: "heatmap",  studies: params[:studies],  genes: genes
+       return   
+    end
    if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
@@ -40,9 +44,6 @@ class GenesController < ApplicationController
       else
         redirect_to  action: "show", id: @gene.id, studies: params[:studies]
       end
-    elsif params[:genes_heatmap]
-     
-       redirect_to action: "heatmap", genes_heatmap: params[:genes_heatmap]      
     else
        @genes = Gene.find(:all, :order => "id desc", :limit => 10) #TODO: make this in a way you can page. 
     end
@@ -63,6 +64,11 @@ class GenesController < ApplicationController
   end
 
   def heatmap
+    session[:studies] = params[:studies] if  params[:studies] 
+    studies = session[:studies]
+    genes = params[:genes]
+
+    @args = {studies: studies, genes: genes }.to_query
     respond_to do |format|
       format.html { render :heatmap }
     end
