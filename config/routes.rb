@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     collection do
       get 'autocomplete'
       get 'heatmap'
+      post 'forward'
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.

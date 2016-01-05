@@ -1,5 +1,5 @@
 
-<%= form_tag("/genes/", method: "get") do  %>
+<%= form_tag("/genes/forward", method: "post") do  %>
 	<h2>One or two genes</h2>
   <%= label_tag(:gene, "Gene:") %>
 	<%= text_field_tag(:gene) %>

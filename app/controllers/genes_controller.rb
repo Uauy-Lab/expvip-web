@@ -1,32 +1,72 @@
 class GenesController < ApplicationController
   before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
+
+  def getMissingGenes(genes)
+    missing = Array.new
+    genes.each do |g|  
+      gene = Gene.find_by(:name=>g)
+      gene = Gene.find_by(:gene=>g) unless  gene
+      unless gene
+        missing << g
+      end
+    end
+    return missing
+  end
+
+  def getGeneIds(genes)
+    ids = Array.new
+    missing = Array.new
+    genes.each do |g|  
+      gene = Gene.find_by(:name=>g)
+      gene = Gene.find_by(:gene=>g) unless  gene
+      if gene
+        ids << gene.id
+      else
+        missing << g
+      end
+    end
+    raise "Genes not found: #{missing.join(",")}" if missing.size != 0
+    return ids
+  end
+
   # GET /genes
   # GET /genes.json
-  def index
-    puts "Index: #{params}"
+  def forward
+    #puts "Index: #{params}"
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
-    if params[:genes_heatmap]
-       genes = params[:genes_heatmap].split(",")
-       redirect_to action: "heatmap",  studies: params[:studies],  genes: genes
-       return   
-    end
-   if params[:compare]
-      @compare =  Gene.find_by(:name=>params[:compare])
-      @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
-   end
-    
-    if gene_name
-     # logger.debug params
-      @gene =  Gene.find_by(:name=>gene_name)
-      @gene = Gene.find_by(:gene=>gene_name) unless  @gene
-      unless @gene
-        flash[:error] = "Gene not found: #{gene_name}"
+
+    if params[:genes_heatmap] and params[:genes_heatmap].size > 0
+      genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
+      
+      begin
+        ids = getGeneIds(genes)
+      rescue Exception => e
+        flash[:error] = e
         redirect_to :back
-        return    
       end
+     session[:genes] = ids.join(',')
+     Rails.logger.info "In forward"
+     Rails.logger.info session[:genes] 
+     redirect_to action: "heatmap",  studies: params[:studies]
+     return   
+   end
+   if params[:compare]
+    @compare =  Gene.find_by(:name=>params[:compare])
+    @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
+  end
+
+  if gene_name
+     # logger.debug params
+     @gene =  Gene.find_by(:name=>gene_name)
+     @gene = Gene.find_by(:gene=>gene_name) unless  @gene
+     unless @gene
+      flash[:error] = "Gene not found: #{gene_name}"
+      redirect_to :back
+      return    
+    end
       #"commit" "Compare" 
       #TODO: Show error message on the way back.
 
@@ -46,12 +86,12 @@ class GenesController < ApplicationController
       end
     else
        @genes = Gene.find(:all, :order => "id desc", :limit => 10) #TODO: make this in a way you can page. 
-    end
-      
- #   format.html { redirect_to action: :show, id: @gene.id }
-  end
+     end
 
-  def autocomplete
+ #   format.html { redirect_to action: :show, id: @gene.id }
+end
+
+def autocomplete
     #puts "In autocomplete!"
     @genes = Gene.order(:name).where("name LIKE ?", "%#{params[:term]}%").limit(20)
 
@@ -66,7 +106,9 @@ class GenesController < ApplicationController
   def heatmap
     session[:studies] = params[:studies] if  params[:studies] 
     studies = session[:studies]
-    genes = params[:genes]
+    genes = []
+    genes = session[:genes] if  session[:genes] 
+    genes = params[:genes] if params[:genes]
 
     @args = {studies: studies, genes: genes }.to_query
     respond_to do |format|
@@ -81,35 +123,18 @@ class GenesController < ApplicationController
     studies = session[:studies]
     compare = ""
     alert = ""
-   
+
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
       compare = @compare.transcript
     end
-  
+
     @args = {studies: studies, compare: compare }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end
 
-  # GET /genes/new
-  def new
-  end
-
-  # GET /genes/1/edit
-  def edit
-  end
-
-  # POST /genes
-  # POST /genes.json
-  def create
-  end
-
-  # PATCH/PUT /genes/1
-  # PATCH/PUT /genes/1.json
-  def update
-  end
-
+  
   # DELETE /genes/1
   # DELETE /genes/1.json
   #def destroy
@@ -134,8 +159,8 @@ class GenesController < ApplicationController
 
     def numeric?(string)
     # `!!` converts parsed number to `true`
-        !!Kernel.Float(string) 
-    rescue TypeError, ArgumentError
-      false
-    end
+    !!Kernel.Float(string) 
+  rescue TypeError, ArgumentError
+    false
+  end
 end

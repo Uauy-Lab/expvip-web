@@ -65,93 +65,92 @@ class ExpressionValuesController < ApplicationController
   end
 
   def getFactorOrder
-     factorOrder     = Hash.new
-     longFactorName  = Hash.new
-     selectedFactors = Hash.new
+   factorOrder     = Hash.new
+   longFactorName  = Hash.new
+   selectedFactors = Hash.new
 
-     Study.find_each do |s| 
-      factorOrder["study"]     = Hash.new unless factorOrder["study"]
-      longFactorName["study"]  = Hash.new unless longFactorName["study"]
-      selectedFactors["study"] = Hash.new unless selectedFactors["study"]  
-      order = factorOrder["study"] 
-      longName = longFactorName["study"]
-      selected = selectedFactors["study"] 
+   Study.find_each do |s| 
+    factorOrder["study"]     = Hash.new unless factorOrder["study"]
+    longFactorName["study"]  = Hash.new unless longFactorName["study"]
+    selectedFactors["study"] = Hash.new unless selectedFactors["study"]  
+    order = factorOrder["study"] 
+    longName = longFactorName["study"]
+    selected = selectedFactors["study"] 
 
-      order[s.accession] = s.id
-      longName[s.accession] = s.title
-      selected[s.accession] = false
+    order[s.accession] = s.id
+    longName[s.accession] = s.title
+    selected[s.accession] = false
 
-     end
-
-     Factor.find_each do |f|
-      
-      factorOrder[f.factor]     = Hash.new unless factorOrder[f.factor]
-      longFactorName[f.factor]  = Hash.new unless longFactorName[f.factor]
-      selectedFactors[f.factor] = Hash.new unless selectedFactors[f.factor]  
-
-      order = factorOrder[f.factor] 
-      longName = longFactorName[f.factor]
-      selected = selectedFactors[f.factor] 
-
-      order[f.name] = f.order
-      longName[f.name] = f.description
-      selected[f.name] = true
-    end
-    return [factorOrder, longFactorName, selectedFactors]
   end
 
-  def getExperimentGroups
-    experiments     = Hash.new 
-    groups          = Hash.new 
-    ExperimentGroup.find_each do | g |
-      group = Hash.new
-      #Should we use description instead?
-      group["name"] = g.name
-      group["description"] = g.name
-      factors = Hash.new
-      g.factors.each { |f| factors[f.factor] = f.name }
-      
+  Factor.find_each do |f|
 
-      g.experiments.each do |e|  
-        unless experiments[e.id]
-          experiments[e.id] = Hash.new 
-          exp = experiments[e.id]
-          exp["name"] = e.accession
-          exp["study"] = e.study_id.to_s
-          exp["group"] = g.id.to_s
-          factors["study"] = e.study.accession
-        end
+    factorOrder[f.factor]     = Hash.new unless factorOrder[f.factor]
+    longFactorName[f.factor]  = Hash.new unless longFactorName[f.factor]
+    selectedFactors[f.factor] = Hash.new unless selectedFactors[f.factor]  
+
+    order = factorOrder[f.factor] 
+    longName = longFactorName[f.factor]
+    selected = selectedFactors[f.factor] 
+
+    order[f.name] = f.order
+    longName[f.name] = f.description
+    selected[f.name] = true
+  end
+  return [factorOrder, longFactorName, selectedFactors]
+end
+
+def getExperimentGroups
+  experiments     = Hash.new 
+  groups          = Hash.new 
+  ExperimentGroup.find_each do | g |
+    group = Hash.new
+    #Should we use description instead?
+    group["name"] = g.name
+    group["description"] = g.name
+    factors = Hash.new
+    g.factors.each { |f| factors[f.factor] = f.name }
+
+
+    g.experiments.each do |e|  
+      unless experiments[e.id]
+        experiments[e.id] = Hash.new 
+        exp = experiments[e.id]
+        exp["name"] = e.accession
+        exp["study"] = e.study_id.to_s
+        exp["group"] = g.id.to_s
+        factors["study"] = e.study.accession
       end
-      group['factors'] = factors
-      groups[g.id] = group
     end
-    return [experiments, groups]
+    group['factors'] = factors
+    groups[g.id] = group
   end
+  return [experiments, groups]
+end
 
-  def getValuesForGene(gene)
-    values = Hash.new
-    ExpressionValue.where("gene_id = :gene", {gene: gene.id }).each do |ev|  
-      type_of_value = ev.type_of_value.name
-      values[type_of_value] = Hash.new unless  values[type_of_value]
-      tvh = values[type_of_value]
+def getValuesForGene(gene)
+  values = Hash.new
+  ExpressionValue.where("gene_id = :gene", {gene: gene.id }).each do |ev|  
+    type_of_value = ev.type_of_value.name
+    values[type_of_value] = Hash.new unless  values[type_of_value]
+    tvh = values[type_of_value]
 
-      tvh[ev.experiment.id] = { experiment:  ev.experiment.id.to_s , value: ev.value}
+    tvh[ev.experiment.id] = { experiment:  ev.experiment.id.to_s , value: ev.value}
 
-    end
-    return values
   end
+  return values
+end
 
-  def inchworm
+def inchworm
     #puts @genes
 
     ret = Hash.new
-#    ret["genes"] = params["genes"].split(",")
     genes = params["genes"].split(",")
     ret["data"] = Hash.new
     ret["data"]["nodes"] = Hash.new
     nodes =  ret["data"]["nodes"]
     ret["data"]["Missing"] = Array.new
-#    ret["data"]["feature_names"] = Array.new
+    #ret["data"]["feature_names"] = Array.new
     ret["metadata"] = Hash.new
     ret["metadata"]["feature_names"] = ["Gene"]
     ret["metadata"]["nodes"] = Hash.new
@@ -160,85 +159,85 @@ class ExpressionValuesController < ApplicationController
     factorOrder, longFactorName, selectedFactors = getFactorOrder
     experimentIds = experiments.keys
     factors = factorOrder.keys
-    
+
     ret["column_metadata"] = Hash.new
     ret["column_metadata"]["features"] = Array.new
     ret["column_metadata"]["feature_names"] =factors 
-    
+
     #studies = Array.new
     factorValues = factors.map { |f| Array.new }
 
 
-   
+
     experimentIds.map do |i| 
       group = experiments[i]["group"]
-  
+
       g = groups[group.to_i]
       fact =  g["factors"]
-    
+
       factors.each_with_index  { |f, j| factorValues[j] <<  g["factors"][f] }
       
     #  studies <<  groups[experiments[i]["group"]]["factors"]
-      
-    end  
+
+  end  
   
-    ret["column_metadata"]["features"] = factorValues
+  ret["column_metadata"]["features"] = factorValues
 
-    ret["data"]["feature_names"]  = experimentIds.map { |i| experiments[i]["name"] }
-    genes.each do |g|  
-      nodes[g] = Hash.new
-      gene = Gene.find_by(name: g)
-      if gene
-        valuesForGene = getValuesForGene gene
-        tpm =  valuesForGene["tpm"]
-        vals = Array.new
-        experimentIds.each { |k|  vals << tpm[k][:value]}
-        nodes[g]["features"] = vals
-        nodes[g]["count"] = 1
-        nodes[g]["distance"] = 0
-        nodes[g]["objects"] =  [gene.name]
+  ret["data"]["feature_names"]  = experimentIds.map { |i| experiments[i]["name"] }
+  genes.each do |g|  
+    nodes[g] = Hash.new
+    gene = Gene.find_by(name: g)
+    if gene
+      valuesForGene = getValuesForGene gene
+      tpm =  valuesForGene["tpm"]
+      vals = Array.new
+      experimentIds.each { |k|  vals << tpm[k][:value]}
+      nodes[g]["features"] = vals
+      nodes[g]["count"] = 1
+      nodes[g]["distance"] = 0
+      nodes[g]["objects"] =  [gene.name]
 
-        ret["metadata"]["nodes"][g] = [g]
+      ret["metadata"]["nodes"][g] = [g]
 
-      else
-        ret["data"]["Missing"] <<  g
-      end
-    end
-
-
-    respond_to do |format|
-      format.json {render json: ret}
+    else
+      ret["data"]["Missing"] <<  g
     end
   end
+
+
+  respond_to do |format|
+    format.json {render json: ret}
+  end
+end
 
   #TODO: Add this to the database. 
   def getDefaultSelection 
-       defSelection = {
-        "Age"=> false, 
-        "High level stress-disease"=> true, 
-        "High level age"=> true, 
-        "High level tissue"=>true,
-        "High level variety"=>true,
-        "Stress-disease"=>false,
-        "study"=>false,
-        "Tissue" => false,
-        "Variety" => false
-       }
-       return defSelection
-  end
+   defSelection = {
+    "Age"=> false, 
+    "High level stress-disease"=> true, 
+    "High level age"=> true, 
+    "High level tissue"=>true,
+    "High level variety"=>true,
+    "Stress-disease"=>false,
+    "study"=>false,
+    "Tissue" => false,
+    "Variety" => false
+  }
+  return defSelection
+end
 
-  def getDefaultOrder 
+def getDefaultOrder 
     #This should be a table in the DB at some point
     defOrder = [
-        "study",
-        "High level tissue",
-        "Tissue",
-        "High level age", 
-        "Age", 
-        "High level stress-disease", 
-        "Stress-disease",
-        "High level variety",
-        "Variety"
+      "study",
+      "High level tissue",
+      "Tissue",
+      "High level age", 
+      "Age", 
+      "High level stress-disease", 
+      "Stress-disease",
+      "High level variety",
+      "Variety"
     ]
     return defOrder
   end
@@ -246,30 +245,31 @@ class ExpressionValuesController < ApplicationController
   def getValuesForHomologues(gene)
     values = Hash.new
     Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
-       values[h.A.name] = getValuesForGene(h.A) if h.A
-       values[h.B.name] = getValuesForGene(h.B) if h.B
-       values[h.D.name] = getValuesForGene(h.D) if h.D
-    end
-    if values.size == 0
-      values[gene.name]    = getValuesForGene(gene)
-    end
-    return values
-  end
-
-  def getValuesToCompare(gene, compare)
-    values = Hash.new
+     values[h.A.name] = getValuesForGene(h.A) if h.A
+     values[h.B.name] = getValuesForGene(h.B) if h.B
+     values[h.D.name] = getValuesForGene(h.D) if h.D
+   end
+   if values.size == 0
     values[gene.name]    = getValuesForGene(gene)
-    values[compare.name] = getValuesForGene(compare) 
-    return values
   end
+  return values
+end
+
+def getValuesToCompare(gene, compare)
+  values = Hash.new
+  values[gene.name]    = getValuesForGene(gene)
+  values[compare.name] = getValuesForGene(compare) 
+  return values
+end
 
 
 
-  def gene
+def gene
     #puts @gene_id
-    #ret = Hash.new
+   #ret = Hash.new
     #ret["Hello"] = params
     #ret = ExpressionValue.find_expression_for_gene(params["gene_id"])
+    
     ret = Hash.new 
     gene = Gene.find params["gene_id"]
     compare = Gene.find_by name: params["compare"] if params["compare"]
@@ -282,30 +282,46 @@ class ExpressionValuesController < ApplicationController
     else
       values = getValuesForHomologues(gene)
     end
-
+    ret["values"] = values
     add_ret_values(ret, params)
+   
     respond_to do |format|
       format.json {render json: ret}
     end
 
   end
 
-    def genes
+  def genes
 
+    old_logger = ActiveRecord::Base.logger
+    ActiveRecord::Base.logger.level  = 1
+    Rails.logger.info "genes"
+    Rails.logger.info session[:genes]
     ret = Hash.new 
-   
     values = Hash.new
-   
-   
-    
-
-    params["genes"] . each do |e| 
-      gene = Gene.find_by name: e
-      values[e] = getValuesForGene(gene)  
+    genes = []
+    useIDs = false
+    if  session[:genes] 
+      useIDs = true
+      genes = session[:genes] 
+    end
+    genes = params["genes"] if params["genes"] 
+    genes = genes.split(',')
+    genes. each do |g|
+      gene = false
+      if useIDs 
+        gene = Gene.find(g.to_i)
+      else
+        gene = Gene.find_by(:name=>g)
+        gene = Gene.find_by(:gene=>g) unless  gene
+      end
+      values[gene.name] = getValuesForGene(gene)  if gene
     end
 
     ret["values"] = values
     add_ret_values(ret, params)
+
+    ActiveRecord::Base.logger = old_logger
     respond_to do |format|
       format.json {render json: ret}
     end
@@ -314,27 +330,22 @@ class ExpressionValuesController < ApplicationController
 
   private
 
-    def add_ret_values(ret, params)
+  def add_ret_values(ret, params)
+    factorOrder, longFactorName, selectedFactors = getFactorOrder 
+    experiments, groups = getExperimentGroups
+    params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
 
-
-      factorOrder, longFactorName, selectedFactors = getFactorOrder 
-      experiments, groups = getExperimentGroups
-
-      params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
-      
-
-
-      ret["factorOrder"]= factorOrder
-      ret["longFactorName"]= longFactorName
+    ret["factorOrder"]= factorOrder
+    ret["longFactorName"]= longFactorName
     
-     ret["selectedFactors"]= selectedFactors
-      ret["defaultFactorSelection"] = getDefaultSelection
-      ret["defaultFactorOrder"] = getDefaultOrder
+    ret["selectedFactors"]= selectedFactors
+    ret["defaultFactorSelection"] = getDefaultSelection
+    ret["defaultFactorOrder"] = getDefaultOrder
     
-      ret["experiments"] = experiments
-      ret["groups"] = groups
+    ret["experiments"] = experiments
+    ret["groups"] = groups
 
-    end
+  end
 
     # Use callbacks to share common setup or constraints between actions.
     def set_expression_value
@@ -345,4 +356,4 @@ class ExpressionValuesController < ApplicationController
     def expression_value_params
       params.require(:expression_value).permit(:compare, :experiment_id, :gene_id, :meta_experiment_id, :type_of_value_id, :value)
     end
-end
+  end
