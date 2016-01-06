@@ -1,6 +1,5 @@
 
 <p>
-In the heatmap
 <div id="bar_expression_viewer"> </div>
 
 <script type="text/javascript">
@@ -9,7 +8,7 @@ In the heatmap
   var eb =  new biovisexpressionbar.ExpressionBar({
     target: container_div,
     data: data_url,
-    renderProperty: 'log2tpm', 
+    renderProperty: 'log2(tpm)', 
     fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
     groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
     barHeight:10,
