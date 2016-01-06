@@ -25,7 +25,7 @@
 
   
 <div class='header'>
-<%= form_tag genes_path, method: :get, class: 'navbar-form navbar-left' do %>
+<%= form_tag "/genes/forward", method: :post, class: 'navbar-form navbar-left' do %>
  
  <div class="left">
   <h1 >
@@ -42,9 +42,11 @@
 
  <div class='form-group right header-form  '>
     
-    <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %> <%= submit_tag("Search") %>
+    <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %>
+     <%= submit_tag "Search" , name: 'submit'  %>
   
-    <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>  <%= submit_tag("Compare") %> 
+    <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%> 
+     <%= submit_tag "Compare", name: 'submit'  %> 
 
 </div>
 <% end %>

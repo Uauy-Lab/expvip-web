@@ -94,7 +94,7 @@ BarPlot.prototype.renderGeneBar = function( i){
 			var pos = d3.select(this).position(this);
 			var index = ((pos.top ) / parent.opt.barHeight)-1;
 			var tooltip =  parent.opt.renderProperty + ': ' +
-			exts.numberWithCommas(da.value) + 'sem: ' + exts.numberWithCommas(da.stdev)  ;
+			exts.numberWithCommas(da.value) + ', sem: ' + exts.numberWithCommas(da.stdev)  ;
 			parent.showTooltip(tooltip, this);
 			parent.showHighlightedFactors(da, this);
 		}
@@ -249,9 +249,7 @@ var heatmap = require("./heatmap.js");
    this.setupSVG();
 
 
-   if(this.opt.restoreDisplayOptions){
-    this.restoreDisplayOptions();
-  }
+   
 
   switch(this.opt.plot ){
     case 'Bar':
@@ -287,7 +285,7 @@ ExpressionBar.prototype.restoreDefaults = function(){
   this._removeValue('showHomoeologues');
   this.opt.groupBy = this.opt.defaultGroupBy;
   this.opt.selectedFactors = this.data.selectedFactors;
-  this.sortOrder = [];
+  this.data.sortOrder = [];
   this.dataLoaded(); 
   this.refresh();
 };
@@ -303,7 +301,9 @@ ExpressionBar.prototype.restoreDisplayOptions = function(){
   // should we add an option to the orders?
   // this can tide up this bit
   if(typeof this.opt.sortOrder !== 'undefined'){
-    this.sortOrder = this.opt.sortOrder;   
+    this.data.sortOrder = this.opt.sortOrder;
+  }else{
+    this.data.sortOrder = [];
   }
 
   var hom_checked = false;  
@@ -611,7 +611,7 @@ ExpressionBar.prototype._storeValue = function(key, value){
 
 ExpressionBar.prototype._removeValue = function(key, value){
   sessionStorage.removeItem(this.opt.target + "_" + key);
-  this.opt['key'] = null;
+  this.opt[key] = null;
 };
 
 ExpressionBar.prototype._retrieveValue = function(key){
@@ -872,7 +872,7 @@ ExpressionBar.prototype._refershSortedOrder = function(factor){
   this._storeValue('sortOrder', this.data.sortOrder);
   this._storeValue('renderedOrder', this.renderedOrder);
 
-  this.data.sortRenderedGroups(this.sortOrder, this.renderedOrder);
+  this.data.sortRenderedGroups(this.data.sortOrder, this.renderedOrder);
   this.setFactorColor(factor);
   this.refresh();
 };
@@ -923,7 +923,6 @@ ExpressionBar.prototype.renderPropertySelector = function(){
 
   for(i in groupOptions){
     var key = groupOptions[i];
-    console.log(key);
     self.propertySelector
     .append(jQuery('<option></option>')
       .attr('value',key)
@@ -998,7 +997,7 @@ ExpressionBar.prototype.prepareSVGForSaving = function(){
   var sourceMain = serializer.serializeToString(svg);
   var sourceFoot = serializer.serializeToString(svgFoot);
   var svg_width  = this.opt.width;
-  var svg_height = this.opt.headerOffset + 40 + this.totalHeight ;
+  var svg_height = this.opt.headerOffset + 60 + this.totalHeight ;
 
 
   sourceMain = sourceMain.replace(/^<svg/, '<svg y="' + headHeight + '" ');
@@ -1238,6 +1237,7 @@ ExpressionBar.prototype.renderGeneTitles = function(i){
   if(renderedTextWidth > blockWidth){
     geneText.attr('transform', 'rotate(270)')
     .style('font-size', this.opt.barHeight/2 + 'px')
+    .attr('y', blockWidth/2);
   }
 
 };
@@ -1316,8 +1316,6 @@ ExpressionBar.prototype.renderTitles = function(){
         .on('click', function(){
           self.data.addSortPriority(key, false);
           self._storeValue('sortOrder', self.data.sortOrder);
-          //self.data.renderedOrder = self.renderedOrder;
-          self.data.sortOrder = self.sortOrder;
           self.data.sortRenderedGroups();
           self.setFactorColor(key);
           self.refresh();
@@ -1361,10 +1359,16 @@ ExpressionBar.prototype.renderSelection = function(){
 };
 
 ExpressionBar.prototype.highlightRow = function(target){
+  if(typeof this.data === 'undefined'){
+    return;
+  }
   if(typeof this.data.renderedData === 'undefined'){
     return;
   }
   if(typeof this.data.renderedData[0] === 'undefined'){
+    return;
+  }
+  if(typeof this.selectionBox === 'undefined'){
     return;
   }
   var d3SVG = d3.select(target);
@@ -1382,7 +1386,10 @@ ExpressionBar.prototype.highlightRow = function(target){
 }
 
 ExpressionBar.prototype.showHighithRow = function(){
- this.selectionBox.attr('visibility', 'visible'); 
+  if(typeof this.selectionBox !== 'undefined'){
+    this.selectionBox.attr('visibility', 'visible'); 
+  }
+ 
 }
 
 ExpressionBar.prototype.hideHidelightRow = function(){
@@ -1493,6 +1500,9 @@ ExpressionBar.prototype.render = function() {
 
 
 ExpressionBar.prototype.dataLoaded = function(){
+  if(this.opt.restoreDisplayOptions){
+    this.restoreDisplayOptions();
+  }
   this.setAvailableFactors();
   this.prepareColorsForFactors();
   this.refreshSVG();
@@ -1610,8 +1620,13 @@ ExpressionData.prototype.log2 = function(data){
 	.reduce(function(previous, current) {
     	//previous[current] = data[current] * data[current];
     	var newVal = data[current].value ;
-    	newVal += 0.25
-    	newVal = Math.log2(newVal); 
+    	//newVal = newVal +0.25
+    	if(newVal < 1){
+    		newVal = 0
+    	}else{
+    		newVal = Math.log2(newVal); 
+    	}
+    	
     	previous[current] = {
     		'experiment' : data[current].experiment,
     		'value' : newVal
@@ -1627,7 +1642,7 @@ ExpressionData.prototype.calculateLog2 = function(){
 		for(v in this.values[g]){
 			var toTransform = this.values[g][v];
 			var toAdd = this.log2(toTransform);
-			var newUnit = 'log2'+v;
+			var newUnit = 'log2(' + v + ')';
 			this.values[g][newUnit] = toAdd;
 		}
 	}
@@ -1786,8 +1801,12 @@ ExpressionData.prototype.getDefaultProperty = function(){
 ExpressionData.prototype.getGroupedData = function(property, groupBy){
 	var dataArray = [];
 	for(var gene in this.values){
+    console.log("Comparig " + gene);
+    console.log(this.opt.gene);
+    console.log(this.opt.compare);
 		if(!this.opt.showHomoeologues && 
 			( 	
+
 				gene !== this.gene &&  
 				gene !==  this.compare 
 				) 
@@ -1860,24 +1879,10 @@ ExpressionData.prototype.calculateMinMax = function(){
 			if(val < min) min = val ;
 		}
 	}
-	if(isLog){
-		min = -2;
-	}
-	if(min < 0){
-		var absMin = -1 * min;
-		if(absMin > max){
-			max = absMin;
-		}else{
-			min = -1 * max;
-		}
-		//max =  2;
-		min = -2;
-	}else{
-		min = 0;
-	}
-
-
-
+	//if(isLog){
+	min = 0;
+	//}
+	
 	this.max = max;
 	this.min = min;
 	//this.min = -1;
@@ -2086,6 +2091,11 @@ ExpressionData.prototype.addSortPriority = function(factor, end){
 };
 
 ExpressionData.prototype.removeSortPriority = function(factor){
+	console.log("Sort order:");
+	console.log(this.sortOrder);
+	if(typeof this.sortOrder === 'undefined'){
+		this.sortOrder = [];
+	}
 	var index = this.sortOrder.indexOf(factor);
 	if (index > -1) {
 		this.sortOrder.splice(index, 1);
@@ -2107,7 +2117,6 @@ var HeatMap = function  (parent) {
 	this.parent = parent;
 	this.data = parent.data;
 	this.opt = parent.opt;
-	console.log("New HeatMap");
 }
 
 
@@ -2169,18 +2178,20 @@ HeatMap.prototype.renderGeneBar = function( i){
     };
   };
 
-  HeatMap.prototype.rangeColor = function(){
-   this.buckets = 5;
-   if(this.parent.data.isLog()){
-    this.colors = colorbrewer.RdBu[this.buckets].slice(0).reverse();
-  }else{
-    this.colors = colorbrewer.YlGnBu[this.buckets];
+  HeatMap.prototype.domain = function(){
+    return [this.parent.data.min, (this.parent.data.max + this.parent.data.min) /2,this.parent.data.max ];
   }
-   
+
+  HeatMap.prototype.rangeColor = function(){
+   this.buckets = 9;
+
+   this.colors = colorbrewer.YlGnBu[this.buckets];
+   //this.colors = colorbrewer.RdBu[this.buckets];
+
+   this.colors = [this.colors[0],this.colors[4],this.colors[8]]
    var colorScale = d3.scale
-   .quantile()
-   .domain(
-    [this.parent.data.min,this.parent.data.max ])
+   .linear()
+   .domain( this.domain())
    .range(this.colors);
    return colorScale;
 
@@ -2214,7 +2225,7 @@ HeatMap.prototype.setGradient = function(){
 
 HeatMap.prototype.renderGlobalScale = function(){
   var svg = this.parent.svgFootContainer;
-  svg.attr("height", 40);
+  svg.attr("height", 60);
   var range = this.rangeColor();
   this.scaleWidth = this.parent.getTitleFactorWidth();
 
@@ -2232,21 +2243,44 @@ HeatMap.prototype.renderGlobalScale = function(){
   .call(xAxis).attr("class", "x axis");
   var offset = this.parent.getTitleSetOffset();
 
+
   xAxisGroup.attr('transform', 'translate(' + offset + ',20)');
   this.rectScale.attr('transform', 'translate(' + offset + ',0)');
+  var labOffset = offset + (this.scaleWidth/2);
+  this.scaleUnits = svg.append('text')
+  .attr('y',50)
+  .attr('x', labOffset);
+  this.setScaleText(this.opt.renderProperty)
   return;
 };
+
+HeatMap.prototype.setScaleText = function(unit){
+  var offset = this.parent.getTitleSetOffset();
+
+  this.scaleUnits.text(unit);
+
+  var renderedTextWidth = this.scaleUnits.node().getBBox().width;
+  var labOffset = offset + (this.scaleWidth/2) - (renderedTextWidth/2);
+  this.scaleUnits
+  .transition().duration(1000).ease("cubic-in-out")
+  .attr('x', labOffset);
+
+  return;
+}
+
 
 
 HeatMap.prototype.refreshScale = function(){
     var axisScale = this.rangeX(this.scaleWidth);
     var xAxis = d3.svg.axis().scale(axisScale).ticks(5);
     var toUpdate = this.parent.svgFootContainer.selectAll("g.x.axis")
+    this.setScaleText(this.opt.renderProperty);
     this.setGradient();
     toUpdate.transition()
      .duration(1000)
      .ease("cubic-in-out")
      .call(xAxis);
+
 }
 
  HeatMap.prototype.refreshBar = function(gene, i){

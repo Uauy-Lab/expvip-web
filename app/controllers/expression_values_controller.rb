@@ -273,6 +273,7 @@ def gene
     ret = Hash.new 
     gene = Gene.find params["gene_id"]
     compare = Gene.find_by name: params["compare"] if params["compare"]
+    ret['gene'] = gene.name
 
     values = Hash.new
     

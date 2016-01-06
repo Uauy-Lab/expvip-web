@@ -30,65 +30,67 @@ class GenesController < ApplicationController
     return ids
   end
 
+  #
+  def forwardHeatmap
+    genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
+    raise "Please select less than 50 genes" if genes.size > 50
+    ids = getGeneIds(genes)
+    raise "Plese select some genes for the heatmap" if ids.size == 0
+    session[:genes] = ids.join(',')
+    redirect_to action: "heatmap",  studies: params[:studies]
+  end
+
+  def forwardSearch
+    gene_name = nil
+    gene_name = params[:gene]
+    gene_name = params[:query] if params[:query]
+    @gene = findGeneName(gene_name)
+    session[:gene] = @gene.name
+    redirect_to  action: "show", id: @gene.id, studies: params[:studies]
+  end
+
+  def forwardCompare
+    gene_name = nil
+    gene_name = params[:gene]
+    gene_name = params[:query] if params[:query]
+    @gene = findGeneName(gene_name)
+    @compare =  findGeneName params[:compare]
+    redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name  
+  end
+
+  def findGeneName(gene_name)
+    gene =  Gene.find_by(:name=>gene_name)
+    gene = Gene.find_by(:gene=>gene_name) unless  gene
+    raise "Gene not found: #{gene_name}" unless gene
+    return gene  
+  end
+
   # GET /genes
   # GET /genes.json
   def forward
     #puts "Index: #{params}"
-    gene_name = nil
-    gene_name = params[:gene]
-    gene_name = params[:query] if params[:query]
+    Rails.logger.info "In forward"
+    Rails.logger.info session[:genes] 
+    Rails.logger.info params
 
-    if params[:genes_heatmap] and params[:genes_heatmap].size > 0
-      genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
-      
-      begin
-        ids = getGeneIds(genes)
-      rescue Exception => e
-        flash[:error] = e
-        redirect_to :back
-      end
-     session[:genes] = ids.join(',')
-     Rails.logger.info "In forward"
-     Rails.logger.info session[:genes] 
-     redirect_to action: "heatmap",  studies: params[:studies]
-     return   
-   end
-   if params[:compare]
-    @compare =  Gene.find_by(:name=>params[:compare])
-    @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
-  end
+    session[:studies] = params[:studies] if  params[:studies] 
 
-  if gene_name
-     # logger.debug params
-     @gene =  Gene.find_by(:name=>gene_name)
-     @gene = Gene.find_by(:gene=>gene_name) unless  @gene
-     unless @gene
-      flash[:error] = "Gene not found: #{gene_name}"
-      redirect_to :back
-      return    
-    end
-      #"commit" "Compare" 
-      #TODO: Show error message on the way back.
-
-      session[:gene] = @gene.name
-      session[:studies] = params[:studies] if  params[:studies] 
-
-      if params[:commit] == "Compare"
-
-        unless @compare
-          flash[:error] = "Gene to compare not found: #{params[:compare]}"
-          redirect_to :back
-          return
-        end    
-        redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name 
+    begin
+      case params[:submit] 
+      when "Heatmap"
+        forwardHeatmap 
+      when "Search"
+        forwardSearch
+      when "Compare"
+        forwardCompare
       else
-        redirect_to  action: "show", id: @gene.id, studies: params[:studies]
+        raise "Unknow redirect: #{params[:submit]}"
       end
-    else
-       @genes = Gene.find(:all, :order => "id desc", :limit => 10) #TODO: make this in a way you can page. 
-     end
-
- #   format.html { redirect_to action: :show, id: @gene.id }
+    rescue Exception => e
+      flash[:error] = e.to_s
+      redirect_to :back
+      return
+    end
 end
 
 def autocomplete
@@ -110,7 +112,7 @@ def autocomplete
     genes = session[:genes] if  session[:genes] 
     genes = params[:genes] if params[:genes]
 
-    @args = {studies: studies, genes: genes }.to_query
+    @args = {studies: studies }.to_query
     respond_to do |format|
       format.html { render :heatmap }
     end
