@@ -69,9 +69,9 @@ class GenesController < ApplicationController
   # GET /genes.json
   def forward
     #puts "Index: #{params}"
-    Rails.logger.info "In forward"
-    Rails.logger.info session[:genes] 
-    Rails.logger.info params
+    #Rails.logger.info "In forward"
+    #Rails.logger.info session[:genes] 
+    #Rails.logger.info params
 
     session[:studies] = params[:studies] if  params[:studies] 
 
