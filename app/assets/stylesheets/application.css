@@ -21,7 +21,7 @@
 
 body{
 	background-color: #E6E6E6	;
-
+    height: 100%;
 }
 
 div.header {
@@ -38,6 +38,13 @@ div.header {
     margin: 0 auto;
 }
 
+div.footer{
+     clear: both;
+     position: relative;
+     z-index: 10;
+    text-align: center;
+}
+
 .left, .right { 
  
   padding: 1em; 
@@ -50,7 +57,9 @@ div.header {
  }
  .header-form input {
     display:inline-block;
-
+* {
+    margin: 0;
+}
 }
  .header-form label {
     width: 25%;
@@ -70,10 +79,27 @@ div.header {
     background-color:  #FFFFFF;
     overflow-y: auto;
     max-height: 85%;
+    height:auto;
 }
 
 .left  { float:left;  }
 .right { float:right; } 
+
+.push {
+    height: 4em;
+}
+
+img.logo{
+    width:20%;
+    padding:10px;
+}
+
+.around {
+    min-height: 100%;
+    height: auto !important; /* This line and the next line are not necessary unless you need IE6 support */
+    height: 100%;
+    margin: 0 auto -155px; /* the bottom margin is the negative value of the footer's height */
+}
 
 .alert-error {
     position: fixed;
