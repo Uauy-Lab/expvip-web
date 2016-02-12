@@ -55,8 +55,29 @@ ready = (function() {
         duration: 500
       }
     });
+
+  $( "#about" ).dialog({
+      autoOpen: false,
+      minWidth: 1000,
+      maxHeight: 500,
+      resizable: false,
+      position: { at: "center top" },
+      show: {
+        effect: "fade",
+        duration: 500
+      },
+      hide: {
+        effect: "fade",
+        duration: 500
+      }
+    });
+
   $( "#studies_button" ).click(function() {
       $( "#about_studies" ).dialog( "open" );
+  });
+
+   $( "#cite_button" ).click(function() {
+      $( "#about" ).dialog( "open" );
   });
 
 });

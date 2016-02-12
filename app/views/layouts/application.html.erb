@@ -45,6 +45,7 @@
   <%= link_to "Add your data", "https://github.com/homonecloco/expvip-web/wiki/LoadingVM"%>
   <%= link_to "Tutorials",  "https://github.com/homonecloco/expvip-web/wiki" %>
   <%= link_to "Videos",  "https://github.com/homonecloco/expvip-web/wiki/List-of-tutorial-videos" %>
+  <%= link_to "Cite", "#", :id => 'cite_button'%>
  </div>
 
  <div class='form-group right header-form  '>
@@ -61,6 +62,12 @@
 <div id="about_studies" >
   <div style="overflow:auto; max-height:400px">
     <%= render :partial => "studies/studiesInfo" %>
+  </div>
+</div>
+
+<div id="about" >
+  <div style="overflow:auto; max-height:400px">
+    <%= render :partial => "wellcome/about" %>
   </div>
 </div>
 
