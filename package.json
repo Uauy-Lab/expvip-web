@@ -10,6 +10,6 @@
     "watchify": "^3.2.2"
   },
   "dependencies": {
-    "bio-vis-expression-bar": "^0.6.11"
+    "bio-vis-expression-bar": "^0.6.12"
   }
 }
