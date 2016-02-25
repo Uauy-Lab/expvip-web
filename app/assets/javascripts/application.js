@@ -17,6 +17,11 @@
 //= require jquery-ui
 //= require inchlib-1.2.0
 
+Math.log2 = Math.log2 || function(x) {
+  return Math.log(x) / Math.LN2;
+};
+
+
 var ready;
 ready = (function() {
   $('a[href="' + this.location.pathname + '"]').parent().addClass('active');
