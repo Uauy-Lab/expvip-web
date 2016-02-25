@@ -1,14 +1,14 @@
 # README #
 
 ##Requirements ##
-exVIP requires to have installed ```ruby 2.1``` or later. 
+expVIP requires to have installed ```ruby 2.1``` or later. 
 
 * ```ruby 2.1``` or newer
 * ```MySQL 5.5``` or newer. May work with other Databases, but it hasn't been tested
 * ```Kallisto 0.42.3``` Optional. You need to get it from [here](http://pachterlab.github.io/kallisto/) and set it up in your ```$PATH```. *** Kallisto is free for non commercial use. Refer to the license in it's website ***
 
 
-## Getting exVIP ##
+## Getting expVIP ##
 
 
 To load the required gems, run ```bundle install``
