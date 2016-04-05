@@ -15,7 +15,7 @@
 //= require bundle
 //= require jquery
 //= require jquery-ui
-//= require inchlib-1.2.0
+
 
 Math.log2 = Math.log2 || function(x) {
   return Math.log(x) / Math.LN2;
