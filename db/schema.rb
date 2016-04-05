@@ -94,9 +94,9 @@ ActiveRecord::Schema.define(version: 20160104181636) do
   add_index "genes", ["name"], name: "index_genes_on_name", using: :btree
 
   create_table "homologies", force: :cascade do |t|
-    t.integer  "Gene_id",    limit: 4
-    t.integer  "Group",      limit: 4
-    t.string   "Genome",     limit: 255
+    t.integer  "gene_id",    limit: 4
+    t.integer  "group",      limit: 4
+    t.string   "genome",     limit: 255
     t.integer  "A_id",       limit: 4
     t.integer  "B_id",       limit: 4
     t.integer  "D_id",       limit: 4
@@ -104,7 +104,7 @@ ActiveRecord::Schema.define(version: 20160104181636) do
     t.datetime "updated_at",             null: false
   end
 
-  add_index "homologies", ["Gene_id"], name: "index_homologies_on_Gene_id", using: :btree
+  add_index "homologies", ["gene_id"], name: "index_homologies_on_gene_id", using: :btree
 
   create_table "meta_experiments", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -177,7 +177,7 @@ ActiveRecord::Schema.define(version: 20160104181636) do
   add_foreign_key "expression_values", "meta_experiments"
   add_foreign_key "expression_values", "type_of_values"
   add_foreign_key "genes", "gene_sets"
-  add_foreign_key "homologies", "Genes"
+  add_foreign_key "homologies", "genes"
   add_foreign_key "meta_experiments", "gene_sets"
   add_foreign_key "studies", "species"
 end

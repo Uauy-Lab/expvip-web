@@ -85,7 +85,7 @@ GEM
     mini_portile2 (2.0.0)
     minitest (5.8.4)
     multi_json (1.11.2)
-    mysql2 (0.4.3)
+    mysql2 (0.3.19)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     rack (1.6.4)
@@ -168,7 +168,7 @@ DEPENDENCIES
   jquery-rails
   jquery-ui-rails
   markdown-rails
-  mysql2
+  mysql2 (~> 0.3.13)
   rails (= 4.2.1)
   redcarpet
   sass-rails (~> 5.0)
