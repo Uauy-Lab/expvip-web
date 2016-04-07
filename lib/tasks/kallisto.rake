@@ -23,6 +23,13 @@ namespace :kallisto do
 			)
 	end
 
+	desc "Loads kallisto from a folder of Kallisto runs (each folder has the accession name"
+	task :loadFolder, [ :input_dir, :meta_experiment, :gene_set ]  => :environment do |t, args|
+		KallistoHelper.loadFolder(input_dir:args[:input_dir], 
+			gene_set: args[:gene_set], 
+			meta_experiment: args[:meta_experiment]
+			)
+	end
 
 end
 

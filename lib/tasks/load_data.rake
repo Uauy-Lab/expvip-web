@@ -116,6 +116,29 @@ namespace :load_data do
   	end
   end
 
+  desc "Load the genes, from a de novo assembly. "
+  task :de_novo_genes, [:gene_set,:filename] => :environment do |t, args|
+    puts "Loading genes"
+    ActiveRecord::Base.transaction do
+      gene_set = GeneSet.find_or_create_by(:name=>args[:gene_set])
+
+      Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
+        ff.each do |entry| 
+          arr = entry.definition.split( / description:"(.*?)" *| / )
+          # puts entry.definition.split( / description:"(.*?)" *| / ).inspect
+          g = Gene.new 
+          g.gene_set = gene_set
+          name = arr.shift
+          g.name = name
+          g.cdna = name
+          #puts g.inspect
+          #raise "testing"
+          g.save!
+        end
+    end
+    end
+  end
+
   #def get_experiment(name)
   #	@experiments[name] = Experiment.find_by(:accession=>name) unless @experiments[name]
   #	return @experiments[name]
