@@ -1,6 +1,7 @@
 
 <%= form_tag "/genes/forward", method: "post" do  %>
 	<h2>One or two genes</h2>
+  Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
   <%= label_tag :gene, "Gene:" %>
 	<%= text_field_tag :gene %>
   	

@@ -61,6 +61,18 @@ class GeneSetsController < ApplicationController
     end
   end
 
+  def set_gene_set_session
+    @gene_set = GeneSet.find(params[:gene_set_selector])
+    session[:gene_set_id] = @gene_set.id if @gene_set
+
+    respond_to do |format|
+      format.html
+      format.json { 
+        render json: @gene_set.name 
+      }
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_gene_set
@@ -69,6 +81,6 @@ class GeneSetsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def gene_set_params
-      params.require(:gene_set).permit(:name, :description)
+      params.require(:gene_set).permit(:name, :description, :gene_set_selector)
     end
 end

@@ -4,11 +4,11 @@
 
  <strong>Gene:</strong>
  
- <%= @gene.gene %>
+ <%= @gene.name %>
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
 <% if @compare %>
  <strong>Compare:</strong>
- <%= @compare.gene %>   
+ <%= @compare.name %>   
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
 

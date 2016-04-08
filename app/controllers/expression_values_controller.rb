@@ -141,91 +141,6 @@ def getValuesForGene(gene)
   return values
 end
 
-def inchworm
-    #puts @genes
-
-    ret = Hash.new
-    genes = params["genes"].split(",")
-    ret["data"] = Hash.new
-    ret["data"]["nodes"] = Hash.new
-    nodes =  ret["data"]["nodes"]
-    ret["data"]["Missing"] = Array.new
-    #ret["data"]["feature_names"] = Array.new
-    ret["metadata"] = Hash.new
-    ret["metadata"]["feature_names"] = ["Gene"]
-    ret["metadata"]["nodes"] = Hash.new
-
-    experiments, groups = getExperimentGroups
-    factorOrder, longFactorName, selectedFactors = getFactorOrder
-    experimentIds = experiments.keys
-    factors = factorOrder.keys
-
-    ret["column_metadata"] = Hash.new
-    ret["column_metadata"]["features"] = Array.new
-    ret["column_metadata"]["feature_names"] =factors 
-
-    #studies = Array.new
-    factorValues = factors.map { |f| Array.new }
-
-
-
-    experimentIds.map do |i| 
-      group = experiments[i]["group"]
-
-      g = groups[group.to_i]
-      fact =  g["factors"]
-
-      factors.each_with_index  { |f, j| factorValues[j] <<  g["factors"][f] }
-      
-    #  studies <<  groups[experiments[i]["group"]]["factors"]
-
-  end  
-  
-  ret["column_metadata"]["features"] = factorValues
-
-  ret["data"]["feature_names"]  = experimentIds.map { |i| experiments[i]["name"] }
-  genes.each do |g|  
-    nodes[g] = Hash.new
-    gene = Gene.find_by(name: g)
-    if gene
-      valuesForGene = getValuesForGene gene
-      tpm =  valuesForGene["tpm"]
-      vals = Array.new
-      experimentIds.each { |k|  vals << tpm[k][:value]}
-      nodes[g]["features"] = vals
-      nodes[g]["count"] = 1
-      nodes[g]["distance"] = 0
-      nodes[g]["objects"] =  [gene.name]
-
-      ret["metadata"]["nodes"][g] = [g]
-
-    else
-      ret["data"]["Missing"] <<  g
-    end
-  end
-
-
-  respond_to do |format|
-    format.json {render json: ret}
-  end
-end
-
-  #TODO: Add this to the database. 
-  def getDefaultSelection 
-   defSelection = {
-    "Age"=> false, 
-    "High level stress-disease"=> true, 
-    "High level age"=> true, 
-    "High level tissue"=>true,
-    "High level variety"=>true,
-    "Stress-disease"=>false,
-    "study"=>false,
-    "Tissue" => false,
-    "Variety" => false
-  }
-  return defSelection
-end
-
 def getDefaultOrder 
     #This should be a table in the DB at some point
     defOrder = [
@@ -328,6 +243,21 @@ def gene
     end
 
   end
+
+  def getDefaultSelection
+    defSelection = {
+    "Age"=> false,
+    "High level stress-disease"=> true,
+    "High level age"=> true,
+    "High level tissue"=>true,
+    "High level variety"=>true,
+    "Stress-disease"=>false,
+    "study"=>false,
+    "Tissue" => false,
+    "Variety" => false
+  }
+  return defSelection
+end
 
   private
 

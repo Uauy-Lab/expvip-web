@@ -39,6 +39,20 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
+  $("#gene_set_selector").on("change", function(event){
+    $.ajax({
+    type: 'get',
+    url: '/gene_sets/set_gene_set_session.json',
+
+    data: {
+        gene_set_selector:$("#gene_set_selector").val()
+    },
+    success: function (response) {
+        document.getElementById("kalb"+parseInt(subcategory_id.match(/[0-9]+/)[0], 10)).innerHTML=response;
+    }
+});
+  });
+
   $(".alert-error").on("click", function(event) { 
     $(this).hide();
   });

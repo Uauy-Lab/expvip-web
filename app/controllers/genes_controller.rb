@@ -2,24 +2,13 @@ class GenesController < ApplicationController
   before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
 
-  def getMissingGenes(genes)
-    missing = Array.new
-    genes.each do |g|  
-      gene = Gene.find_by(:name=>g)
-      gene = Gene.find_by(:gene=>g) unless  gene
-      unless gene
-        missing << g
-      end
-    end
-    return missing
-  end
-
   def getGeneIds(genes)
     ids = Array.new
     missing = Array.new
+    gene_set = GeneSet.find(session[:gene_set_id])
     genes.each do |g|  
-      gene = Gene.find_by(:name=>g)
-      gene = Gene.find_by(:gene=>g) unless  gene
+      gene = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id)
+      gene = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id) unless  gene
       if gene
         ids << gene.id
       else
@@ -44,8 +33,10 @@ class GenesController < ApplicationController
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
+    gene_set = GeneSet.find(params[:gene_set_selector])
     @gene = findGeneName(gene_name)
     session[:gene] = @gene.name
+    session[:gene_set_id] = gene_set.id
     redirect_to  action: "show", id: @gene.id, studies: params[:studies]
   end
 
@@ -53,15 +44,18 @@ class GenesController < ApplicationController
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
-    @gene = findGeneName(gene_name)
+
+    gene_set = GeneSet.find(params[:gene_set_selector])
+    session[:gene_set_id] = gene_set.id
+    @gene = findGeneName(gene_name, gene_set)
     @compare =  findGeneName params[:compare]
     redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name  
   end
 
-  def findGeneName(gene_name)
-    gene =  Gene.find_by(:name=>gene_name)
-    gene = Gene.find_by(:gene=>gene_name) unless  gene
-    raise "Gene not found: #{gene_name}" unless gene
+  def findGeneName(gene_name, gene_set)
+    gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)
+    gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
+    raise "Gene not found: #{gene_name} for #{gene_set.name} " unless gene
     return gene  
   end
 
@@ -95,7 +89,8 @@ end
 
 def autocomplete
     #puts "In autocomplete!"
-    @genes = Gene.order(:name).where("name LIKE ?", "%#{params[:term]}%").limit(20)
+    gene_set_id = session[:gene_set_id] 
+    @genes = Gene.order(:name).where("name LIKE ? and gene_set_id = ?", "%#{params[:term]}%", gene_set_id).limit(20)
 
     respond_to do |format|
       format.html
@@ -129,7 +124,7 @@ def autocomplete
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
-      compare = @compare.transcript
+      compare = @compare.name
     end
 
     @args = {studies: studies, compare: compare }.to_query

@@ -6,6 +6,7 @@
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
   <%=render  :partial =>"layouts/analytics" rescue nil%>
+  <%= csrf_meta_tags %>
   <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
 <script type="text/javascript">
     window.cookieconsent_options = {"message":"This website uses cookies to ensure you get the best experience on our website","dismiss":"Got it!","learnMore":"More info","link":null,"theme":"dark-bottom"};
@@ -64,8 +65,8 @@
      <%= submit_tag "Search" , name: 'submit'  %>
   
     <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%> 
-     <%= submit_tag "Compare", name: 'submit'  %> 
-
+     <%= submit_tag "Compare", name: 'submit'  %> <br/>
+     Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
 </div>
 <% end %>
 </div>
