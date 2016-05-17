@@ -21,3 +21,5 @@ log/development.log
 
 /node_modules/
 npm-debug.log
+/config/database.yml
+/config/secrets.yml
