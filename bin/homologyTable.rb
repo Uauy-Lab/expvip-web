@@ -17,6 +17,7 @@ class Gene
 	def chromosome
 		ret = name.split("_")[1] 
 		ret = "3B" if !name.nil? and name.start_with? "TRAES3B"
+		ret = name.split("_")[2] if  name.start_with? "TRIAE_CS42" 
 		ret
 	end
 

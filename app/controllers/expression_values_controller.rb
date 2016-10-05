@@ -134,9 +134,7 @@ def getValuesForGene(gene)
     type_of_value = ev.type_of_value.name
     values[type_of_value] = Hash.new unless  values[type_of_value]
     tvh = values[type_of_value]
-
     tvh[ev.experiment.id] = { experiment:  ev.experiment.id.to_s , value: ev.value}
-
   end
   return values
 end

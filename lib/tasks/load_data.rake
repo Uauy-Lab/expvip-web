@@ -6,7 +6,6 @@ namespace :load_data do
   task :factor, [:filename] => :environment do |t, args|
     ActiveRecord::Base.transaction do 
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-        #puts row.inspect
         factor = Factor.find_or_create_by(
           :factor=>row["factor"],  :description=>row["name"], 
            :name=>row["short"])
@@ -32,42 +31,26 @@ namespace :load_data do
 		  		study.manuscript = row["Manuscript"]
 		  		study.species = species
 		  		study.save!
-		  		#variety = Variety.find_or_create_by(:name=>row["Variety"])
-		  		#tissue = Tissue.find_or_create_by(:name=>row["Tissue"])
 
 		  		#We need to validate that it doesn't exist. Maybe make the accessions primary keys. 
 		  		experiment = Experiment.find_or_create_by(:accession => row["run_accession"] )
-		  		experiment.accession = row["run_accession"]
-          #experiment.variety = variety
-		  		#experiment.tissue = tissue
-		  		#experiment.age = row["Age"]
-		  		#experiment.stress = row["Stress/disease"]
 		  		experiment.accession = row["run_accession"]
           experiment.total_reads = row["Total reads"].to_i if row["Total reads"]
           experiment.mapped_reads = row["Mapped reads"].to_i if row["Mapped reads"] 
           experiment.study = study
 		  		experiment.save!
-
-
-
 		  		experiment_group = ExperimentGroup.find_or_create_by(:name=>row["Group_number_for_averaging"], :description=>row["Group_for_averaging"])
 		  		
           if experiment_group.factors.length == 0
-        
-            #puts "Factors not loaded yet! for #{experiment_group.name}"
             factors.each do |f|
               v = row[f]
               factor = Factor.find_by factor: f, description:v
-              #puts "#{f}:#{v}:#{factor}"
               raise "#{f}:#{v} not found!. Make sure '#{v}' was loaded in the factors\n" unless factor
               experiment_group.factors << factor
             end
           end
 
           experiment_group.experiments << experiment
-		  		
-
-
           experiment_group.save!
 		  	end
 	  	end
@@ -76,20 +59,14 @@ namespace :load_data do
   desc "Change the name of the studies"
   task :fixStudyExpression, [:filename]  => :environment do |t, args|
       puts "FixingStudies"
-
       ActiveRecord::Base.transaction do
         CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-          #puts row.inspect
-          #species = Species.find_or_create_by(:scientific_name=>row["scientific_name"])
-          
-          #Maybe we need to validate that we are not overwritting. Look if there is a way to know if find_or_create tells which is the case. 
           puts row["secondary_study_accession"]
           study = Study.find_by(:accession=>row["secondary_study_accession"])
           puts study.inspect
           #We need to validate that it doesn't exist. Maybe make the accessions primary keys. 
           experiment = Experiment.find_by(:accession=>row["run_accession"])
           experiment.study = study
-          puts experiment.inspect
           experiment.save!
         end
       end
@@ -101,18 +78,16 @@ namespace :load_data do
   	puts "Loading genes"
   	ActiveRecord::Base.transaction do
   		gene_set = GeneSet.find_or_create_by(:name=>args[:gene_set])
-
   		Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
   			ff.each do |entry|
     			arr = entry.definition.split( / description:"(.*?)" *| / )
     			g = Gene.new 
     			g.gene_set = gene_set
     			g.name = arr.shift
-				  
           arr.each { |e| g.add_field(e) }
 				  g.save!
   			end
-		end
+		  end
   	end
   end
 
@@ -125,17 +100,14 @@ namespace :load_data do
       Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
         ff.each do |entry| 
           arr = entry.definition.split( / description:"(.*?)" *| / )
-          # puts entry.definition.split( / description:"(.*?)" *| / ).inspect
           g = Gene.new 
           g.gene_set = gene_set
           name = arr.shift
           g.name = name
           g.cdna = name
-          #puts g.inspect
-          #raise "testing"
           g.save!
         end
-    end
+      end
     end
   end
 
@@ -189,7 +161,6 @@ namespace :load_data do
       meta_exp.gene_set = gene_set
       #TODO: add validation if any of the find_by is null
 
-  		#genes_arr = Gene.connection.select_all("SELECT * FROM clients WHERE id = '1'")
   		genes = Hash.new
   		Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
   			genes[g.name] = g.id
@@ -203,12 +174,8 @@ namespace :load_data do
       count = 0
   		inserts = Array.new
   		CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-  			#puts row.inspect
-        #puts meta_exp.inspect
-  			#gene = Gene.find_by(:name=>row["target_id"])
         gene_name = row["target_id"]
   			gene = genes[gene_name]
-  			#puts gene.inspect
   			row.delete("target_id")
   			row.to_hash.each_pair do |name, val| 
   				val = val.to_f
@@ -221,14 +188,12 @@ namespace :load_data do
         if count % 1000 == 0
           puts "Loaded #{count} ExpressionValue (#{gene_name})" 
           sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
-          #puts sql
           conn.execute sql
           inserts = Array.new
         end
   		end
       puts "Loaded #{count} ExpressionValue " 
       sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
-      #puts sql
       conn.execute sql
   	end
   end
