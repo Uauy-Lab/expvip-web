@@ -7,8 +7,9 @@ namespace :load_data do
     ActiveRecord::Base.transaction do 
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
         factor = Factor.find_or_create_by(
-          :factor=>row["factor"],  :description=>row["name"], 
-           :name=>row["short"])
+          :factor=>row["factor"], 
+          :description=>row["name"])
+        factor.name = row["short"]
         factor.order = row["order"].to_i
         factor.save!
       end
@@ -75,20 +76,54 @@ namespace :load_data do
 
   desc "Load the genes, from the ENSEMBL fasta file."
   task :ensembl_genes, [:gene_set, :filename] => :environment do |t, args|
-  	puts "Loading genes"
+  	puts "Loading Ensembl genes"
   	ActiveRecord::Base.transaction do
   		gene_set = GeneSet.find_or_create_by(:name=>args[:gene_set])
-  		Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
+  		#puts gene_set.inspect
+      Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
   			ff.each do |entry|
+          #puts entry.definition
     			arr = entry.definition.split( / description:"(.*?)" *| / )
     			g = Gene.new 
     			g.gene_set = gene_set
     			g.name = arr.shift
           arr.each { |e| g.add_field(e) }
-				  g.save!
+				  #puts arr.inspect
+          g.save!
   			end
 		  end
   	end
+  end
+
+  desc "Load the genes, from the ENSEMBL fasta file."
+  task :gff_produced_genes, [:gene_set, :filename] => :environment do |t, args|
+    puts "Loading Ensembl genes"
+    i = 0
+    ActiveRecord::Base.transaction do
+      gene_set = GeneSet.find_or_create_by(:name=>args[:gene_set])
+      puts gene_set.inspect
+      Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
+        ff.each do |entry|
+          #puts entry.definition
+          arr = entry.definition.split( /\s|\t/ )
+          g = Gene.new 
+          g.gene_set = gene_set
+          g.name = arr.shift
+          fields = Hash.new
+          arr.each do |e| 
+            f = e.split("=")
+            fields[f[0]] = f[1]
+          end
+          g.transcript = g.name
+          g.gene = fields["gene"]
+          g.cdna = fields["biotype"]
+          g.save!
+          i += 1
+          puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
+        end
+      end
+    end
+    puts "Loaded #{i} genes"
   end
 
   desc "Load the genes, from a de novo assembly. "
@@ -123,8 +158,8 @@ namespace :load_data do
        conn = ActiveRecord::Base.connection
        gene_set = GeneSet.find_by(:name=>args[:gene_set])
        genes = Hash.new
-       Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
-        genes[g.gene] = g
+       Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}' ORDER BY gene").each do |g|  
+        genes[g.gene] = g unless genes[g.gene]
        end
        puts "Loaded #{genes.size} genes  in memory"
        count = 0
@@ -132,8 +167,10 @@ namespace :load_data do
        CSV.foreach(args[:filename], :headers=>true, :col_sep=>"\t") do |row|
         h = Homology.new
         #Gene A B D Group Genome
-      
-        h.gene = genes[row["Gene"]]
+        #puts row["Gene"].inspect
+        #puts  genes[row["Gene"]].inspect
+        #puts h.inspect
+        h.Gene = genes[row["Gene"]]
         h.A = genes[row["A"]]
         h.B = genes[row["B"]]
         h.D = genes[row["D"]]
@@ -175,8 +212,10 @@ namespace :load_data do
   		inserts = Array.new
   		CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
         gene_name = row["target_id"]
+        gene_name = row["transcript"] unless row["target_id"]
   			gene = genes[gene_name]
   			row.delete("target_id")
+        row.delete("transcript")
   			row.to_hash.each_pair do |name, val| 
   				val = val.to_f
           raise  "Experiment #{name} not found " unless experiments[name]
@@ -185,7 +224,7 @@ namespace :load_data do
           inserts.push str          
   			end
   			count += 1
-        if count % 1000 == 0
+        if count % 10 == 0
           puts "Loaded #{count} ExpressionValue (#{gene_name})" 
           sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
           conn.execute sql

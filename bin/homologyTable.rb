@@ -48,6 +48,9 @@ class Homology
 	def initialize(id)
 		@id = id
 		@rows = Array.new
+	end
+	def to_s
+		rows["genes"]
 	end	
 end
 
@@ -79,15 +82,21 @@ genes.each_pair do |name, gene|
 	group = gene.group
 	genome = gene.genome
 	total_homs = 0
+	#if gene.homologies.size > 3
+	#	gene.homologies.each { |e|  e.rows.each { |i| puts [i["genes"], i["perc_cov"], i["perc_id"], i["perc_pos"]].join("\t") } }
+	#end
 	gene.homologies.each do |h|
 		h.rows.each do |r|  
 			g = r["gene"]
 			total_homs += 1 unless g.name == name
-			if g.chromosome
-				to_print[g.genome_index] = g.name if g.group == group
+			if g.chromosome and  g.group == group 
+				to_print[g.genome_index] = r unless to_print[g.genome_index]
+				to_print[g.genome_index] = r if to_print[g.genome_index]["perc_pos"].to_f < r["perc_pos"].to_f 
 			end
 		end
 	end
+	to_print.map! {|item| item["gene"].name if  item and not item.is_a? String and item["gene"]}
+	to_print[0] = name
 	sum = 0
 	sum = to_print.collect do| c | 
 		ret = 0
