@@ -2,15 +2,15 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.1'
+gem 'rails', '>=5'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
+#gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
-gem 'coffee-rails', '~> 4.1.0'
+#gem 'coffee-rails', '~> 4.2.1'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
@@ -25,7 +25,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'mysql2', '~>  0.3.13' 
 
-gem "bio", "~> 1.4.3"
+gem "bio", "~> 1.5"
 
 gem "bio-kallisto", "~> 0.1.0"
 
@@ -35,7 +35,7 @@ gem 'markdown-rails'
 
 gem 'redcarpet'
 
-gem 'activerecord-session_store'
+#gem 'activerecord-session_store'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
