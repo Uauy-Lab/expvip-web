@@ -61,22 +61,27 @@ OptionParser.new do |opts|
 
 	opts.on("-r", "--index FILE", "Kallisto index") do |v|
 		options[:index] = v
-		options[:ref_name] = v.split("/")[-1] unless options[:ref_name] 
 	end
 
-	options.on("-n","--ref_name NAME", "Name for the experiment. By default the filename of the index") do
+	opts.on("-n","--ref_name NAME", "Name for the experiment. By default the filename of the index") do
 		options[:ref_name] = v
 	end
 end.parse!
+options[:ref_name] = options[:index].split("/")[-1] unless options[:ref_name] 
 
 cmd_str=""
 mkdir_str=""
+i=0
 
 CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	puts row
+	i += 1
 	l = row["left"]
 	r = row["right"]
-	out_d = options[:output_dir] + "/" + options[:ref_name] + "/" + row
+	study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".")
+	id 	  	= row["Sample IDs"].gsub(/\s+/,"_").gsub(",",".")
+	out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{study}/#{id}"
+	mkdir_str += "\"#{out_d}\"\n" 
 	if l and r
 		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d)}" + "\"\n"  
 	else
@@ -89,8 +94,23 @@ end
 
 File.open(options[:out],"w") do |f|
 	f.puts "#!/bin/bash"
+	f.puts "#SBATCH --mem=10Gb"
+	f.puts "#SBATCH -p tgac-medium "
+	f.puts "#SBATCH -J kallisto_#{options[:ref_name]}"
+	f.puts "#SBATCH -n 1"
+	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
+	f.puts "#SBATCH --array=0-#{i}"
 	f.puts "source kallisto-0.42.3"
-	f.puts cmd_str
+	f.puts "i=$SLURM_ARRAY_TASK_ID"
+	f.puts "declare -a out_dirs=(#{mkdir_str})"
+	f.puts "declare -a commands=(#{cmd_str})"
 
+	f.puts "cmd=${commands[$i]}"
+	f.puts "out_dir=${out_dirs[$i]}"
+	f.puts "echo $i"
+	f.puts "echo $out_dir"
+	f.puts "echo $cmd"
+	f.puts "mkdir -p $out_dir"
+	f.puts "srun $cmd"
 end
 
