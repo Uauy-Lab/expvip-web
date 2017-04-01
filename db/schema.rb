@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -13,160 +12,150 @@
 
 ActiveRecord::Schema.define(version: 20160104181636) do
 
-  create_table "ExperimentGroups_Factors", id: false, force: :cascade do |t|
-    t.integer "experiment_group_id", limit: 4, null: false
-    t.integer "factor_id",           limit: 4, null: false
+  create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "experiment_group_id", null: false
+    t.integer "factor_id",           null: false
   end
 
-  create_table "experiment_groups", force: :cascade do |t|
-    t.string   "name",        limit: 255
+  create_table "experiment_groups", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
     t.text     "description", limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
   end
 
-  create_table "experiment_groups_experiments", id: false, force: :cascade do |t|
-    t.integer "experiment_group_id", limit: 4, null: false
-    t.integer "experiment_id",       limit: 4, null: false
+  create_table "experiment_groups_experiments", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "experiment_group_id", null: false
+    t.integer "experiment_id",       null: false
+    t.index ["experiment_group_id"], name: "index_experiment_groups_experiments_on_experiment_group_id", using: :btree
+    t.index ["experiment_id"], name: "index_experiment_groups_experiments_on_experiment_id", using: :btree
   end
 
-  add_index "experiment_groups_experiments", ["experiment_group_id"], name: "index_experiment_groups_experiments_on_experiment_group_id", using: :btree
-  add_index "experiment_groups_experiments", ["experiment_id"], name: "index_experiment_groups_experiments_on_experiment_id", using: :btree
-
-  create_table "experiments", force: :cascade do |t|
-    t.string   "accession",    limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.integer  "study_id",     limit: 4
-    t.integer  "total_reads",  limit: 4
-    t.integer  "mapped_reads", limit: 4
+  create_table "experiments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "accession"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.integer  "study_id"
+    t.integer  "total_reads"
+    t.integer  "mapped_reads"
+    t.index ["accession"], name: "index_experiments_on_accession", using: :btree
+    t.index ["study_id"], name: "index_experiments_on_study_id", using: :btree
   end
 
-  add_index "experiments", ["accession"], name: "index_experiments_on_accession", using: :btree
-  add_index "experiments", ["study_id"], name: "index_experiments_on_study_id", using: :btree
-
-  create_table "expression_values", force: :cascade do |t|
-    t.integer  "experiment_id",      limit: 4
-    t.integer  "gene_id",            limit: 4
-    t.integer  "meta_experiment_id", limit: 4
-    t.integer  "type_of_value_id",   limit: 4
+  create_table "expression_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "experiment_id"
+    t.integer  "gene_id"
+    t.integer  "meta_experiment_id"
+    t.integer  "type_of_value_id"
     t.float    "value",              limit: 24
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.index ["experiment_id"], name: "index_expression_values_on_experiment_id", using: :btree
+    t.index ["gene_id"], name: "index_expression_values_on_gene_id", using: :btree
+    t.index ["meta_experiment_id"], name: "index_expression_values_on_meta_experiment_id", using: :btree
+    t.index ["type_of_value_id"], name: "index_expression_values_on_type_of_value_id", using: :btree
   end
 
-  add_index "expression_values", ["experiment_id"], name: "index_expression_values_on_experiment_id", using: :btree
-  add_index "expression_values", ["gene_id"], name: "index_expression_values_on_gene_id", using: :btree
-  add_index "expression_values", ["meta_experiment_id"], name: "index_expression_values_on_meta_experiment_id", using: :btree
-  add_index "expression_values", ["type_of_value_id"], name: "index_expression_values_on_type_of_value_id", using: :btree
-
-  create_table "factors", force: :cascade do |t|
-    t.string   "name",        limit: 255
+  create_table "factors", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
     t.text     "description", limit: 65535
-    t.integer  "order",       limit: 4
+    t.integer  "order"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
-    t.string   "factor",      limit: 255
+    t.string   "factor"
+    t.index ["factor"], name: "index_factors_on_factor", using: :btree
   end
 
-  add_index "factors", ["factor"], name: "index_factors_on_factor", using: :btree
-
-  create_table "gene_sets", force: :cascade do |t|
-    t.string   "name",        limit: 255
+  create_table "gene_sets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
     t.text     "description", limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
   end
 
-  create_table "genes", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.string   "cdna",        limit: 255
-    t.string   "possition",   limit: 255
-    t.string   "gene",        limit: 255
-    t.string   "transcript",  limit: 255
+  create_table "genes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
+    t.string   "cdna"
+    t.string   "possition"
+    t.string   "gene"
+    t.string   "transcript"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
-    t.integer  "gene_set_id", limit: 4
+    t.integer  "gene_set_id"
     t.text     "description", limit: 65535
+    t.index ["gene_set_id"], name: "index_genes_on_gene_set_id", using: :btree
+    t.index ["name"], name: "index_genes_on_name", using: :btree
   end
 
-  add_index "genes", ["gene_set_id"], name: "index_genes_on_gene_set_id", using: :btree
-  add_index "genes", ["name"], name: "index_genes_on_name", using: :btree
-
-  create_table "homologies", force: :cascade do |t|
-    t.integer  "gene_id",    limit: 4
-    t.integer  "group",      limit: 4
-    t.string   "genome",     limit: 255
-    t.integer  "A_id",       limit: 4
-    t.integer  "B_id",       limit: 4
-    t.integer  "D_id",       limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+  create_table "homologies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "gene_id"
+    t.integer  "group"
+    t.string   "genome"
+    t.integer  "A_id"
+    t.integer  "B_id"
+    t.integer  "D_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["gene_id"], name: "index_homologies_on_gene_id", using: :btree
   end
 
-  add_index "homologies", ["gene_id"], name: "index_homologies_on_gene_id", using: :btree
-
-  create_table "meta_experiments", force: :cascade do |t|
-    t.string   "name",        limit: 255
+  create_table "meta_experiments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
     t.text     "description", limit: 65535
-    t.integer  "gene_set_id", limit: 4
+    t.integer  "gene_set_id"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.index ["gene_set_id"], name: "index_meta_experiments_on_gene_set_id", using: :btree
+    t.index ["name"], name: "index_meta_experiments_on_name", using: :btree
   end
 
-  add_index "meta_experiments", ["gene_set_id"], name: "index_meta_experiments_on_gene_set_id", using: :btree
-  add_index "meta_experiments", ["name"], name: "index_meta_experiments_on_name", using: :btree
-
-  create_table "sessions", force: :cascade do |t|
-    t.string   "session_id", limit: 255,   null: false
+  create_table "sessions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "session_id",               null: false
     t.text     "data",       limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["session_id"], name: "index_sessions_on_session_id", unique: true, using: :btree
+    t.index ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
   end
 
-  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", unique: true, using: :btree
-  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
-
-  create_table "species", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.string   "scientific_name", limit: 255
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+  create_table "species", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
+    t.string   "scientific_name"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
   end
 
-  create_table "studies", force: :cascade do |t|
-    t.string   "accession",  limit: 255
-    t.string   "title",      limit: 255
-    t.string   "manuscript", limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "species_id", limit: 4
+  create_table "studies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "accession"
+    t.string   "title"
+    t.string   "manuscript"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "species_id"
+    t.index ["accession"], name: "index_studies_on_accession", using: :btree
+    t.index ["species_id"], name: "index_studies_on_species_id", using: :btree
+    t.index ["title"], name: "index_studies_on_title", using: :btree
   end
 
-  add_index "studies", ["accession"], name: "index_studies_on_accession", using: :btree
-  add_index "studies", ["species_id"], name: "index_studies_on_species_id", using: :btree
-  add_index "studies", ["title"], name: "index_studies_on_title", using: :btree
-
-  create_table "tissues", force: :cascade do |t|
-    t.string   "name",        limit: 255
+  create_table "tissues", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
     t.text     "description", limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
   end
 
-  create_table "type_of_values", force: :cascade do |t|
-    t.string   "name",        limit: 255
+  create_table "type_of_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
     t.text     "description", limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.index ["name"], name: "index_type_of_values_on_name", using: :btree
   end
 
-  add_index "type_of_values", ["name"], name: "index_type_of_values_on_name", using: :btree
-
-  create_table "varieties", force: :cascade do |t|
-    t.string   "name",        limit: 255
+  create_table "varieties", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
     t.text     "description", limit: 65535
-    t.string   "url",         limit: 255
+    t.string   "url"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
   end

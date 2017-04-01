@@ -3,20 +3,21 @@
 ##Requirements ##
 expVIP requires to have installed ```ruby 2.1``` or later. 
 
-* ```ruby 2.1``` or newer
+* ```ruby 2.2``` or newer
 * ```MySQL 5.5``` or newer. May work with other Databases, but it hasn't been tested
-* ```Kallisto 0.42.3``` Optional. You need to get it from [here](http://pachterlab.github.io/kallisto/) and set it up in your ```$PATH```. *** Kallisto is free for non commercial use. Refer to the license in it's website ***
+* ```Kallisto 0.42.3``` Optional. You need to get it from [here](http://pachterlab.github.io/kallisto/) and set it up in your ```$PATH```.  **Kallisto is free for non commercial use. Refer to the license in it's website**
+*  ```MongoDB 3.4``` To store the values in a non-relational database. 
 
 
 ## Getting expVIP ##
 
 
-To load the required gems, run ```bundle install``
+To load the required gems, run ```bundle install```
 
 ##Setting up the database ##
 If you are using the provided VM, you can skip this step, as it is already setup. 
 
-expVIP is developed on ```MySQL 5.5```. However, other databases may work as the queries are generated using ```ActiveRecord```. To set your database, you need to modify the file ```config/database.yml``` with the relevant information.
+expVIP is developed on ```MySQL 5.7```. However, other databases may work as the queries are generated using ```ActiveRecord```. To set your database, you need to modify the file ```config/database.yml``` with the relevant information.
 
 ```yml
 default: &default
@@ -73,11 +74,12 @@ Age	24	25 dpa	25dpa
 Age	25	30 dpa	30dpa
 Age	26	35 dpa	35dpa
 ```
-Alternatively, a single file with all the factors on the same columns can be used to populate the table. The order of the columns is not important, as long as the headers are consistant.  
+
+Alternatively, a single file with all the factors on the same columns can be used to populate the table. The order of the columns is not important, as long as the headers are: ```factor```	```order```	```name``` ```short```.  
 
 To load several files of factors do the following:
 
-```sh
+```bash
 for f in ./test/default_setup/FactorOrders/*.tsv; do 
 	rake load_data:factor[$f]; 
 done
@@ -109,13 +111,13 @@ The second step is to load the experiment meta data. Currently, a tab separated 
 
 The rake task is :
 
-```sh
+```bash
 rake load_data:metadata[./test/default_setup/metadata.txt]
 ```
 
 If ```Mapped reads``` and ```Total reads``` are missing, you need to run the ```Kallisto``` mapping from the ```rake``` task. 
 
-### Loading the gene sets ###
+### Loading the gene sets (ensembl notation)###
 Before loading the actual expression, it is necesary to load the gene models. Currently, only the fasta file with the cdna from ensembl is supported. The fasta header should contain the following fields, besides the gene name (first string in the header).
 
 * **cdna**
@@ -124,8 +126,8 @@ Before loading the actual expression, it is necesary to load the gene models. Cu
 * **transcript** 
 * **description** a free text, in quotes. Any other field with quotes may fail in the load. 
 
-```sh
-rake load_data:ensembl_genes[IWGSC2.26,/Triticum_aestivum.IWGSC2.26.cdna.all.fa]
+```bash
+rake load_data:ensembl_genes[IWGSC2.26,Triticum_aestivum.IWGSC2.26.cdna.all.fa]
 ```
 
 The fasta file looks like:
@@ -143,7 +145,38 @@ GGCGTGCAGCCCAAGTCCGCACCCGGCTCTAGGTTTCTGCTAATCTTCTTCCACCTGTGA
 TACGCGCTCCGGGGCTAGGAGCACTCGTTGCCGGCTGCCTCGTGCTCGGAATGGCGGATG
 ```
 
+### Loading gene sets (from gff produced fasta)
+
+
+Another supported type of header with fields separatd by spaces, each key-value pair is separated by ```=```. The supported keys are:
+
+* **gene**
+* **biotype** 
+
+```bash
+rake  gff_produced_genes[TGACv1,Triticum_aestivum_CS42_TGACv1_scaffold.annotation.gff3.cdna.fa]
+```
+
+The fasta file looks like: 
+
+```
+>TRIAE_CS42_1AL_TGACv1_000001_AA0000010.1   gene=TRIAE_CS42_1AL_TGACv1_000001_AA0000010	biotype=protein_coding
+GAGCGCCGCCCGTACGCTGCACCCGCAGCCACGCACTCGAGGCCGAGCTCCCGAGCGTGCCGCCGCCTCG
+ACCTCGCGACCCGCCGGCGACCGGATCCTCGCCGGAGATGAGTGCCGCCGTGCCCTGCTCCCTCCTCTCT
+```
+
+### Loading genes only by the fasta ID
+
+expVIP can be used for *de novo* assemblies, where you only have the name of the contigs/transcripts and not a relationship of the gene. 
+
+```bash
+rake de_novo_genes(MyAssembly,transcripts.fa]
+```
+
+This can be used to 
+
 #Loading the homologies
+
 In order to show the homoeologues, a file with the homoeologies must bue loaded. The file is tab separated with the following format:
 
 ```

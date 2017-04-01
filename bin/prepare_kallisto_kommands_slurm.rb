@@ -94,7 +94,7 @@ end
 
 File.open(options[:out],"w") do |f|
 	f.puts "#!/bin/bash"
-	f.puts "#SBATCH --mem=10Gb"
+	f.puts "#SBATCH --mem=25Gb"
 	f.puts "#SBATCH -p tgac-medium "
 	f.puts "#SBATCH -J kallisto_#{options[:ref_name]}"
 	f.puts "#SBATCH -n 1"
