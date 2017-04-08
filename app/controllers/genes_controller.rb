@@ -34,7 +34,7 @@ class GenesController < ApplicationController
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
     gene_set = GeneSet.find(params[:gene_set_selector])
-    @gene = findGeneName(gene_name, gene_set)
+    @gene = findGeneName gene_name, gene_set 
     session[:gene] = @gene.name
     session[:gene_set_id] = gene_set.id
     redirect_to  action: "show", id: @gene.id, studies: params[:studies]
@@ -48,7 +48,7 @@ class GenesController < ApplicationController
     gene_set = GeneSet.find(params[:gene_set_selector])
     session[:gene_set_id] = gene_set.id
     @gene = findGeneName(gene_name, gene_set)
-    @compare =  findGeneName params[:compare]
+    @compare =  findGeneName params[:compare], gene_set
     redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name  
   end
 

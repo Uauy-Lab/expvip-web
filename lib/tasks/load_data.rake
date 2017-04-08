@@ -39,7 +39,8 @@ namespace :load_data do
           experiment.total_reads = row["Total reads"].to_i if row["Total reads"]
           experiment.mapped_reads = row["Mapped reads"].to_i if row["Mapped reads"] 
           experiment.study = study
-		  		experiment.save!
+		  		#experiment.save!
+          ExperimentsHelper.saveExperiment experiment
 		  		experiment_group = ExperimentGroup.find_or_create_by(:name=>row["Group_number_for_averaging"], :description=>row["Group_for_averaging"])
 		  		
           if experiment_group.factors.length == 0
@@ -82,29 +83,26 @@ namespace :load_data do
   		#puts gene_set.inspect
       Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
   			ff.each do |entry|
-          #puts entry.definition
     			arr = entry.definition.split( / description:"(.*?)" *| / )
     			g = Gene.new 
     			g.gene_set = gene_set
     			g.name = arr.shift
           arr.each { |e| g.add_field(e) }
-				  #puts arr.inspect
-          g.save!
+				  GenesHelper.saveGene(g)
   			end
 		  end
   	end
   end
 
-  desc "Load the genes, from the ENSEMBL fasta file."
+  desc "Load the genes, from a fasta file.  '=' is used on each field "
   task :gff_produced_genes, [:gene_set, :filename] => :environment do |t, args|
-    puts "Loading Ensembl genes"
+    puts "Loading gff produced genes"
     i = 0
     ActiveRecord::Base.transaction do
       gene_set = GeneSet.find_or_create_by(:name=>args[:gene_set])
       puts gene_set.inspect
       Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
         ff.each do |entry|
-          #puts entry.definition
           arr = entry.definition.split( /\s|\t/ )
           g = Gene.new 
           g.gene_set = gene_set
@@ -117,7 +115,7 @@ namespace :load_data do
           g.transcript = g.name
           g.gene = fields["gene"]
           g.cdna = fields["biotype"]
-          g.save!
+          GenesHelper.saveGene(g)
           i += 1
           puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
         end
@@ -140,7 +138,7 @@ namespace :load_data do
           name = arr.shift
           g.name = name
           g.cdna = name
-          g.save!
+          GenesHelper.saveGene(g)
         end
       end
     end
@@ -152,6 +150,41 @@ namespace :load_data do
   #end
 
   desc "Load the homology values. The headers of the table must be: Gene  A B D Group Genome. The gene corresponds to the gene name, not the specific transcript"
+  task :homology_deprecated, [:gene_set, :filename] => :environment do |t, args|
+    puts args 
+    ActiveRecord::Base::transaction do
+       conn = ActiveRecord::Base.connection
+       gene_set = GeneSet.find_by(:name=>args[:gene_set])
+       genes = Hash.new
+       Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}' ORDER BY gene").each do |g|  
+        genes[g.gene] = g unless genes[g.gene]
+       end
+       puts "Loaded #{genes.size} genes  in memory"
+       count = 0
+
+       CSV.foreach(args[:filename], :headers=>true, :col_sep=>"\t") do |row|
+        h = Homology.new
+        #Gene A B D Group Genome
+        #puts row["Gene"].inspect
+        #puts  genes[row["Gene"]].inspect
+        #puts h.inspect
+        h.Gene = genes[row["Gene"]]
+        h.A = genes[row["A"]]
+        h.B = genes[row["B"]]
+        h.D = genes[row["D"]]
+        h.genome = row["Genome"]
+        h.group = row["Group"]
+        h.save!
+        count += 1
+        if count % 10000 == 0
+          puts "Loaded #{count} Homologies (#{row['Gene']})" 
+        end
+       end
+       puts "Loaded #{count} Homologies"
+    end
+  end
+
+    desc "Load the homology values. The headers of the table must be: Gene  A B D Group Genome. The gene corresponds to the gene name, not the specific transcript"
   task :homology, [:gene_set, :filename] => :environment do |t, args|
     puts args 
     ActiveRecord::Base::transaction do
