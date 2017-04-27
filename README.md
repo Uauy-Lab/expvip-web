@@ -6,7 +6,7 @@ expVIP requires to have installed ```ruby 2.1``` or later.
 * ```ruby 2.2``` or newer
 * ```MySQL 5.5``` or newer. May work with other Databases, but it hasn't been tested
 * ```Kallisto 0.42.3``` Optional. You need to get it from [here](http://pachterlab.github.io/kallisto/) and set it up in your ```$PATH```.  **Kallisto is free for non commercial use. Refer to the license in it's website**
-*  ```MongoDB 3.4``` To store the values in a non-relational database. 
+*  ```MongoDB 3.4``` To store the expression values in a non-relational database. 
 
 
 ## Getting expVIP ##
@@ -17,7 +17,7 @@ To load the required gems, run ```bundle install```
 ##Setting up the database ##
 If you are using the provided VM, you can skip this step, as it is already setup. 
 
-expVIP is developed on ```MySQL 5.7```. However, other databases may work as the queries are generated using ```ActiveRecord```. To set your database, you need to modify the file ```config/database.yml``` with the relevant information.
+expVIP is developed on ```MySQL 5.7```. However, other databases may work as most of the queries are generated using ```ActiveRecord```. To set your database, you need to modify the file ```config/database.yml``` with the relevant information.
 
 ```yml
 default: &default

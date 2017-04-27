@@ -37,6 +37,14 @@ module Bio
 			reads=[]
 			self.getCommand(index:index, single:true, fastq:s, output_dir:output_dir, fragment_length:fragment_length, sd:sd)
 		end
+
+		def self.getIndividualPairs(left:,right:)
+			l=left.split(":")
+			r=right.split(":")
+			out = Array.new
+			l.each_with_index { |e, i| out << [e,r[i]] }
+			out
+		end
 	end
 
 end
@@ -45,7 +53,7 @@ options = {}
 options[:output_dir]="/nbi/group-data/ifs/NBI/Cristobal-Uauy/expression_browser/collaborators/kallisto/"
 options[:index]="/nbi/Research-Groups/NBI/Cristobal-Uauy/TGACv1_annotation_CS42_ensembl_release/Triticum_aestivum_CS42_TGACv1_scaffold.annotation.gff3.cdna"
 OptionParser.new do |opts|
-	opts.banner = "Usage: prepare_kallisto_kommands_slurm.rb [options]"
+	opts.banner = "Usage: prepare_kallisto_kommands_slurm_split_metadata.rb [options]"
 
 	opts.on("-i", "--metadata FILE", "Metadata file. Must contain the columns Sample IDs,left,right,single,fragment_size,sd. By default the file is separated by tabs. Right, left and single can be array of files") do |v|
 		options[:metadata] = v
@@ -73,24 +81,30 @@ cmd_str=""
 mkdir_str=""
 i=0
 
+out = File.open("#{options[:out]}_metadata.txt","w")
 CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	#puts row
-	i += 1
+	
 	l = row["left"]
 	r = row["right"]
-	study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
-	id 	  	= row["Sample IDs"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
-	out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{study}/#{id}"
-	mkdir_str += "\"#{out_d}\"\n" 
-	if l and r
-		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d)}" + "\"\n"  
-	else
-		single = row['single']
-		fl = row['fragment_size'].to_i
-		sd = row['sd'].to_f
-		cmd_str += "\"#{Bio::Kallisto.getCommadSingleEnd(index: options[:index], single:single,fragment_length:fl, sd:sd, output_dir:out_d)}" + "\"\n"
+	fastas = Bio::Kallisto.getIndividualPairs(left:l, right:r)
+	samp_id	  	= row["Sample IDs"].clone
+	fastas.each_with_index do |pair,j|  
+		l1,r1 = pair
+		row["Sample IDs"] = "#{samp_id}_#{j}"
+		study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
+		id 	  	= row["Sample IDs"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
+		out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{study}/#{id}"
+		mkdir_str += "\"#{out_d}\"\n" 
+		row["left"] = l1
+		row["right"] = r1
+		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l1, right:r1,  output_dir:out_d)}" + "\"\n"  
+		out.puts row.to_h.keys.join("\t") +"\tSample"  if i == 0
+		out.puts row.to_h.values.join("\t") +"\t#{samp_id}" 
+		i += 1
 	end
 end
+out.close
 
 File.open(options[:out],"w") do |f|
 	f.puts "#!/bin/bash"

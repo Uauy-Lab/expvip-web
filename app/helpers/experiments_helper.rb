@@ -2,8 +2,19 @@ module ExperimentsHelper
 	def self.saveExperiment(experiment)
 		@client = MongodbHelper.getConnection unless @client 
 		experiment.save!
-		exp_mongo = @client[:experiments].find({:_id => experiment.id}).first
-		doc = { :_id => experiment.id, :accession => experiment.accession } 
-		@client[:experiments].insert_one doc unless exp_mongo	
+		doc = { :accession => experiment.accession } 
+		@client[:experiments].update_one(
+			{ :_id => experiment.id }, 
+			{ '$set' => doc}, 
+			upsert:true
+			)
+
 	end
+
+	def self.saveValues(experiment, type, values)	
+		@client = MongodbHelper.getConnection unless @client 	
+		@client[:experiments].update( { :_id => experiment.id }, 
+			'$set' => { type => values } )
+	end
+
 end
