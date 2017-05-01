@@ -22,7 +22,7 @@ module Bio
 			l=left.split(":")
 			r=right.split(":")
 			raise "Reads should have at least one path for each pair" if l.size == 0 or r.size == 0
-			raise "left and right reads must be paired." unless l.size == r.size
+			raise "left and right reads must be paired: \n#{left}\n#{right}" unless l.size == r.size
 			reads=[]
 			l.each_with_index do |e, i| 
 				reads << e
@@ -43,26 +43,21 @@ end
 
 options = {}
 options[:output_dir]="/nbi/group-data/ifs/NBI/Cristobal-Uauy/expression_browser/collaborators/kallisto/"
-options[:index]="/nbi/Research-Groups/NBI/Cristobal-Uauy/TGACv1_annotation_CS42_ensembl_release/Triticum_aestivum_CS42_TGACv1_scaffold.annotation.gff3.cdna"
+options[:index]="/usr/users/ga002/ramirezr/Cristobal-Uauy/WGAv1.0/annotation/IWGSCv1.0_UTR_ALL.cdnas.fasta.gz.k31"
 OptionParser.new do |opts|
 	opts.banner = "Usage: prepare_kallisto_kommands_slurm.rb [options]"
-
 	opts.on("-i", "--metadata FILE", "Metadata file. Must contain the columns Sample IDs,left,right,single,fragment_size,sd. By default the file is separated by tabs. Right, left and single can be array of files") do |v|
 		options[:metadata] = v
 	end
-
 	opts.on("-o", "--output FILE", "File were the bash script for submission will be stored") do |v|
 		options[:out] = v
 	end
-
 	opts.on("-f", "--output-dir FILE", "Folder where the samples will be mapped. There is going to be a folder for each study, and each study will contain subfolder") do |v|
 		options[:output_dir] = v
 	end
-
 	opts.on("-r", "--index FILE", "Kallisto index") do |v|
 		options[:index] = v
 	end
-
 	opts.on("-n","--ref_name NAME", "Name for the experiment. By default the filename of the index") do
 		options[:ref_name] = v
 	end
@@ -95,7 +90,7 @@ end
 File.open(options[:out],"w") do |f|
 	f.puts "#!/bin/bash"
 	f.puts "#SBATCH --mem=25Gb"
-	f.puts "#SBATCH -p tgac-medium "
+	f.puts "#SBATCH -p nbi-medium,RG-Cristobal-Uauy"
 	f.puts "#SBATCH -J kallisto_#{options[:ref_name]}"
 	f.puts "#SBATCH -n 1"
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
@@ -110,7 +105,9 @@ File.open(options[:out],"w") do |f|
 	f.puts "echo $i"
 	f.puts "echo $out_dir"
 	f.puts "echo $cmd"
+
 	f.puts "mkdir -p $out_dir"
-	f.puts "srun $cmd"
+	f.puts "if [ -s $out_dir/abundance.tsv ]\nthen\n\techo \"File $out_dir/abundance.tsv exists\""
+	f.puts "else\n\tsrun $cmd \nfi"
 end
 
