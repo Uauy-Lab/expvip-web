@@ -43,7 +43,7 @@ end
 
 options = {}
 options[:output_dir]="/nbi/group-data/ifs/NBI/Cristobal-Uauy/expression_browser/collaborators/kallisto/"
-options[:index]="/usr/users/ga002/ramirezr/Cristobal-Uauy/WGAv1.0/annotation/IWGSCv1.0_UTR_ALL.cdnas.fasta.gz.k31"
+options[:index]="/usr/users/ga002/ramirezr/Cristobal-Uauy/WGAv1.0/annotation/IWGSC_v1.1_ALL_20170706_transcripts.fasta.k31"
 OptionParser.new do |opts|
 	opts.banner = "Usage: prepare_kallisto_kommands_slurm.rb [options]"
 	opts.on("-i", "--metadata FILE", "Metadata file. Must contain the columns Sample IDs,left,right,single,fragment_size,sd. By default the file is separated by tabs. Right, left and single can be array of files") do |v|
@@ -95,6 +95,7 @@ File.open(options[:out],"w") do |f|
 	f.puts "#SBATCH -n 1"
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
 	f.puts "#SBATCH --array=0-#{i}"
+	f.puts "#SBATCH --time=12:00:00"
 	f.puts "source kallisto-0.42.3"
 	f.puts "i=$SLURM_ARRAY_TASK_ID"
 	f.puts "declare -a out_dirs=(#{mkdir_str})"
