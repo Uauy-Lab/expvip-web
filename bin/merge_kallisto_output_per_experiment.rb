@@ -84,7 +84,8 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	i += 1
 	j = 0
 	headers << id 
-	
+	total_est = 0
+
 	CSV.foreach(abundace_f, col_sep: "\t", headers:true) do |row2|
 		if i == 1
 			all_samples_tpm[j]  = []
@@ -95,11 +96,13 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 
 		gene = row2["target_id"].split(".")[0]
 
+		total_est += row2["est_counts"].to_f
+
 		all_samples_tpm[j]   << row2["tpm"]
 		all_samples_count[j] << row2["est_counts"]
 
-		all_samples_tpm_by_gene[gene][i] += row2["tpm"].to_f
-		all_samples_count_by_gene[gene][i] += row2["est_counts"].to_f
+		all_samples_tpm_by_gene[gene][id] += row2["tpm"].to_f
+		all_samples_count_by_gene[gene][id] += row2["est_counts"].to_f
 		j += 1
 	end
 	all_samples_count_sum <<  [id, 
@@ -115,7 +118,7 @@ FileUtils.mkdir_p options[:out] + "/ByGene"
 
 
 File.open(options[:out] + "/#{options[:study_title]}_summary.tsv", "w") do |file|  
-	file.puts headers.join "\t"
+	file.puts ["Sample", "Mapped_count", "Total_read", "Percentage"].join "\t"
 	all_samples_count_sum.each { |e|  file.puts e.join "\t" }
 end
 
@@ -134,10 +137,12 @@ end
 headers[0] = "gene"
 File.open(options[:out] + "/ByGene/#{study}_tpm.tsv", "w") do |file|  
 	file.puts headers.join "\t"
+	sample_ids = headers.clone
+	sample_ids.shift
 	all_samples_tpm_by_gene.each_pair do |gene, values|  
 		tmp = []
 		tmp << gene
-		values.keys.sort.each{|e| tmp << values[e]}
+		sample_ids.each{|e| tmp << values[e]}
 		file.puts tmp.join "\t"
 	end
 end
@@ -145,10 +150,14 @@ end
 
 File.open(options[:out] + "/ByGene/#{study}_count.tsv", "w") do |file|  
 	file.puts headers.join "\t"
+	sample_ids = headers.clone
+	sample_ids.shift
+	
 	all_samples_count_by_gene.each_pair do |gene, values|  
+
 		tmp = []
 		tmp << gene
-		values.keys.sort.each{|e| tmp << values[e]}
+		sample_ids.each{|e| tmp << values[e]}
 		file.puts tmp.join "\t"
 	end
 end
