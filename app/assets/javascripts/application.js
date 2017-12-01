@@ -12,10 +12,10 @@
 //
 
 
-//= require bundle
-//= require jquery
-//= require jquery-ui
 
+// = require jquery
+// = require jquery-ui
+// = require bundle
 
 Math.log2 = Math.log2 || function(x) {
   return Math.log(x) / Math.LN2;

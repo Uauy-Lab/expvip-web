@@ -39,8 +39,8 @@ namespace :load_data do
           experiment.total_reads = row["Total reads"].to_i if row["Total reads"]
           experiment.mapped_reads = row["Mapped reads"].to_i if row["Mapped reads"] 
           experiment.study = study
-		  		#experiment.save!
-          ExperimentsHelper.saveExperiment experiment
+		  		experiment.save!
+          #ExperimentsHelper.saveExperiment experiment
 		  		experiment_group = ExperimentGroup.find_or_create_by(:name=>row["Group_number_for_averaging"], :description=>row["Group_for_averaging"])
 		  		
           if experiment_group.factors.length == 0
@@ -88,7 +88,8 @@ namespace :load_data do
     			g.gene_set = gene_set
     			g.name = arr.shift
           arr.each { |e| g.add_field(e) }
-				  GenesHelper.saveGene(g)
+				  g.save!
+          #GenesHelper.saveGene(g)
   			end
 		  end
   	end
@@ -115,7 +116,8 @@ namespace :load_data do
           g.transcript = g.name
           g.gene = fields["gene"]
           g.cdna = fields["biotype"]
-          GenesHelper.saveGene(g)
+          g.save!
+          #GenesHelper.saveGene(g)
           i += 1
           puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
         end
@@ -138,7 +140,8 @@ namespace :load_data do
           name = arr.shift
           g.name = name
           g.cdna = name
-          GenesHelper.saveGene(g)
+          #GenesHelper.saveGene(g)
+          g.save!
         end
       end
     end

@@ -15,6 +15,7 @@ expVIP requires to have installed ```ruby 2.1``` or later.
 To load the required gems, run ```bundle install```
 
 ##Setting up the database ##
+
 If you are using the provided VM, you can skip this step, as it is already setup. 
 
 expVIP is developed on ```MySQL 5.7```. However, other databases may work as most of the queries are generated using ```ActiveRecord```. To set your database, you need to modify the file ```config/database.yml``` with the relevant information.
@@ -43,6 +44,7 @@ To laod data in the database, a set of rake tasks is provded.
 
 
 ###Available factors and their order. 
+
 The first thing to do is to setup the available factors. Each file looks like:
 
 ```
@@ -173,9 +175,11 @@ expVIP can be used for *de novo* assemblies, where you only have the name of the
 rake de_novo_genes(MyAssembly,transcripts.fa]
 ```
 
-This can be used to 
+This can be used to use an arbitrary list of genes
 
-#Loading the homologies
+
+###Loading the homologies
+
 
 In order to show the homoeologues, a file with the homoeologies must bue loaded. The file is tab separated with the following format:
 
@@ -215,10 +219,10 @@ rake load_data:homology[IWGSC2.26,/homology.txt]
 ```
 
 
-###Loading values ###
+###Loading values 
 
 
-#### Single big table ####
+#### Single big table 
 The values are stored in a single long table. This allows to get new values, should we want to.  In order to load the data, the task ```load_data:values``` is provided. The table must contain a column ```target_id``` that has the gene name, as the first field in the fasta file used for the mapping. The rest of the columns most contain a header with the accession of the experiment. Each row represents a value. All the values in the table must be from the same time. For exaple, to load the TPMs, the following command is used. 
 
 ```sh

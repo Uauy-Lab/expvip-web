@@ -6,7 +6,7 @@
     "start": "npm run watch-js & rails s"
   },
   "devDependencies": {
-    "browserify": "^10.2.4",
+    "browserify": "^14.5.0",
     "watchify": "^3.2.2"
   },
   "dependencies": {
