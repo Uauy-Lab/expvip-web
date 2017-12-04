@@ -301,14 +301,19 @@ namespace :load_data do
         row.delete("target_id")
         row.delete("transcript")
         h_row = row.to_hash 
-        h_row.each_pair { |name, val| h_row[name] = val.to_f  }
+        to_insert_h = Hash.new
+        h_row.each_pair do |name, val|
+          exp_id = experiments[name]
+          raise "Experiment #{name} not found" unless exp_id
+          to_insert_h[exp_id] = val.to_f  
+        end
         
         exp_val = ExpressionValue.find_or_create_by( 
           :gene =>  gene, 
           :meta_experiment => meta_exp ,
           :type_of_value => value_type )
         exp_val.save!
-        ExperimentsHelper.saveValues(exp_val, value_type.name, h_row)
+        ExperimentsHelper.saveValues(exp_val, value_type.id, to_insert_h)
 
 
       end
