@@ -1,4 +1,4 @@
-class ChangeDataTypeForDescription < ActiveRecord::Migration
+class ChangeDataTypeForDescription < ActiveRecord::Migration[4.2]
   def change
     reversible do |dir|
       change_table :genes do |t|

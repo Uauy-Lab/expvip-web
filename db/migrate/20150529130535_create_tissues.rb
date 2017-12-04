@@ -1,4 +1,4 @@
-class CreateTissues < ActiveRecord::Migration
+class CreateTissues < ActiveRecord::Migration[4.2]
   def change
     create_table :tissues do |t|
       t.string :name

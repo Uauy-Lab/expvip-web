@@ -1,4 +1,4 @@
-class AddSpeciesRefToStudies < ActiveRecord::Migration
+class AddSpeciesRefToStudies < ActiveRecord::Migration[4.2]
   def change
     add_reference :studies, :species, index: true, foreign_key: true
   end

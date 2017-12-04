@@ -1,4 +1,4 @@
-class CreateExperimentGroups < ActiveRecord::Migration
+class CreateExperimentGroups < ActiveRecord::Migration[4.2]
   def change
     create_table :experiment_groups do |t|
       t.string :name

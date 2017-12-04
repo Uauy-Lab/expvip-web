@@ -1,4 +1,4 @@
-class CreateHomologies < ActiveRecord::Migration
+class CreateHomologies < ActiveRecord::Migration[4.2]
   def change
     create_table :homologies do |t|
       t.references :gene, index: true, foreign_key: true

@@ -1,4 +1,4 @@
-class CreateMetaExperiments < ActiveRecord::Migration
+class CreateMetaExperiments < ActiveRecord::Migration[4.2]
   def change
     create_table :meta_experiments do |t|
       t.string :name

@@ -1,4 +1,4 @@
-class CreateTypeOfValues < ActiveRecord::Migration
+class CreateTypeOfValues < ActiveRecord::Migration[4.2]
   def change
     create_table :type_of_values do |t|
       t.string :name

@@ -1,4 +1,4 @@
-class CreateExpressionValues < ActiveRecord::Migration
+class CreateExpressionValues < ActiveRecord::Migration[4.2]
   def change
     create_table :expression_values do |t|
       t.references :experiment, index: true, foreign_key: true

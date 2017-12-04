@@ -21,7 +21,7 @@ namespace :load_data do
 	  	puts "Loading metadata"
 
 	  	ActiveRecord::Base.transaction do
-		  	factors = Factor.uniq.pluck(:factor)
+		  	factors = Factor.distinct.pluck(:factor)
         CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
 		  	#	puts row.inspect
 		  		species = Species.find_or_create_by(:scientific_name=>row["scientific_name"])
@@ -39,21 +39,15 @@ namespace :load_data do
           experiment.total_reads = row["Total reads"].to_i if row["Total reads"]
           experiment.mapped_reads = row["Mapped reads"].to_i if row["Mapped reads"] 
           experiment.study = study
-		  		experiment.save!
-          #ExperimentsHelper.saveExperiment experiment
-		  		experiment_group = ExperimentGroup.find_or_create_by(:name=>row["Group_number_for_averaging"], :description=>row["Group_for_averaging"])
 		  		
-          if experiment_group.factors.length == 0
-            factors.each do |f|
+          factors.each do |f|
               v = row[f]
               factor = Factor.find_by factor: f, description:v
               raise "#{f}:#{v} not found!. Make sure '#{v}' was loaded in the factors\n" unless factor
-              experiment_group.factors << factor
-            end
+          
+              experiment.factors << factor
           end
-
-          experiment_group.experiments << experiment
-          experiment_group.save!
+          experiment.save!
 		  	end
 	  	end
   end
@@ -271,5 +265,54 @@ namespace :load_data do
       sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
       conn.execute sql
   	end
+  end
+
+  desc "Load the values from a csv file"
+  task :values_mongo, [:meta_experiment, :gene_set, :value_type, :filename ] => :environment do |t, args| 
+    puts args
+
+    #mongo = MongodbHelper.getConnection
+
+    ActiveRecord::Base::transaction do
+      conn = ActiveRecord::Base.connection
+      meta_exp = MetaExperiment.find_or_create_by(:name=>args[:meta_experiment])
+      gene_set = GeneSet.find_by(:name=>args[:gene_set])
+      value_type = TypeOfValue.find_or_create_by(:name=>args[:value_type])
+      experiments = Hash.new
+      meta_exp.gene_set = gene_set
+      #TODO: add validation if any of the find_by is null
+
+      genes = Hash.new
+      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
+        genes[g.name] = g
+      end
+      puts "Loaded #{genes.size} genes  in memory"
+
+      Experiment.find_each do | e |
+        experiments[e.accession] = e.id
+      end  
+      puts "Loaded #{experiments.size} experiments  in memory"
+      count = 0
+      inserts = Array.new
+      CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
+        gene_name = row["target_id"]
+        gene_name = row["transcript"] unless row["target_id"]
+        gene = genes[gene_name]
+        row.delete("target_id")
+        row.delete("transcript")
+        h_row = row.to_hash 
+        h_row.each_pair { |name, val| h_row[name] = val.to_f  }
+        
+        exp_val = ExpressionValue.find_or_create_by( 
+          :gene =>  gene, 
+          :meta_experiment => meta_exp ,
+          :type_of_value => value_type )
+        exp_val.save!
+        ExperimentsHelper.saveValues(exp_val, value_type.name, h_row)
+
+
+      end
+      puts "Loaded #{count} ExpressionValue " 
+    end
   end
 end

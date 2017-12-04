@@ -39,7 +39,7 @@ gem 'activerecord-session_store'
 
 gem 'mongo'
 
-gem 'mongoid', "~> 6.1.0"
+#gem 'mongoid', "~> 6.1.0"
 
 #gem 'activerecord-session_store'
 
@@ -70,6 +70,6 @@ group :test do
  
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
+  #gem 'spring'
 end
 

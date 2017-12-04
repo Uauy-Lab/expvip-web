@@ -1,4 +1,4 @@
-class CreateGeneSets < ActiveRecord::Migration
+class CreateGeneSets < ActiveRecord::Migration[4.2]
   def change
     create_table :gene_sets do |t|
       t.string :name

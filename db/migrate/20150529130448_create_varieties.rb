@@ -1,4 +1,4 @@
-class CreateVarieties < ActiveRecord::Migration
+class CreateVarieties < ActiveRecord::Migration[4.2]
   def change
     create_table :varieties do |t|
       t.string :name

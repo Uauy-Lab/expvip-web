@@ -1,4 +1,4 @@
-class CreateFactors < ActiveRecord::Migration
+class CreateFactors < ActiveRecord::Migration[4.2]
   def change
     create_table :factors do |t|
       t.string :name
