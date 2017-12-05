@@ -1,4 +1,5 @@
 require 'json'
+
 class ExpressionValuesController < ApplicationController
   before_action :set_expression_value, only: [:show, :edit, :update, :destroy]
 
@@ -103,25 +104,35 @@ end
 def getExperimentGroups
   experiments     = Hash.new 
   groups          = Hash.new 
-  ExperimentGroup.find_each do | g |
+  Experiment.find_each do | g |
     group = Hash.new
+    #byebug
+    #puts g.inspect
     #Should we use description instead?
-    group["name"] = g.name
-    group["description"] = g.name
+    group["name"] = g.accession
+    group["description"] = g.accession
+    #group["group"] = g.id.to_s
     factors = Hash.new
     g.factors.each { |f| factors[f.factor] = f.name }
 
 
-    g.experiments.each do |e|  
-      unless experiments[e.id]
-        experiments[e.id] = Hash.new 
-        exp = experiments[e.id]
-        exp["name"] = e.accession
-        exp["study"] = e.study_id.to_s
-        exp["group"] = g.id.to_s
-        factors["study"] = e.study.accession
-      end
-    end
+    experiments[g.id] = Hash.new 
+    exp = experiments[g.id]
+    exp["name"]  = g.accession
+    exp["study"] = g.study_id.to_s
+    exp["group"] = g.id.to_s
+    factors["study"] = g.study.accession
+
+    #g.experiments.each do |e|  
+    #  unless experiments[e.id]
+    #    experiments[e.id] = Hash.new 
+    #    exp = experiments[e.id]
+    #    exp["name"] = e.accession
+    #    exp["study"] = e.study_id.to_s
+    #    exp["group"] = g.id.to_s
+    #    factors["study"] = e.study.accession
+    #  end
+    #end
     group['factors'] = factors
     groups[g.id] = group
   end
@@ -129,12 +140,24 @@ def getExperimentGroups
 end
 
 def getValuesForGene(gene)
+  #TODO: Add code to validate for different experiments. 
   values = Hash.new
+  client = MongodbHelper.getConnection
   ExpressionValue.where("gene_id = :gene", {gene: gene.id }).each do |ev|  
+    #byebug
     type_of_value = ev.type_of_value.name
     values[type_of_value] = Hash.new unless  values[type_of_value]
     tvh = values[type_of_value]
-    tvh[ev.experiment.id] = { experiment:  ev.experiment.id.to_s , value: ev.value}
+
+    obj = client[:experiments].find({ :_id => ev.id })
+    #byebug
+    #obj.each{ |o|  }
+ #   l_vals = Hash.new
+    obj.first.each_pair { |k, val| values[type_of_value][k] = {experiment:  k, value: val}  }
+    
+    #obj.each{|o| o.each_pair {|k,v|  tov = TypeOfValue.find(6).name  } }
+
+    #tvh[ev.experiment.id] = { experiment:  ev.experiment.id.to_s , value: ev.value}
   end
   return values
 end
@@ -200,7 +223,7 @@ def gene
     add_ret_values(ret, params)
    
     respond_to do |format|
-      format.json {render json: ret}
+      format.json {render json: ret, format: :json}
     end
 
   end

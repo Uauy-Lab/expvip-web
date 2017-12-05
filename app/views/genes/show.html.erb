@@ -16,8 +16,9 @@
 
 <script type="text/javascript">
   var container_div="bar_expression_viewer";
-  var data_url = "<%=raw "../../expression_values/gene/#{@gene.id}.json?#{@args}"%>" ;
+  var data_url = "<%= "http://localhost:3000/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
+  console.log(data_url)
   var eb =  new biovisexpressionbar.ExpressionBar({
     target: container_div,
     highlight: gene, 

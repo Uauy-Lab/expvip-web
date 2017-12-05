@@ -313,9 +313,8 @@ namespace :load_data do
           :meta_experiment => meta_exp ,
           :type_of_value => value_type )
         exp_val.save!
-        ExperimentsHelper.saveValues(exp_val, value_type.id, to_insert_h)
-
-
+        count += 1
+        ExperimentsHelper.saveValues(exp_val, to_insert_h)
       end
       puts "Loaded #{count} ExpressionValue " 
     end

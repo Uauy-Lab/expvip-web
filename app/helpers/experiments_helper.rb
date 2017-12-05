@@ -11,11 +11,11 @@ module ExperimentsHelper
 
 	end
 
-	def self.saveValues(experiment, type, values)	
+	def self.saveValues(experiment, values)	
 		@client = MongodbHelper.getConnection unless @client 	
 		@client[:experiments].find_one_and_update(
 		 { :_id => experiment.id }, 
-			{'$set' => { type => values }},
+			{'$set' =>  values },
 			:upsert => true 
 			)
 	end
