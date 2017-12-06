@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
   var container_div="bar_expression_viewer";
-  var data_url = "<%=raw "../../expression_values/genes.json?#{@args}"%>" ;
+  var data_url = "<%=raw "http://localhost:3000/expression_values/genes.json?#{@args}"%>" ;
   var eb =  new biovisexpressionbar.ExpressionBar({
     target: container_div,
     data: data_url,

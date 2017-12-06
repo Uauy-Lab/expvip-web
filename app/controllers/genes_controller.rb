@@ -22,7 +22,7 @@ class GenesController < ApplicationController
   #
   def forwardHeatmap
     genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
-    raise "Please select less than 50 genes" if genes.size > 50
+    raise "Please select less than 500 genes" if genes.size > 500
     ids = getGeneIds(genes)
     raise "Plese select some genes for the heatmap" if ids.size == 0
     session[:genes] = ids.join(',')
@@ -82,7 +82,8 @@ class GenesController < ApplicationController
       end
     rescue Exception => e
       flash[:error] = e.to_s
-      redirect_to :back
+      session[:return_to] ||= request.referer
+      redirect_to session.delete(:return_to)
       return
     end
 end
