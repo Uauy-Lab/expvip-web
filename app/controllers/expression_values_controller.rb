@@ -180,14 +180,13 @@ def getDefaultOrder
 
   def getValuesForHomologues(gene)
     values = Hash.new
-    Homology.where("Gene_id = :gene", {gene: gene.id}).each do |h|
-     values[h.A.name] = getValuesForGene(h.A) if h.A
-     values[h.B.name] = getValuesForGene(h.B) if h.B
-     values[h.D.name] = getValuesForGene(h.D) if h.D
-   end
-   if values.size == 0
-    values[gene.name]    = getValuesForGene(gene)
-  end
+    values[gene.name] = getValuesForGene(gene)  
+    HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|
+      hom = h.homology 
+      HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
+        values[h2.gene.name] = getValuesForGene(h2.gene) unless h2.gene == gene
+      end
+    end
   return values
 end
 
