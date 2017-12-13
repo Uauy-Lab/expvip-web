@@ -181,40 +181,40 @@ namespace :load_data do
     end
   end
 
-    desc "Load the homology values. The headers of the table must be: Gene  A B D Group Genome. The gene corresponds to the gene name, not the specific transcript"
-  task :homology, [:gene_set, :filename] => :environment do |t, args|
-    puts args 
+  desc "Load homology in a pairwaise manner"
+  task :homology_pairs, [:gene_set, :filename] => :environment do |t, args|
+    puts args
     ActiveRecord::Base::transaction do
-       conn = ActiveRecord::Base.connection
-       gene_set = GeneSet.find_by(:name=>args[:gene_set])
-       genes = Hash.new
-       Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}' ORDER BY gene").each do |g|  
+      conn = ActiveRecord::Base.connection
+      gene_set = GeneSet.find_by(:name=>args[:gene_set])
+      genes = Hash.new
+      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}' ORDER BY gene").each do |g|  
         genes[g.gene] = g unless genes[g.gene]
-       end
-       puts "Loaded #{genes.size} genes  in memory"
-       count = 0
+      end
+      puts "Loaded #{genes.size} genes  in memory"
+      count = 0
 
-       CSV.foreach(args[:filename], :headers=>true, :col_sep=>"\t") do |row|
-        h = Homology.new
-        #Gene A B D Group Genome
-        #puts row["Gene"].inspect
-        #puts  genes[row["Gene"]].inspect
-        #puts h.inspect
-        h.Gene = genes[row["Gene"]]
-        h.A = genes[row["A"]]
-        h.B = genes[row["B"]]
-        h.D = genes[row["D"]]
-        h.genome = row["Genome"]
-        h.group = row["Group"]
+      CSV.foreach(args[:filename], :headers=>true, :col_sep=>"\t") do |row|
+        
+        h = HomologyPair.new
+        h.homology = row["homology_id"].to_i
+        h.gene = genes[row["genes"]]
+        h.cigar = row["cigar_line"]
+        h.cigar = nil if row["cigar_line"].length > 254
+        h.perc_cov = row["perc_cov"].to_f
+        h.perc_id  = row["perc_id"].to_f
+        h.perc_pos = row["perc_pos"].to_f
         h.save!
         count += 1
         if count % 10000 == 0
-          puts "Loaded #{count} Homologies (#{row['Gene']})" 
+          puts "Loaded #{count} Homologies (#{row['homology_id']})" 
         end
        end
        puts "Loaded #{count} Homologies"
+
     end
   end
+
 
   desc "Load the values from a csv file"
   task :values, [:meta_experiment, :gene_set, :value_type, :filename ] => :environment do |t, args| 

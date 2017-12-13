@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171203232235) do
+ActiveRecord::Schema.define(version: 20171213155529) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "ExperimentGroup_id", null: false
@@ -100,6 +100,19 @@ ActiveRecord::Schema.define(version: 20171203232235) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["gene_id"], name: "index_homologies_on_gene_id"
+  end
+
+  create_table "homology_pairs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "homology"
+    t.string "cigar"
+    t.decimal "perc_cov", precision: 7, scale: 4
+    t.decimal "perc_id", precision: 7, scale: 4
+    t.decimal "perc_pos", precision: 7, scale: 4
+    t.bigint "gene_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["gene_id"], name: "index_homology_pairs_on_gene_id"
+    t.index ["homology"], name: "index_homology_pairs_on_homology"
   end
 
   create_table "meta_experiments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

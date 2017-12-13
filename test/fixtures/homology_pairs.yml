@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  homology_id: 1
+  cigar: MyString
+  perc_cov: 9.99
+  perc_id: 
+  perc_pos: 9.99
+  gene: one
+
+two:
+  homology_id: 1
+  cigar: MyString
+  perc_cov: 9.99
+  perc_id: 
+  perc_pos: 9.99
+  gene: two
