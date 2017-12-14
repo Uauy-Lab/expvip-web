@@ -1,0 +1,503 @@
+/**********************
+ * Override Bootstrap *
+ **********************/
+
+/**
+ * For scrollspy, etc.
+ */
+body {
+  font-size: 13px;
+  position: relative;
+  font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/**
+ * No underlines on links, ever
+ */
+a:hover, .btn-link:hover {
+  text-decoration: none;
+}
+
+/**
+ * Use normal font weight for labels and indicate they are clickable by setting
+ * `cursor: pointer`.
+ */
+label {
+  cursor: pointer;
+  margin-bottom: 0;
+  font-weight: normal;
+}
+
+/**
+ * Without this .disable'd elements hardly look disabled.
+ */
+.disabled {
+  color: #ccc;
+}
+a.disabled:hover {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+/**
+ * Increase font size, add border, make place for subtext to app name.
+ */
+.navbar {
+  border-radius: 0;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 35px;
+}
+.navbar-brand {
+  height: auto;
+  padding: 20px 15px;
+  font-size: 32px;
+  font-family: "Roboto";
+  color: rgb(51, 51, 51);
+}
+.navbar-brand > small {
+  font-size: 50%;
+}
+
+.navbar-nav > li > a {
+  padding: 24px 15px;
+  font-size: 14px;
+  color: rgb(51, 51, 51);
+}
+
+/**
+ * Take out margin from .page-header and use table layout with first cell
+ * taking up all available space left by its siblings.
+ *
+ * Useful for displaying small, extra bit of information in the page
+ * header alongside title.
+ */
+.page-header {
+  display: table;
+  margin: 0;
+  width: 100%;
+  border-color: #ddd;
+  padding-bottom: 5px;
+}
+.page-header > * {
+  display: table-cell;
+}
+.page-header > *:first-child {
+  width: 100%;
+}
+
+.page-content {
+  padding: 5px 0 0 5px;
+}
+
+.panel {
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.panel .panel-heading {
+  color: #428BCE;
+  padding: 10px 1px;
+  font-family: "Roboto";
+  background-color: inherit;
+}
+
+/**
+ * Take padding-right out of .control-label and keep padding of .input-group.
+ * Works better when browser is resized to smaller width.
+ */
+.control-label[class*="col-"] {
+ padding-right: 0;
+}
+.input-group[class*="col-"] {
+ padding-left: 15px;
+ padding-right: 15px;
+}
+
+/**
+ * Take our border from each row and apply only to table header.
+ */
+.table {
+  margin-bottom: 0;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td,
+.table>tbody>tr>td, .table>tfoot>tr>td {
+  border-top: none;
+  padding-left: 0;
+  font-weight: normal;
+}
+.table>thead>tr>th {
+  border-bottom: 1px solid #ddd;
+}
+
+
+/********************
+ * Extend Bootstrap *
+ ********************/
+
+/**
+ * Use monospace font.
+ */
+.text-monospace {
+  font-family: monospace;
+}
+
+/**
+ * Make text bold.
+ */
+.text-bold {
+  font-weight: bold;
+}
+
+/**
+ * Set cursor: pointer on the given element.
+ */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/**
+ * Do not wrap text or show horizontal scrollbar if text overflows the width of
+ * the element. Show ellipsis instead.
+ */
+.nowrap-ellipsis {
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/**
+ * Helpers to override :hover and .active on .nav elements.
+ */
+.nav.hover-reset>li>a:hover {
+  background-color: inherit;
+}
+.nav.focus-reset>li>a:focus {
+  background-color: inherit;
+}
+.nav.active-bold>.active>a {
+  font-weight: bold;
+}
+
+/**
+ * Use with .label class to use the foreground color defined by parent element.
+ */
+.label-reset {
+  color: inherit;
+  line-height: inherit;
+  font-weight: normal;
+}
+
+/**
+ * Set padding: 10px and 15px on li.
+ */
+.list-padded li {
+  padding: 10px 15px;
+}
+
+
+/***************************
+ * SequenceServer specific *
+ ***************************/
+.nojs-error {
+  margin-top: 10px;
+  padding: 10px;
+  color: white;
+  background-color: red;
+}
+
+.dnd-errors {
+  color: red;
+  font-size: 18px;
+}
+
+.sequence-controls {
+  position: absolute;
+  top: 4px;
+  right: 19px;
+}
+
+.biojs-vis-sequence pre {
+  margin: 0 0;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  background-color: inherit;
+}
+
+.notifications {
+  height: 32px;
+  position: relative;
+  top: -32px;
+}
+
+.notification {
+  height: 32px !important;
+}
+
+.notification .alert-info, .notification .alert-danger {
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 6px 12px 6px 12px;
+}
+
+.databases-container {
+  margin-top: -15px;
+}
+
+.databases-container .btn {
+  text-align: left;
+  white-space: normal;
+}
+
+.databases .checkbox {
+  padding-left: 5px;
+}
+
+.databases label {
+  padding-left: 0;
+}
+
+#blast > .form-group:last-child {
+  margin-top: -5px;
+}
+
+#help pre:hover {
+  background-color: #FFC;
+}
+
+label[for="advanced"] {
+  font-family: "Roboto";
+  font-size: 16px;
+  display: table-cell;
+  width: 1%;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 5px 12px 5px 0;
+}
+input[name="advanced"] {
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+#methods{
+  font-family: "Roboto";
+}
+
+#method, #methods li {
+  text-transform: uppercase;
+}
+
+#methods li {
+  font-size: 15px;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  cursor: pointer;
+}
+
+.dropdown-menu li {
+  border-bottom: 1px solid #ccc;
+}
+
+.dropdown-menu li:last-child {
+  border-bottom: 0;
+}
+
+#result {
+  margin-top: 45px;
+}
+
+h1,h2,h3,h4,h5,h6,.page-header {
+  font-family: "Roboto";
+  color: rgb(51, 51, 51);
+}
+
+.sidebar > .page-header > h4 {
+  padding: 10px 0 0 0;
+  font-size: 14px;
+}
+
+.sidebar.affix {
+  top: 0;
+}
+
+.index {
+  max-height: 416px; /* will accomodate 10 elements. IE 7 and above only. */
+  overflow-y: auto;
+}
+
+/* Result per query. */
+.resultn {
+  margin-bottom: 50px;
+}
+
+.graphical-overview {
+  font-size: 12px;
+  text-align: center;
+}
+svg:not(:root) {
+  overflow: visible;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #f00;
+    stroke-width: 2px;
+    shape-rendering: crispEdges;
+}
+.axis path {
+  stroke-width: 3px;
+}
+
+.tabular-view {
+  margin-bottom: 14px;
+}
+
+.hitn {
+  padding-top: 14px;
+  margin-top: 4px;
+}
+.hitn h4 {
+  cursor: pointer;
+}
+.hitn h4 span {
+  cursor: text;
+}
+.hitn > p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.hsps {
+  padding-bottom: 14px;
+}
+.hsp-stats>thead>tr>th {
+  border-bottom: none;
+  padding: 0;
+}
+.hsp-stats>tbody>tr>td {
+  padding: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.alignment {
+  margin-top: 8px;
+  white-space: pre;
+  font-family: monospace;
+  line-height: 12px;
+  letter-spacing: 1px;
+}
+
+.hit-links {
+  letter-spacing: 1px;
+}
+
+.fastan > .page-header {
+  padding-bottom: 8px;
+}
+.fastan > .page-content {
+  padding-top: 8px;
+  padding-left: 0;
+}
+
+.footer a:first-child {
+  vertical-align: super;
+}
+
+.dnd-overlay {
+  position: absolute;
+  top: 51px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+.dnd-overlay * {
+  pointer-events: none;
+}
+
+.dnd-overlay-container {
+  padding-top: 72px;
+}
+
+.dnd-overlay-container p {
+  font-size: 48px;
+}
+
+/* input form */
+.col-md-6 .panel-heading h4 {
+  margin: 0;
+}
+
+.list-group.databases {
+  padding: 0;
+}
+
+.list-group.databases .list-group-item {
+  border: none;
+  padding: 1px 0;
+}
+
+.list-group.databases .list-group-item input {
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+}
+
+.report-statistics {
+  white-space: pre;
+  font-family: monospace;
+}
+
+.spinner {
+  width: 100%;
+  text-align: center;
+  padding-bottom: 30px;
+}
+
+.glow {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+  border-left: 2px solid #f0ad4e;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.tooltip-inner {
+    max-width: 350px;
+}
+
+.pre-reset {
+  margin: 0 0;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  background-color: inherit;
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { 
+  .sidebar.affix {
+    width: 243.5px;
+  }
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .sidebar.affix {
+    width: 292.5px;
+  }
+}

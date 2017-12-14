@@ -1,3 +1,4 @@
+require 'sequenceserver'
 Rails.application.routes.draw do
   #map.root :controller => 'wellcome', :action => :default
   #get 'wellcome/default'
@@ -31,16 +32,8 @@ Rails.application.routes.draw do
       get 'set_gene_set_session'     
     end
   end
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-#  resources :species
-#  resources :studies
-#  resources :varieties
-#  resources :tissues
-#  resources :experiments
-#  resources :experiment_groups
-
+  SequenceServer.init
+  mount SequenceServer, :at => "sequenceserver"
   
 end

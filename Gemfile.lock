@@ -1,3 +1,14 @@
+GIT
+  remote: https://github.com/homonecloco/sequenceserver.git
+  revision: 68e2054febe785fa5b34c811796ea7e267a94e2d
+  branch: update-sinatra
+  specs:
+    sequenceserver (1.0.11)
+      json_pure (~> 1.8, >= 1.8.2)
+      ox (~> 2.1, >= 2.1.1)
+      sinatra (~> 2.0, >= 2.0)
+      slop (~> 3.6, >= 3.6.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -73,6 +84,7 @@ GEM
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
     json (1.8.6)
+    json_pure (1.8.6)
     loofah (2.1.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -88,11 +100,15 @@ GEM
     mongo (2.4.3)
       bson (>= 4.2.1, < 5.0.0)
     multi_json (1.12.2)
+    mustermann (1.0.1)
     mysql2 (0.3.21)
     nio4r (2.1.0)
     nokogiri (1.8.1)
       mini_portile2 (~> 2.3.0)
+    ox (2.8.2)
     rack (2.0.3)
+    rack-protection (2.0.0)
+      rack
     rack-test (0.8.2)
       rack (>= 1.0, < 3)
     rails (5.1.4)
@@ -139,6 +155,12 @@ GEM
     sdoc (0.4.2)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
+    sinatra (2.0.0)
+      mustermann (~> 1.0)
+      rack (~> 2.0)
+      rack-protection (= 2.0.0)
+      tilt (~> 2.0)
+    slop (3.6.0)
     spring (2.0.2)
       activesupport (>= 4.2)
     sprockets (3.7.1)
@@ -187,6 +209,8 @@ DEPENDENCIES
   redcarpet
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
+  sequenceserver!
+  sinatra (~> 2.0)
   spring
   sqlite3
   turbolinks (~> 5.0.0)
