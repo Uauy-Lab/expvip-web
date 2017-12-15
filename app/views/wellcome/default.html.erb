@@ -1,24 +1,12 @@
 
-<%= form_tag "/genes/forward", method: "post" do  %>
-	<h2>One or two genes</h2>
-  Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
-  <%= label_tag :gene, "Gene:" %>
-	<%= text_field_tag :gene %>
-  	
-    <%= submit_tag "Search", name: 'submit' %>
-  	<%= text_field_tag :compare %>
-  	<%= submit_tag "Compare" , name: 'submit' %>
-  	<br/>
-  	Examples: Traes_5BS_0AFC3F795.1, Traes_4DS_1CF5D9107.1
-    <h2>Multiple genes</h2>
-    If you want to compare more than two genes, you can add a list of genes separated by commas or one gene in each line.
-    <%= text_area_tag :genes_heatmap, "", size: "56x3" %>
-    <%= submit_tag "Heatmap" , name: 'submit' %>
 
-  	<h2>Select studies to display:</h2>
-  	<% @studies.each do |study| %>
-	   <%= check_box_tag "studies[]", study.accession, checked = true %>
-	   <%= label_tag(study.accession, study.title) %>
-	   <br/>
-	<% end %>
-<% end %>
+
+<div id="searches"  >
+  <div id="search_left" class="left"  width="50%" style="min-height:450px" >
+        <%=  render 'search_form' %>
+</div>
+<div id="search_right" class="right"   width="50%" style="min-height:550px">  
+&nbsp;  
+<iframe id="sequenceserver" src="sequenceserver" style="position: absolute; width:40%; height:800px; border: none"></iframe>
+</div>
+</div>

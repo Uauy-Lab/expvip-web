@@ -20,28 +20,6 @@
 <body>
 
 
-
-
-<div class='wrapper'>
-<% flash.each do |key, value| %>
-
-  <div class="alert-<%= key %>">
-   <p> <%= value %>  </p>   
-  </div>
-  
-<% end %>
-<%= yield %>
-<div class="footer">
-  <%= image_tag("jic.png", class: "logo" ) %>
-  <%= image_tag("tgac.png", class: "logo" ) %>
-  <%= image_tag("bbsrc.png", class: "logo" ) %>
-  <%= image_tag("iwyp.png", class: "logo" ) %>
-
-</div>
-</div>
-
-
-  
 <div class='header'>
 <%= form_tag "/genes/forward", method: :post, class: 'navbar-form navbar-left' do %>
  
@@ -81,6 +59,32 @@
     <%= render :partial => "wellcome/about" %>
   </div>
 </div>
+
+<div class='wrapper'>
+
+  
+<% flash.each do |key, value| %>
+
+  <div class="alert-<%= key %>">
+   <p> <%= value %>  </p>   
+  </div>
+  
+<% end %>
+<%= yield %>
+
+</div>
+
+<div class="footer">
+  <%= image_tag("jic.png", class: "logo" ) %>
+  <%= image_tag("tgac.png", class: "logo" ) %>
+  <%= image_tag("bbsrc.png", class: "logo" ) %>
+  <%= image_tag("iwyp.png", class: "logo" ) %>
+
+</div>
+
+
+  
+
 
 </body>
 </html>

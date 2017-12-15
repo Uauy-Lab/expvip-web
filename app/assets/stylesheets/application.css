@@ -28,7 +28,6 @@ div.header {
 	background-color:  #FFFFFF;
 	border-radius: 25px;
     padding: 20px;
-    width: 1000px;
     float: center;
     height: 75px;
     position: fixed;
@@ -39,16 +38,25 @@ div.header {
 }
 
 div.footer{
-     clear: both;
-     position: relative;
-     z-index: 10;
-    text-align: center;
+  
+  background-color:  #FFFFFF;
+  border-radius: 25px;
+  padding: 20px;
+  float: center;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-height: 75px;
 }
 
 .left, .right { 
  
-  padding: 1em; 
- 
+  /*padding: 1em;*/ 
+  float:left;
+  /*position: absolute;*/
+  height: calc(70%); 
+  width: calc(40%); 
 } 
 
 .header-form {
@@ -74,11 +82,11 @@ div.footer{
     top: 120px;
     left: 0;
     right: 0;
+    bottom: 120px;
     margin: 0 auto;
-    width: 1000px;
     background-color:  #FFFFFF;
     overflow-y: auto;
-    max-height: 85%;
+    max-height: 75%;
     height:auto;
 }
 
@@ -90,7 +98,7 @@ div.footer{
 }
 
 img.logo{
-    width:20%;
+    height: 75px;
     padding:10px;
 }
 

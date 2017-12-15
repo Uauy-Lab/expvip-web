@@ -98,6 +98,30 @@ ready = (function() {
    $( "#cite_button" ).click(function() {
       $( "#about" ).dialog( "open" );
   });
+  
+  var search_right = $('#search_right');
+  var search_left = $('#search_left');
+  var introblurb = $('#introblurb');
+   $('#sequenceserver').load(function(){
+    var parent = $(this).contents();
+    var node = $(this).contents().find('body').find('.navbar');
+    var self = $(this);
+    node.html('<h4>BLAST Scaffold</h4>');
+    $(this).contents().find('#footer').html('');
+
+    $($(this).contents()).click(function(event) {
+      all_downloads = parent.find(".mutation_link");
+      all_downloads.attr('target','_blank');
+    });
+    search_btn = $(this).contents().find('#method');
+    
+    search_btn.click(function(){
+      search_right.width('100%')
+      self.width('950px');
+      search_left.hide();
+      introblurb.hide();
+    });
+  });
 
 });
 
