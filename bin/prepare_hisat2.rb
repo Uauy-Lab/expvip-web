@@ -15,7 +15,8 @@ module Bio
 			extra += " --rg-id #{sample}"
 			extra += " --rg SM:#{sample}"
 			extra += " --rg LB:#{sample}"
-			cmd = "hisat2  #{extra} -x #{index} -1 #{l.join(",")} -2 #{r.join(",")} -U #{u.join(",")}  -S #{output_sam}"
+			extra += " -U #{u.join(",")}" unless u.nil? or u.size == 0 
+			cmd = "hisat2  #{extra} -x #{index} -1 #{l.join(",")} -2 #{r.join(",")}  -S #{output_sam}"
 		end
 	end
 end
@@ -48,20 +49,20 @@ sam_str=""
 i=0
 
 CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
-	#puts row
 	
 	l = row["left"]
 	r = row["right"]
 	single = row['single']
 	study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
-	id 	  	= row["Sample IDs"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
+	id 	  	= row["Sample.IDs"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 	out_d ="#{options[:output_dir]}/#{study}/#{id}"
-
-	mkdir_str += "\"#{out_d}\"\n" 
+	single = "" if single.nil?
+ 	mkdir_str += "\"#{out_d}\"\n" 
 	if l and r
 		#cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d)}" + "\"\n" 
 		l=l.split(":")
 		r=r.split(":")
+
 		u=single.split(":")
 		raise "Reads should have at least one path for each pair" if l.size == 0 or r.size == 0
 		raise "left and right reads must be paired: \n#{l}\n#{r}" unless l.size == r.size
