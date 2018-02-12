@@ -21,7 +21,7 @@ module Bio
 		def self.getCommadPairedEnd(index:, output_dir:, left:, right:, keep_bam:false)
 			l=left.split(":")
 			r=right.split(":")
-			raise "Reads should have at least one path for each pair" if l.size == 0 or r.size == 0
+			raise "Reads should have at least one path for each pair #{left}" if l.size == 0 or r.size == 0
 			raise "left and right reads must be paired: \n#{left}\n#{right}" unless l.size == r.size
 			reads=[]
 			l.each_with_index do |e, i| 
@@ -91,7 +91,7 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	output_prefix = "#{out_d}/#{id}"
 	#output_sam = "#{out_d}/#{id}.sam"
 	
-	if l and r
+	if l and r and l.length > 1 and r.length > 1
 		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d, keep_bam: options[:keep_bam])}" + "\"\n"  
 	else
 		single = row['single']
@@ -103,12 +103,12 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 end
 
 def get_bam_extra_string
-
 	extra = " > $prefix.sam \n\t"
 	extra << "srun samtools view -bS $prefix.sam > $prefix.bam \n\t"
-	#extra << "srun rm $prefix.sam \n\t"
 	extra << "srun samtools sort -m 5G  -o $prefix.sorted.bam $prefix.bam \n\t"
-	#extra << "srun rm $prefix.bam \n\t"
+	extra << "srun samtools index $prefix.sorted.bam \n\t"
+	extra << "srun rm $prefix.sam \n\t"
+	extra << "srun rm $prefix.bam \n\t"
 	extra 
 end
 
