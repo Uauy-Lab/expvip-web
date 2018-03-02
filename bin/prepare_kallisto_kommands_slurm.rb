@@ -53,7 +53,7 @@ OptionParser.new do |opts|
 	opts.on("-i", "--metadata FILE", "Metadata file. Must contain the columns Sample IDs,left,right,single,fragment_size,sd. By default the file is separated by tabs. Right, left and single can be array of files") do |v|
 		options[:metadata] = v
 	end
-	opts.on("-o", "--output FILE", "File were the bash script for submission will be stored") do |v|
+	opts.on("-o", "--output FILE", "Output bash script for submission will be stored") do |v|
 		options[:out] = v
 	end
 	opts.on("-f", "--output-dir FILE", "Folder where the samples will be mapped. There is going to be a folder for each study, and each study will contain subfolder") do |v|
@@ -66,7 +66,7 @@ OptionParser.new do |opts|
 		options[:ref_name] = v
 	end
 
-	opts.on("-k", "--keep_bam", " pseido Keep BAM file") do
+	opts.on("-k", "--keep_bam", " pseudo Keep BAM file") do
 		options[:keep_bam] = true
 	end
 
