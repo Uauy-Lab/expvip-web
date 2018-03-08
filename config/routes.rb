@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   root 'wellcome#default'
   get 'wellcome/search_gene'
 
+  get 'download' => 'download#default'
+
  # resources :expression_values
  # resources :type_of_values
  # resources :meta_experiments
@@ -14,6 +16,7 @@ Rails.application.routes.draw do
       get 'autocomplete'
       get 'heatmap'
       post 'forward'
+      get 'forward'
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.

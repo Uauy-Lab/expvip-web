@@ -33,7 +33,8 @@ class GenesController < ApplicationController
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
-    gene_set = GeneSet.find(params[:gene_set_selector])
+    gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
+    gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]
     @gene = findGeneName gene_name, gene_set 
     session[:gene] = @gene.name
     session[:gene_set_id] = gene_set.id
@@ -69,7 +70,7 @@ class GenesController < ApplicationController
 
     session[:studies] = params[:studies] if  params[:studies] 
 
-    begin
+    # begin
       case params[:submit] 
       when "Heatmap"
         forwardHeatmap 
@@ -80,12 +81,13 @@ class GenesController < ApplicationController
       else
         raise "Unknow redirect: #{params[:submit]}"
       end
-    rescue Exception => e
-      flash[:error] = e.to_s
-      session[:return_to] ||= request.referer
-      redirect_to session.delete(:return_to)
-      return
-    end
+    # rescue Exception => e
+    #   flash[:error] = e.to_s
+    #   puts e
+    #   session[:return_to] ||= request.referer
+    #   redirect_to session.delete(:return_to)
+    #   return
+    # end
 end
 
 def autocomplete

@@ -9,9 +9,9 @@
 default: &default
   adapter: mysql2
   encoding: utf8
-  database: "wheat_expression"
-  username: root
-  password: 
+  database: "expvip"
+  username: expvipUSR
+  password: expvipPWD
   host: localhost
   port: 3306
 

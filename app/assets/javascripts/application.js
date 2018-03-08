@@ -99,6 +99,7 @@ ready = (function() {
       $( "#about" ).dialog( "open" );
   });
   
+  //*************************************SEQUENCESERVER - START*************************************
   var search_right = $('#search_right');
   var search_left = $('#search_left');
   var introblurb = $('#introblurb');
@@ -107,21 +108,54 @@ ready = (function() {
     var node = $(this).contents().find('body').find('.navbar');
     var self = $(this);
     node.html('<h4>BLAST Scaffold</h4>');
-    $(this).contents().find('#footer').html('');
+    $(this).contents().find('#footer').html('');          
+    // Changing the checkbox input under the textarea to a radio button  
+    $(this).contents().find('#blast').find('input').eq(0).attr('type', 'radio');;
 
-    $($(this).contents()).click(function(event) {
-      all_downloads = parent.find(".mutation_link");
-      all_downloads.attr('target','_blank');
-    });
-    search_btn = $(this).contents().find('#method');
-    
+    // Removing the form after the BLAST button has been clicked
+    search_btn = $(this).contents().find('#method');    
     search_btn.click(function(){
       search_right.width('100%')
       self.width('950px');
       search_left.hide();
-      introblurb.hide();
+      introblurb.hide();             
+
+      // Adding a new column to the results table (with a time delay to let the content to be generated first and then changed)  
+      $(document).ready(function($) {
+        setTimeout(function(){
+
+          // Adding the header of the column
+          $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left"> Gene search </th>')
+
+          // Adding the data of the column
+          // ***Constructing the link(adding the gene set)
+          var geneSet = '';
+          var testPath = $('#sequenceserver').contents().find('#blast').find('.databases-container').find('input').each(function(index, el) {
+            if($(this).prop("checked", true)){
+              geneSet = $(this).parent().text();
+              geneSet = $.trim(geneSet);
+            }else{
+              // ***If no gene set has been selected
+              alert("Weird Stuff!\nPlease select a gene set");
+            }
+          });;
+                    
+          $('#sequenceserver').contents().find('tbody').eq(0).find('tr').each(function(index, el) {                         
+            // ***Constructing the link(adding the gene name)
+            var geneName = $(this).find('td').eq(1).children().text();   
+            var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet;
+
+            var secondColResTable = $(this).find('td').eq(1);
+            // var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=IWGSC2.26";   //**************for testing purposes
+            secondColResTable.after("<td> <a href=" + link + " target=\"_blank\">Search this gene</a> </td>");            
+          });          
+        }, 500);        
+      });
+
     });
   });
+//*************************************SEQUENCESERVER - END*************************************
+
 
 });
 
