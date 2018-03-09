@@ -1,4 +1,5 @@
 require 'sequenceserver'
+# require "#{Rails.root}/lib/links.rb"  
 Rails.application.routes.draw do
   #map.root :controller => 'wellcome', :action => :default
   #get 'wellcome/default'

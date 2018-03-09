@@ -133,7 +133,7 @@ ready = (function() {
           var testPath = $('#sequenceserver').contents().find('#blast').find('.databases-container').find('input').each(function(index, el) {
             if($(this).prop("checked", true)){
               geneSet = $(this).parent().text();
-              geneSet = $.trim(geneSet);
+              geneSet = $.trim(geneSet).replace(/\s+/g, '');              
             }else{
               // ***If no gene set has been selected
               alert("Weird Stuff!\nPlease select a gene set");

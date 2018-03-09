@@ -13,6 +13,7 @@
 # Ignore lock files.
 Gemfile.lock
 package-lock.json
+/config/database.yml
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
