@@ -104,6 +104,10 @@ ready = (function() {
   var search_left = $('#search_left');
   var introblurb = $('#introblurb');
    $('#sequenceserver').load(function(){
+
+    // SHALL BE REMOVED LATER - THIS IS JUST FOR DEVELOPMENT SAKE
+    $(this).contents().find('textarea.text-monospace').html('TCCCTATCTGTTTCCTTGGCAGCTCCCTGATCCAATCGATCCATCAGGGCTCGACTAACTTCTTCCAGCGCCTCTTCAGCGCGGGAGATCTACCAGCGTCGGCGGAGGGGCGTAGGTGCAGGCGTGCAGCCCAAGTCCGCACCCGGCTCTAGGTTTCTGCTAATCTTCTTCCACCTGTGATACGCGCTCCGGGGCTAGGAGCACTCGTTGCCGGCTGCCTCGTGCTCGGAATGGCGGATGGGGACTCGTCCGACTTCACCTTCTGCAAGGTTGACTATGCTGAAAATGATGGTCGTTTGGACTCCCCTAATTCCATCGCTGTGGCAAGTATGACACTGGAGGATGTTGCCGGTGATGGTGAGACTAAGAAGGTTCAGGATGACAAGCAAACAGTCAATCCAGTTACTGATGAAAAATCTAGTTCCATATCTAGTCGCACCAATGGTGTATCGCTTCGAGAGTCCAATATAAAAGAACCAGTTGTACCAACCAGTAGTGGAGAGTCTGTGCAGTCAAATGTGTCAGCTCAACCAAAACCTTTAAAGAAATCTGCTGTACGTGCAAAGGTTCCTTTTGAGAAGGGCTTTAGCCCAATGGACTGGCTTAAGCTGACTCGTACACATCCAGATCT')
+
     var parent = $(this).contents();
     var node = $(this).contents().find('body').find('.navbar');
     var self = $(this);
@@ -111,6 +115,11 @@ ready = (function() {
     $(this).contents().find('#footer').html('');          
     // Changing the checkbox input under the textarea to a radio button  
     $(this).contents().find('#blast').find('input').eq(0).attr('type', 'radio');;
+
+    $($(this).contents()).click(function(event) {
+      all_downloads = parent.find(".mutation_link");
+      all_downloads.attr('target','_blank');
+    });
 
     // Removing the form after the BLAST button has been clicked
     search_btn = $(this).contents().find('#method');    
@@ -145,8 +154,7 @@ ready = (function() {
             var geneName = $(this).find('td').eq(1).children().text();   
             var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet;
 
-            var secondColResTable = $(this).find('td').eq(1);
-            // var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=IWGSC2.26";   //**************for testing purposes
+            var secondColResTable = $(this).find('td').eq(1);            
             secondColResTable.after("<td> <a href=" + link + " target=\"_blank\">Search this gene</a> </td>");            
           });          
         }, 500);        

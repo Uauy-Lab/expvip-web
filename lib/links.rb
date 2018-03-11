@@ -4,14 +4,10 @@ module SequenceServer
     require 'erb'
     require 'pp'
     # Provide a method to URL encode _query parameters_. See [1].
-    include ERB::Util
+    include ERB::Util    
     #
-    alias_method :encode, :url_encode
+    alias_method :encode, :url_encode    
 
-# As the file is a copy fromt the server, im just ignoring this files
-#
-#    NCBI_ID_PATTERN    = /gi\|(\d+)\|/
-#    UNIPROT_ID_PATTERN = /sp\|(\w+)\|/
 
     # Link generators return a Hash like below.
     #
@@ -63,110 +59,45 @@ module SequenceServer
     # See methods provided by default for an example implementation.
 
     def sequence_viewer
-      accession  = encode self.accession
-      database_ids = encode querydb.map(&:id).join(' ')
-      #puts regions
-      regs = regions.collect{|r| "region%5B%5D=#{r.start.to_s}-#{r.end.to_s}" }.join('&')
-     
-      #puts regs
-      #puts "#{last.qstart} #{last.qend} #{last.sstart} #{last.send}"
-      #puts querydb.inpsect
-      url = "search/list?scaffolds%5B%5D=#{accession}&search=scaffolds&#{regs.to_s}"
-      #puts url
-      #url = "function(){console.log(#{accession});}"
+          
+      gene  = encode self.accession                        
+      gene_set = encode whichdb.first.title.sub(/\s+/, '') # Removing any whitespace between the characters
+      url = "genes/forward?submit=Search&gene=#{gene}" \
+            "&gene_set=#{gene_set}"        
+
       {
         :order => 0,
         :url   => url,
-        :title => 'View mutations',
+        :title => 'Expression',
         :class => 'mutation_link',
         :icon  => 'fa-eye'
       }
+
     end
 
     # Returns tuple of tuple indicating start and end coordinates of matched
     # regions of query and hit sequences.
-    
-   
+
+
 
     def fasta_download
-      accession  = encode self.accession
-      database_ids = encode querydb.map(&:id).join(' ')
-      url = "get_sequence/?sequence_ids=#{accession}" \
-            "&database_ids=#{database_ids}&download=fasta"
 
-      {
-        :order => 1,
-        :title => 'FASTA',
-        :url   => url,
-        :class => 'download',
-        :icon  => 'fa-download'
-      }
       nil
+
     end
 
     def ncbi
-      return nil unless id.match(NCBI_ID_PATTERN)
-      ncbi_id = Regexp.last_match[1]
-      ncbi_id = encode ncbi_id
-      url = "http://www.ncbi.nlm.nih.gov/#{querydb.first.type}/#{ncbi_id}"
-      {
-        :order => 2,
-        :title => 'NCBI',
-        :url   => url,
-        :icon  => 'fa-external-link'
-      }
+
+      nil
+
     end
 
     def uniprot
-      return nil unless id.match(UNIPROT_ID_PATTERN)
-      uniprot_id = Regexp.last_match[1]
-      uniprot_id = encode uniprot_id
-      url = "http://www.uniprot.org/uniprot/#{uniprot_id}"
-      {
-        :order => 2,
-        :title => 'Uniprot',
-        :url   => url,
-        :icon  => 'fa-external-link'
-      }
-    end
-    module_function
-    def regions
-      region_set = Array.new
-     puts "Query length: #{query.length}"
-      puts "Query hits count: #{query.hits.size} "
-      puts "HSPs count: #{hsps.size} "
-      puts "Query length: #{query.length}"
-      qlen = query.length
-      hsps.each do |hsp|  
-        reg = Bio::DB::Fasta::Region.new
-        reg.entry = accession
-        reg.start = hsp.sstart < hsp.send ? hsp.sstart : hsp.send
-        reg.end   = hsp.send > hsp.sstart ? hsp.send : hsp.sstart
-        next if reg.size < qlen * 0.1
 
-        reg.start = reg.start - 10000
-        reg.end = reg.end + 10000
-        reg.start = 1 if reg.start < 1
-        region_set << reg   
-      end
-      #puts "Regionset: #{region_set}"
-      ret = Array.new
-      last = nil 
-      region_set.sort.each do |r|
-        if last.nil? 
-          last = r.clone
-          next
-        end 
-        if r.overlaps last
-          last = last.joinRegion(r)
-        else
-          ret << last.clone if last
-          last = r.clone 
-        end  
-      end
-      ret << last if last
-      ret
+      nil
+
     end
+
   end
 end
 
