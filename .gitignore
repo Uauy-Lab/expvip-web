@@ -6,6 +6,8 @@
 
 .DS_Store
 
+/config/database.yml
+
 # Ignore bundler config.
 /.bundle
 /app/assets/javascripts/bundle.js
