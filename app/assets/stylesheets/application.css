@@ -24,10 +24,33 @@ body{
     height: 100%;
 }
 
+div.navigation{    
+    width: 100%;        
+    margin-top: 10px;
+}
+
+div.navigation a{    
+    display: inline-block;
+    padding: 10px 0px 10px 0px;
+    margin: 0px 0px 0px -4px;
+    width: calc(100%/7);
+    text-align: center;
+    font-size: larger;
+    border-radius: 10px;
+}
+
+div.navigation a:hover{
+    background-color: #E6E6E6;
+    -webkit-transition: background-color 300ms linear;
+    -ms-transition: background-color 300ms linear;
+    transition: background-color 300ms linear;
+    color: black;
+}
+
 div.header {
 	background-color:  #FFFFFF;
 	border-radius: 25px;
-    padding: 20px;
+    padding: 10px 20px 30px 20px;
     float: center;
     height: 75px;
     position: fixed;
