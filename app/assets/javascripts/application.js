@@ -134,7 +134,7 @@ ready = (function() {
         setTimeout(function(){
 
           // Adding the header of the column
-          $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left"> Gene search </th>')
+          $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression search</th>')
 
           // Adding the data of the column
           // ***Constructing the link(adding the gene set)
@@ -155,9 +155,9 @@ ready = (function() {
             var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet;
 
             var secondColResTable = $(this).find('td').eq(1);            
-            secondColResTable.after("<td> <a href=" + link + " target=\"_blank\">Search this gene</a> </td>");            
+            secondColResTable.after("<td> <a href=" + link + " target=\"_blank\">Expression</a> </td>");            
           });          
-        }, 500);        
+        }, 800);        
       });
 
     });
