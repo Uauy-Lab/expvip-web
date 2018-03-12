@@ -157,7 +157,7 @@ ready = (function() {
             var secondColResTable = $(this).find('td').eq(1);            
             secondColResTable.after("<td> <a href=" + link + " target=\"_blank\">Expression</a> </td>");            
           });          
-        }, 800);        
+        }, 3000);        
       });
 
     });
