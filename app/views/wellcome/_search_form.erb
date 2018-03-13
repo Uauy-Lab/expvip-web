@@ -16,7 +16,11 @@
 
   	<h2>Select studies to display:</h2>
   	<% @studies.each do |study| %>
+     <% if study.selected %>
 	   <%= check_box_tag "studies[]", study.accession, checked = true %>
+     <% else %>
+     <%= check_box_tag "studies[]", study.accession, checked = false %>
+     <% end %>
 	   <%= label_tag(study.accession, study.title) %>
 	   <br/>
 	<% end %>
