@@ -37,6 +37,9 @@ div.navigation a{
     text-align: center;
     font-size: larger;
     border-radius: 10px;
+    text-decoration: inherit;
+    color: #337ab7 !important;
+    /*background-color: #E6E6E6;*/
 }
 
 div.navigation a:hover{
@@ -45,6 +48,7 @@ div.navigation a:hover{
     -ms-transition: background-color 300ms linear;
     transition: background-color 300ms linear;
     color: black;
+    text-decoration: underline;
 }
 
 div.header {
