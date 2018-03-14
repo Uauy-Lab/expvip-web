@@ -162,8 +162,33 @@ ready = (function() {
 
     });
   });
-//*************************************SEQUENCESERVER - END*************************************
+  //*************************************SEQUENCESERVER - END*************************************  
+  
+  //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************
+  if(sessionStorage.bar_expression_viewer_selectedFactors){    
 
+    expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors
+    expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
+    studies = expBarSelectedStudiesObj.study;    
+
+    for (var key in studies) {
+      if (studies.hasOwnProperty(key)) {        
+        if(studies[key]){          
+          $("[value='" + key + "']").prop('checked', true);          
+        } else {
+          $("[value='" + key + "']").prop('checked', false);
+        }
+      }
+    }
+
+    $("[name='studies[]']").click(function(){
+      var selectedStudy = $(this).val();      
+      studies[selectedStudy] = true;      
+      sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
+    });
+
+  }  
+  //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
 
 });
 

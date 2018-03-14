@@ -1,12 +1,13 @@
 <%= form_tag "/genes/forward", method: "post" do  %>
   <h2>One or two genes</h2>
   Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
-  <%= label_tag :gene, "Gene:" %>
-  <%= text_field_tag :gene %>
 
+  <%= label_tag :gene, "Gene:" %>
+  <%= text_field_tag :gene, "Traes_5BS_0AFC3F795.1" %>
   <%= submit_tag "Search", name: 'submit' %>
   <%= text_field_tag :compare %>
   <%= submit_tag "Compare" , name: 'submit' %>
+
   <br/>
   Examples: Traes_5BS_0AFC3F795.1, Traes_4DS_1CF5D9107.1
   <h2>Multiple genes</h2>
