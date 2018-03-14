@@ -114,7 +114,12 @@ ready = (function() {
     node.html('<h4>BLAST Scaffold</h4>');
     $(this).contents().find('#footer').html('');          
     // Changing the checkbox input under the textarea to a radio button  
-    $(this).contents().find('#blast').find('input').eq(0).attr('type', 'radio');;    
+    $(this).contents().find('#blast').find('input').eq(0).attr('type', 'radio');;
+
+    $($(this).contents()).click(function(event) {
+      all_downloads = parent.find(".mutation_link");
+      all_downloads.attr('target','_top');
+    });
 
     // Removing the form after the BLAST button has been clicked
     search_btn = $(this).contents().find('#method');    
@@ -160,7 +165,7 @@ ready = (function() {
   //*************************************SEQUENCESERVER - END*************************************  
   
   //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************
-  if(sessionStorage.bar_expression_viewer_selectedFactors){    // If session storage for bar_expression_viewer_selectedFactors exists
+  if(sessionStorage.bar_expression_viewer_selectedFactors){    
 
     expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors
     expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
@@ -182,18 +187,6 @@ ready = (function() {
       sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
     });
 
-  } else {  // If session storage for bar_expression_viewer_selectedFactors doesn't exist    
-
-    /*
-      Age: {1_sp:true, 2_no:true, 2dpa:true, 3_lea:true, 4+dpa:true, 4dpa:true, 5_lea:true, 6dpa:true, 7d:true, 8dpa:true, 9dpa:true, 10dpa:true, 11dpa:true, 12dpa:true, 14d:true, 14dpa:true, 15dpa:true, 20dpa:true, 24d:true, 25dpa:true, 30dpa:true, 35dpa:true, anth:true, f_lea:true, see:true, till:true}
-      High level age:{see: true, veg: true, repr: true}
-      High level stress-disease:{none: true, dis: true, abio: true, trans: true}
-      High level tissue:{spike: true, grain: true, le+sh: true, roots: true}
-      High level variety:{CS: true, other: true, N_CS: true}
-
-    */
-
-    var sessioStorage = ""
   }  
   //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
 
