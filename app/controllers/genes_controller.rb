@@ -121,6 +121,7 @@ def autocomplete
   def show
     session[:studies] = params[:studies] if  params[:studies] 
     studies = session[:studies]
+    puts "Here are some sessions ==================> #{session[:studies]}"
     compare = ""
     alert = ""
 
