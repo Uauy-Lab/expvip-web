@@ -37,8 +37,8 @@ class GenesController < ApplicationController
     gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]
     @gene = findGeneName gene_name, gene_set 
     session[:gene] = @gene.name
-    session[:gene_set_id] = gene_set.id
-    redirect_to  action: "show", id: @gene.id, studies: params[:studies]
+    session[:gene_set_id] = gene_set.id    
+    redirect_to  action: "show", id: @gene.id
   end
 
   def forwardCompare
@@ -118,10 +118,8 @@ def autocomplete
 
   # GET /genes/1
   # GET /genes/1.json
-  def show
-    session[:studies] = params[:studies] if  params[:studies] 
-    studies = session[:studies]
-    puts "Here are some sessions ==================> #{session[:studies]}"
+  def show    
+    studies = session[:studies]    
     compare = ""
     alert = ""
 
