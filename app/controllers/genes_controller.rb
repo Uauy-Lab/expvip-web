@@ -1,6 +1,8 @@
 class GenesController < ApplicationController
-  before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
+  require 'digest'
+
+  before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
   def getGeneIds(genes)
     ids = Array.new
@@ -133,7 +135,12 @@ def autocomplete
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end  
 
-  def share        
+  def share
+    # puts "\n\n\nThese are the parameters sent\n#{params[:factors]}\n\n\n"
+    sha1 = Digest::SHA1.new
+    sha1 << params[:factors]
+    x = sha1.hexdigest
+    # puts "\n\n\nThis is the digest of it\n#{x}\n\n\n"
     gene_set = GeneSet.find(session[:gene_set_id])
     gene_name = session[:gene]    
     @gene = findGeneName gene_name, gene_set 
