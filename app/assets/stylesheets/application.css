@@ -43,9 +43,9 @@ div.navigation a{
 
 div.navigation a:hover{
     background-color: #E6E6E6;
-    -webkit-transition: background-color 300ms linear;
-    -ms-transition: background-color 300ms linear;
-    transition: background-color 300ms linear;
+    -webkit-transition: background-color 200ms linear;
+    -ms-transition: background-color 200ms linear;
+    transition: background-color 200ms linear;
     color: black;
     text-decoration: underline;
 }
@@ -55,7 +55,7 @@ div.header {
 	border-radius: 25px;
     padding: 10px 20px 30px 20px;
     float: center;
-    height: 75px;
+    height: 110px;
     position: fixed;
     top: 0;
     left: 0;
@@ -105,7 +105,7 @@ div.footer{
     padding: 20px;
     float: center;
     position: fixed;
-    top: 120px;
+    top: 155px;
     left: 0;
     right: 0;
     bottom: 120px;
@@ -155,7 +155,6 @@ img.logo{
     overflow:auto;
 }
 
-
 .alert-info {
     position: fixed;
     float: center;
@@ -174,4 +173,30 @@ img.logo{
     border-bottom: 1px solid #7BA6D6;
     border:1px solid #7BA6D6;
     overflow:auto;
+}
+
+input[type="submit"]{    
+    background-color: #337ab7;
+    border-radius: 7px;
+    padding: 5px 7px;
+    margin: 2px;
+    cursor: pointer;
+    color: white;
+    box-shadow: 2px 2px 5px grey;
+    border: none;
+}
+
+input[type="text"], textarea{    
+    padding: 5px;
+    margin: 1px;
+}
+
+select{
+    background-color: #489e47;
+    border-radius: 3px;
+    padding: 3px 7px;
+    margin: 2px;
+    cursor: pointer;
+    color: white;    
+    border: none;
 }

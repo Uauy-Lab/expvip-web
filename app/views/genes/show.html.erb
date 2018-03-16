@@ -12,6 +12,12 @@
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
 
+<%= form_tag("share", method: "post") do %>  
+  <%= text_area_tag(:factors) %>  
+  <%= submit_tag("Share", id:"share") %>
+<% end %>
+
+
 <div id="bar_expression_viewer"> </div>
 
 <script type="text/javascript">
@@ -31,4 +37,10 @@
     headerOffset:100
   });
   //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen
+
+  // Populating the textarea with factor settings to be posted 
+  var factorSettings = sessionStorage.bar_expression_viewer_selectedFactors;  
+  $("textarea#factors").css("display", "none");
+  $("textarea#factors").val(factorSettings); 
+
 </script>

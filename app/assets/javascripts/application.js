@@ -171,7 +171,7 @@ ready = (function() {
     var expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
     var studies = expBarSelectedStudiesObj.study;    
 
-    for (var key in studies) {
+    for (var key in studies) {    // Checking the studies based on their value in the session
       if (studies.hasOwnProperty(key)) {        
         if(studies[key]){          
           $("[value='" + key + "']").prop('checked', true);
@@ -181,11 +181,11 @@ ready = (function() {
       }
     }
 
-    $("[name='studies[]']").click(function(){
+    $("[name='studies[]']").click(function(){   // Store the study in the session if it has been checked
       var selectedStudy = $(this).val();      
       studies[selectedStudy] = true;      
       sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
-    });
+    });    
 
   } else {    // If bar_expression_viewer_selectedFactors doesn't exist
     console.log("Making the session storage");

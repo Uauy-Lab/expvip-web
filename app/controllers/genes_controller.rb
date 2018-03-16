@@ -34,7 +34,7 @@ class GenesController < ApplicationController
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
     gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
-    gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]
+    gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
     @gene = findGeneName gene_name, gene_set 
     session[:gene] = @gene.name
     session[:gene_set_id] = gene_set.id    
@@ -131,8 +131,14 @@ def autocomplete
 
     @args = {studies: studies, compare: compare }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
-  end
+  end  
 
+  def share        
+    gene_set = GeneSet.find(session[:gene_set_id])
+    gene_name = session[:gene]    
+    @gene = findGeneName gene_name, gene_set 
+    redirect_to  action: "show", id: @gene.id
+  end
   
   # DELETE /genes/1
   # DELETE /genes/1.json
