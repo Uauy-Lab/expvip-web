@@ -116,6 +116,20 @@ div.footer{
     height:auto;
 }
 
+.wrapper a{
+    color: #337ab7;
+    padding: 7px;
+    text-decoration: none;
+    margin: 5px;
+    font-size: 17px;
+}
+.wrapper a:hover{
+    background-color: #E6E6E6;
+    color: #337ab7;
+    border-radius: 7px;
+    text-decoration: underline red;
+}
+
 .left  { float:left;  }
 .right { float:right; } 
 
