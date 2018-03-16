@@ -116,6 +116,19 @@ div.footer{
     height:auto;
 }
 
+#about_studies a{
+    color: #337ab7;
+    padding: 3px;
+    text-decoration: none;    
+    line-height: 20px;
+}
+#about_studies a:hover{
+    background-color: inherit;
+    color: #337ab7;    
+    text-decoration: underline red;
+    border-radius: 7px;
+}
+
 .wrapper a{
     color: #337ab7;
     padding: 7px;
