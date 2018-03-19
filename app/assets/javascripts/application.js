@@ -12,7 +12,7 @@
 //
 
 
-
+//= require bootstrap-sprockets
 //= require jquery
 //= require jquery-ui
 //= require bundle

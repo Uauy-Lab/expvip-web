@@ -10,14 +10,14 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- *= require_tree .
- *= require_self
  *= require jquery-ui/tooltip
  *= require jquery-ui/autocomplete
  *= require jquery-ui/button
  *= require jquery-ui/core
  */
 
+@import "bootstrap-sprockets";
+@import "bootstrap";
 
 body{
 	background-color: #E6E6E6	;
@@ -55,7 +55,7 @@ div.header {
 	border-radius: 25px;
     padding: 10px 20px 30px 20px;
     float: center;
-    height: 110px;
+    height: 140px;
     position: fixed;
     top: 0;
     left: 0;
@@ -76,14 +76,12 @@ div.footer{
   max-height: 75px;
 }
 
-.left, .right { 
- 
-  /*padding: 1em;*/ 
+/*.left, .right { 
+   
   float:left;
-  /*position: absolute;*/
   height: calc(70%); 
   width: calc(40%); 
-} 
+} */
 
 .header-form {
     width: 300px;
