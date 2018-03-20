@@ -1,6 +1,6 @@
 class GenesController < ApplicationController
 
-  require 'digest'
+  require 'digest'  
 
   before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
@@ -135,15 +135,20 @@ def autocomplete
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }
   end  
 
-  def share
-    # puts "\n\n\nThese are the parameters sent\n#{params[:factors]}\n\n\n"
+  def share    
     sha1 = Digest::SHA1.new
     sha1 << params[:factors]
-    x = sha1.hexdigest
-    # puts "\n\n\nThis is the digest of it\n#{x}\n\n\n"
+    x = sha1.hexdigest        
+
     gene_set = GeneSet.find(session[:gene_set_id])
     gene_name = session[:gene]    
-    @gene = findGeneName gene_name, gene_set 
+    @gene = findGeneName gene_name, gene_set     
+
+    @client = MongodbHelper.getConnection unless @client
+    puts "\n\n\nSame hash exists? \n#{@client[:share].find({'hash' => x}).count == 0 ? "NO" : "YES"}\n\n\n"
+    @client[:share].insert_one({:gene_set => gene_set.name, :factors => params[:factors], :hash => x}) if @client[:share].find({'hash' => x}).count == 0
+    puts "\n\n\nSame hash exists? \n#{@client[:share].find({'hash' => x}).count == 0 ? "NO" : "YES"}\n\n\n"    
+
     redirect_to  action: "show", id: @gene.id
   end
   

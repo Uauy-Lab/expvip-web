@@ -39,8 +39,21 @@
   //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen
 
   // Populating the textarea with factor settings to be posted 
-  var factorSettings = sessionStorage.bar_expression_viewer_selectedFactors;  
+  // Concatenating the three available sessions to store them as one value
   $("textarea#factors").css("display", "none");
-  $("textarea#factors").val(factorSettings); 
+  $("#share").click(function(event) {
+    var selectedFactorsSession = sessionStorage.bar_expression_viewer_selectedFactors;
+    var renderPropertySession = sessionStorage.bar_expression_viewer_renderProperty;
+    var showHomoeologuesSession = sessionStorage.bar_expression_viewer_showHomoeologues;
+    var calculateLogSession = sessionStorage.bar_expression_viewer_calculateLog;
+    var selectedFactorsSessionObj = JSON.parse(selectedFactorsSession);
+    selectedFactorsSessionObj.bar_expression_viewer_renderProperty = renderPropertySession;
+    selectedFactorsSessionObj.bar_expression_viewer_showHomoeologues = showHomoeologuesSession;
+    selectedFactorsSessionObj.bar_expression_viewer_calculateLog = calculateLogSession;
+    selectedFactorsSession = JSON.stringify(selectedFactorsSessionObj) ;
+
+    var factorSettings = selectedFactorsSession;      
+    $("textarea#factors").val(factorSettings); 
+  });  
 
 </script>
