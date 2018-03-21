@@ -120,7 +120,7 @@ def autocomplete
 
   # GET /genes/1
   # GET /genes/1.json
-  def show    
+  def show 
     studies = session[:studies]    
     compare = ""
     alert = ""
@@ -129,27 +129,28 @@ def autocomplete
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
       compare = @compare.name
-    end
+    end    
 
     @args = {studies: studies, compare: compare }.to_query
-    #studies.each { |e|  @studies += "studies[]=#{e}\&" }
+    #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  
 
-  def share    
+  def share 
+    # Hash the settings 
     sha1 = Digest::SHA1.new
     sha1 << params[:factors]
     x = sha1.hexdigest        
 
+    # Get the gene
     gene_set = GeneSet.find(session[:gene_set_id])
     gene_name = session[:gene]    
-    @gene = findGeneName gene_name, gene_set     
+    @gene = findGeneName gene_name, gene_set
 
-    @client = MongodbHelper.getConnection unless @client
-    puts "\n\n\nSame hash exists? \n#{@client[:share].find({'hash' => x}).count == 0 ? "NO" : "YES"}\n\n\n"
-    @client[:share].insert_one({:gene_set => gene_set.name, :factors => params[:factors], :hash => x}) if @client[:share].find({'hash' => x}).count == 0
-    puts "\n\n\nSame hash exists? \n#{@client[:share].find({'hash' => x}).count == 0 ? "NO" : "YES"}\n\n\n"    
+    # Store the settings
+    @client = MongodbHelper.getConnection unless @client    
+    @client[:share].insert_one({:gene_set => gene_set.name, :factors => params[:factors], :hash => x}) if @client[:share].find({'hash' => x}).count == 0    
 
-    redirect_to  action: "show", id: @gene.id
+    return x
   end
   
   # DELETE /genes/1

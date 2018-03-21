@@ -50,8 +50,8 @@ ready = (function() {
     success: function (response) {
         document.getElementById("kalb"+parseInt(subcategory_id.match(/[0-9]+/)[0], 10)).innerHTML=response;
     }
-});
-  });
+    });
+  });  
 
   $(".alert-error").on("click", function(event) { 
     $(this).hide();

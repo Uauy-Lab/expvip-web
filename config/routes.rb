@@ -18,7 +18,7 @@ Rails.application.routes.draw do
       get 'heatmap'
       post 'forward'
       get 'forward'
-      post 'share'
+      post 'share'      
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.
