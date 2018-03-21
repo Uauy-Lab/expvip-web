@@ -29,3 +29,4 @@ log/development.log
 npm-debug.log
 /config/database.yml
 /config/secrets.yml
+/nbproject

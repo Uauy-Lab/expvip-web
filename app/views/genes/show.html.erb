@@ -2,23 +2,24 @@
 
 <%= javascript_tag "window_token = '#{form_authenticity_token}'" %>
 
- <strong>Gene:</strong>
- 
- <%= @gene.name %>
+ <strong>Gene:</strong> <%= @gene.name %> 
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
+ 
 <% if @compare %>
  <strong>Compare:</strong>
  <%= @compare.name %>   
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
 
+ <!-- Here is the share button form and stuff ************************************** -->
+ <br><br><br> 
+  <textarea id="factors" name="factors"></textarea>
 
-<%= link_to "/share", remote: true, method: :post, id: 'share' %>
-<%= text_area_tag(:factors) %> 
+  <button id="share" value="factors" name="factors">Share</button>
+ <br><br><br>
+<!-- Here is the share button form and stuff ************************************** -->
 
-<!-- <textarea id="factors" name="factors"></textarea>
 
-<button id="share" value="factors" name="factors">Share</button> -->
 
 <div id="bar_expression_viewer"> </div>
 
@@ -26,7 +27,7 @@
   var container_div="bar_expression_viewer";
   var data_url = "<%= "http://localhost:3000/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
-  console.log(data_url)
+  console.log(data_url);
   var eb =  new biovisexpressionbar.ExpressionBar({
     target: container_div,
     highlight: gene, 
@@ -43,9 +44,7 @@
   // Populating the textarea with factor settings to be posted 
   // Concatenating the three available sessions to store them as one value
 
-  $(document).ready(function(){
-    // $("textarea#factors").css("display", "none");        
-
+  $(document).ready(function(){           
     $("#share").click(function(event) {
       var selectedFactorsSession = sessionStorage.bar_expression_viewer_selectedFactors;
       var renderPropertySession = sessionStorage.bar_expression_viewer_renderProperty;
@@ -57,16 +56,24 @@
       selectedFactorsSessionObj.bar_expression_viewer_calculateLog = calculateLogSession;
       selectedFactorsSession = JSON.stringify(selectedFactorsSessionObj) ;
 
-      var factorSettings = selectedFactorsSession;      
-      $("textarea#factors").val(factorSettings);       
+      var factorSettings = selectedFactorsSession;             
+
+      $.ajax({
+        type: "POST",
+        url: "share" + "?&authenticity_token=" + window_token,
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+        dataType: "json",
+        data: {factors: factorSettings},
+        success: function(data){
+          alert ("Maybe?");
+        },
+        error: function(data){
+          alert ("Don't even know");
+        }
+      })
 
     });
 
-
-      $("#share").on("ajax:success", function(e, data, status, xhr){
-        console.log("Some weird shit");
-      });    
-
-  })    
+  });
 
 </script>

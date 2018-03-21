@@ -143,7 +143,9 @@ def autocomplete
 
     # Get the gene
     gene_set = GeneSet.find(session[:gene_set_id])
+    puts "\n\n\nHere is the gene_set: \n#{gene_set}\n\n\n"
     gene_name = session[:gene]    
+    puts "\n\n\nHere is the gene_name: \n#{gene_name}\n\n\n"
     @gene = findGeneName gene_name, gene_set
 
     # Store the settings
