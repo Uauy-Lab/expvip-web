@@ -138,21 +138,24 @@ def autocomplete
   def share 
     # Hash the settings 
     sha1 = Digest::SHA1.new
-    sha1 << params[:factors]
-    x = sha1.hexdigest        
+    sha1 << params[:settings]
+    hashedSettings = sha1.hexdigest        
 
     # Get the gene
-    gene_set = GeneSet.find(session[:gene_set_id])
-    puts "\n\n\nHere is the gene_set: \n#{gene_set}\n\n\n"
-    gene_name = session[:gene]    
-    puts "\n\n\nHere is the gene_name: \n#{gene_name}\n\n\n"
+    gene_set = GeneSet.find(session[:gene_set_id])    
+    gene_name = session[:gene]        
     @gene = findGeneName gene_name, gene_set
 
     # Store the settings
     @client = MongodbHelper.getConnection unless @client    
-    @client[:share].insert_one({:gene_set => gene_set.name, :factors => params[:factors], :hash => x}) if @client[:share].find({'hash' => x}).count == 0    
+    @client[:share].insert_one({:gene_set => gene_set.name, :settings => params[:settings], :hash => hashedSettings}) if @client[:share].find({'hash' => hashedSettings}).count == 0                               
 
-    return x
+    response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {settings: hashedSettings}.to_query
+    
+    respond_to do |format|
+      format.json { render json: {"value" => response}}      
+    end
+    
   end
   
   # DELETE /genes/1

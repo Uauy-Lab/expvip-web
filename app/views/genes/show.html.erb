@@ -1,7 +1,5 @@
 <p id="notice"><%= notice %></p>
 
-<%= javascript_tag "window_token = '#{form_authenticity_token}'" %>
-
  <strong>Gene:</strong> <%= @gene.name %> 
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
@@ -12,10 +10,8 @@
 <% end %>
 
  <!-- Here is the share button form and stuff ************************************** -->
- <br><br><br> 
-  <textarea id="factors" name="factors"></textarea>
-
-  <button id="share" value="factors" name="factors">Share</button>
+ <br><br><br>   
+  <button id="share" value="settings" name="settings">Share</button>
  <br><br><br>
 <!-- Here is the share button form and stuff ************************************** -->
 
@@ -60,17 +56,18 @@
 
       $.ajax({
         type: "POST",
-        url: "share" + "?&authenticity_token=" + window_token,
-        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+        url: "share",
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));},
         dataType: "json",
-        data: {factors: factorSettings},
-        success: function(data){
-          alert ("Maybe?");
+        data: {settings: factorSettings},
+        success: function(data, x, y){          
+          alert("This is your URL: " + data.value);
+          console.log("This is your URL: " + data.value);
         },
         error: function(data){
-          alert ("Don't even know");
+          alert ("There was an error while processing the data");
         }
-      })
+      });           
 
     });
 
