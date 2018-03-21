@@ -17,34 +17,51 @@
 </head>
 
 <body>
-  <div class='header'>
+    
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+          
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <h1>Wheat Expression Browser   <span style="font-size:50%">powered by expVIP</span></h1>  
+        </div>
 
-    <div class="left">
-      <h1 >Wheat Expression Browser   <span style="font-size:50%">powered by expVIP</span></h1>  
-    </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">          
+            
+          <%= form_tag "/genes/forward", method: :post, class: 'navbar-form navbar-right' do %> 
+            <div class="form-group">    
+               <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %>
+               <%= submit_tag "Search" , name: 'submit', class: "btn btn-default"  %>
 
-    <%= form_tag "/genes/forward", method: :post, class: 'right' do %> 
-     <div class='form-inline right'>    
-        <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %>
-        <%= submit_tag "Search" , name: 'submit'  %>
-        
-        <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%> 
-        <%= submit_tag "Compare", name: 'submit'  %> 
-         <br>
-         Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
-      </div>
-    <% end %>
-
-    <div class="navigation left">
-      <%= link_to "Home", root_path %>
-      <%= link_to "Studies", "#", :id => 'studies_button'%>  
-      <%= link_to "Download", "/download" %>
-      <%= link_to "Add your data", "https://github.com/homonecloco/expvip-web/wiki/LoadingVM"%>
-      <%= link_to "Tutorials",  "https://github.com/homonecloco/expvip-web/wiki" %>
-      <%= link_to "Videos",  "https://github.com/homonecloco/expvip-web/wiki/List-of-tutorial-videos" %>
-      <%= link_to "Cite", "#", :id => 'cite_button'%>  
-    </div>
-  </div>
+               <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%> 
+               <%= submit_tag "Compare", name: 'submit', class: "btn btn-default"  %> 
+                <br>
+                Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
+            </div>
+          <% end %>
+          
+          <div class="navigation left">
+            <%= link_to "Home", root_path %>
+            <%= link_to "Studies", "#", :id => 'studies_button'%>  
+            <%= link_to "Download", "/download" %>
+            <%= link_to "Add your data", "https://github.com/homonecloco/expvip-web/wiki/LoadingVM"%>
+            <%= link_to "Tutorials",  "https://github.com/homonecloco/expvip-web/wiki" %>
+            <%= link_to "Videos",  "https://github.com/homonecloco/expvip-web/wiki/List-of-tutorial-videos" %>
+            <%= link_to "Cite", "#", :id => 'cite_button'%>  
+          </div>
+          
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+    
+  
 
   <div id="about_studies" >
     <div style="overflow:auto; max-height:400px">
@@ -58,7 +75,7 @@
     </div>
   </div>
 
-  <div class='wrapper'>
+  <div class='container-fluid'>
 
   
   <% flash.each do |key, value| %>
