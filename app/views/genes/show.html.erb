@@ -8,14 +8,22 @@
  <%= @compare.name %>   
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
-
- <!-- Here is the share button form and stuff ************************************** -->
- <br><br><br>   
+ 
+ <br>   
   <button id="share" value="settings" name="settings">Share</button>
- <br><br><br>
-<!-- Here is the share button form and stuff ************************************** -->
+  <p class="share_message"></p>
+ <br>
 
 
+<div id="share_popup">
+    <span>X</span>    
+    <input type="text">
+    <br>
+    <br>
+    <p class="share_message">Click on the below button and paste the link for sharing</p>
+    <br>
+    <button id="copy_link">Copy to Clipboard</button>
+</div>
 
 <div id="bar_expression_viewer"> </div>
 
@@ -41,7 +49,9 @@
   // Concatenating the three available sessions to store them as one value
 
   $(document).ready(function(){           
-    $("#share").click(function(event) {
+    $("#share").click(function() {
+      
+      // Appending other setting sessions to the main session 
       var selectedFactorsSession = sessionStorage.bar_expression_viewer_selectedFactors;
       var renderPropertySession = sessionStorage.bar_expression_viewer_renderProperty;
       var showHomoeologuesSession = sessionStorage.bar_expression_viewer_showHomoeologues;
@@ -52,22 +62,39 @@
       selectedFactorsSessionObj.bar_expression_viewer_calculateLog = calculateLogSession;
       selectedFactorsSession = JSON.stringify(selectedFactorsSessionObj) ;
 
+      // JSON object with all the setting data
       var factorSettings = selectedFactorsSession;             
 
+      // POST request for sending session data to the backend to generate the sharable link
       $.ajax({
         type: "POST",
         url: "share",
         beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));},
         dataType: "json",
         data: {settings: factorSettings},
-        success: function(data, x, y){          
-          alert("This is your URL: " + data.value);
-          console.log("This is your URL: " + data.value);
+        success: function(data){                              
+          $("#share_popup input").val(data.value);                    
         },
-        error: function(data){
-          alert ("There was an error while processing the data");
+        error: function(){
+          alert ("There was an error while processing the data to generate the sharable link");
         }
-      });           
+      });    
+      
+      // Display the popup with the sharable link
+      $("#share_popup").show("slow");
+      
+      // Copy the link to the clipboard and close the popup
+      $("#copy_link").click(function(){
+        $("#share_popup input").select();
+        document.execCommand("Copy");
+        $("#share_popup").hide("slow");
+        $(".share_message").html("The link has been copied to your clipboard");
+      });
+
+      // Close the popup when clicked on the cross
+      $("#share_popup span").click(function (){
+        $("#share_popup").hide("fast");
+      });
 
     });
 

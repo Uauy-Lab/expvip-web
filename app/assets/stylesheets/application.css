@@ -51,8 +51,8 @@ div.navigation a:hover{
 }
 
 div.header {
-	background-color:  #FFFFFF;
-	border-radius: 25px;
+    background-color:  #FFFFFF;
+    border-radius: 25px;
     padding: 10px 20px 30px 20px;
     float: center;
     height: 110px;
@@ -77,10 +77,8 @@ div.footer{
 }
 
 .left, .right { 
- 
-  /*padding: 1em;*/ 
-  float:left;
-  /*position: absolute;*/
+   
+  float:left;  
   height: calc(70%); 
   width: calc(40%); 
 } 
