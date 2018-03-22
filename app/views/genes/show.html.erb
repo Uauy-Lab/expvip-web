@@ -9,6 +9,22 @@
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
  
+<% if @settings %>  
+  <%= javascript_tag do -%>
+    sessionStorage.clear();    
+    var all_settings = JSON.parse(<%= @settings.to_json.html_safe %>);
+    sessionStorage.setItem('bar_expression_viewer_renderProperty', all_settings.bar_expression_viewer_renderProperty);
+    delete all_settings.bar_expression_viewer_renderProperty;
+    sessionStorage.setItem('bar_expression_viewer_showHomoeologues', all_settings.bar_expression_viewer_showHomoeologues);
+    delete all_settings.bar_expression_viewer_showHomoeologues;
+    sessionStorage.setItem('bar_expression_viewer_calculateLog', all_settings.bar_expression_viewer_calculateLog);
+    delete all_settings.bar_expression_viewer_calculateLog;
+    sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(all_settings));
+  <% end -%>
+<% end %>
+ 
+    
+    
  <br>   
   <button id="share" value="settings" name="settings">Share</button>
   <p class="share_message"></p>
@@ -48,7 +64,7 @@
   // Populating the textarea with factor settings to be posted 
   // Concatenating the three available sessions to store them as one value
 
-  $(document).ready(function(){           
+  $(document).ready(function(){                      
     $("#share").click(function() {
       
       // Appending other setting sessions to the main session 

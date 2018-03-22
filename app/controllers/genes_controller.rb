@@ -125,12 +125,23 @@ def autocomplete
     compare = ""
     alert = ""
 
+    # If parameters passed contain compare
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
       compare = @compare.name
     end    
-
+    
+    # If parameters passed cnotain settings (it's a shared link)
+    if params[:settings]
+      @client = MongodbHelper.getConnection unless @client    
+      data = @client[:share].find({'hash' =>  params[:settings]}).first
+      @settings = data[:settings]
+      x = JSON.parse @settings
+      studies = x['study']
+           
+    end   
+    
     @args = {studies: studies, compare: compare }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  

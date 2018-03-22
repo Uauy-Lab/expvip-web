@@ -167,7 +167,7 @@ ready = (function() {
   //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************
   if(sessionStorage.bar_expression_viewer_selectedFactors){    // If bar_expression_viewer_selectedFactors exists    
     console.log("Don't need to Make the session storage");
-    var expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors
+    var expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors;
     var expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
     var studies = expBarSelectedStudiesObj.study;    
 
