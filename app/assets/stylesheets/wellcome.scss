@@ -2,10 +2,14 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-#share{
-    margin: 20px 0px;
+share_area{
+    display: inline-block;
+}
+
+#share{    
     font-size: 1.5em;
-    padding: 10px;
+    padding: 10px;    
+    display: inline-block;
 }
 
 #share_popup{
@@ -48,17 +52,21 @@
     box-sizing : border-box;
     font-size: 1.4em;
     text-align: center;
-    border-radius: 10px;
-    /*box-shadow: 5px 8px grey;*/
+    border-radius: 10px;    
 }
 
 .share_message{    
-    font-family: helvetica;            
-    width: 100%;
+    font-family: helvetica;                
     margin: 0;    
     box-sizing : border-box;
     font-size: 1.4em;
-    text-align: center;        
+    text-align: center;   
+    display: inline-block;    
+}
+
+#share_message_popup{
+    display: block !important;
+    width: 100%;    
 }
 
 #copy_link{

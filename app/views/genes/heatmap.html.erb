@@ -1,5 +1,5 @@
+<%= render :partial => "genes/share" %>
 
-<p>
 <div id="bar_expression_viewer"> </div>
 
 <script type="text/javascript">
@@ -15,5 +15,15 @@
     width:1000,
     headerOffset:150,
     plot:'HeatMap'
-  });
-  </script>
+  });   
+  
+  $(document).ready(function(){                                     
+    
+    setTimeout(function(){                  
+      if(sessionStorage.bar_expression_viewer_calculateLog == "false"){
+        $("#bar_expression_viewer_log2").click();
+      }              
+    }, 3000);
+        
+  });  
+</script>

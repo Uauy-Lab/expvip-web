@@ -87,11 +87,12 @@ div.footer{
     width: 300px;
 
  }
- .header-form input {
+ .header-form input[type="text"]{
     display:inline-block;
-* {
     margin: 0;
-}
+    width: 150px;
+    border-width: 2px;
+    border-radius: 5px;          
 }
  .header-form label {
     width: 25%;
@@ -216,7 +217,7 @@ input[type="submit"]:active, button:active{
 
 input[type="text"], textarea{    
     padding: 5px;
-    margin: 1px;
+    margin: 1px;    
 }
 
 input[type="checkbox"]{        

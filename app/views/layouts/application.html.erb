@@ -5,7 +5,7 @@
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
-  <%=render  :partial =>"layouts/analytics" rescue nil%>
+  <%= render :partial =>"layouts/analytics" rescue nil %>
   <%= csrf_meta_tags %>
   <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
 <script type="text/javascript">
@@ -30,7 +30,7 @@
 
  </div>
 
- <div class='form-group right header-form  '>
+ <div class='form-group right header-form'>
     
     <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %>
     <%= submit_tag "Search" , name: 'submit'  %>

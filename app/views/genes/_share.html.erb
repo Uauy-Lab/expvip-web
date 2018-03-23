@@ -1,0 +1,122 @@
+<div id="share_area">
+  <button id="share" value="settings" name="settings">Share</button>
+  <p class="share_message"></p> 
+</div> 
+
+<div id="share_popup">
+    <span>X</span>    
+    <input type="text">
+    <br>
+    <br>
+    <p class="share_message" id="share_message_popup">Click on the below button and paste the link for sharing</p>
+    <br>
+    <button id="copy_link">Copy to Clipboard</button>
+</div>
+
+
+<%# If this is a shared link removed the data from the session and reload it with shared settings %> 
+<% if @settings %>  
+  <%= javascript_tag do -%>
+    sessionStorage.clear();    
+    var all_settings = JSON.parse(<%= @settings.to_json.html_safe %>);
+    
+    // Load render property
+    if(all_settings.bar_expression_viewer_renderProperty !== "undefined"){      
+      sessionStorage.setItem('bar_expression_viewer_renderProperty', all_settings.bar_expression_viewer_renderProperty);
+      delete all_settings.bar_expression_viewer_renderProperty;
+    } else {      
+      console.log("No render property in session");
+    }    
+    
+    // Load calculate homeologues    
+    if(all_settings.bar_expression_viewer_showHomoeologues !== "undefined"){      
+      sessionStorage.setItem('bar_expression_viewer_showHomoeologues', all_settings.bar_expression_viewer_showHomoeologues);
+      delete all_settings.bar_expression_viewer_showHomoeologues;
+    } else {      
+      console.log("No homoeologues in session");
+    }    
+    
+    // Load calculate log
+    if(all_settings.bar_expression_viewer_calculateLog !== "undefined"){      
+      sessionStorage.setItem('bar_expression_viewer_calculateLog', all_settings.bar_expression_viewer_calculateLog);
+      delete all_settings.bar_expression_viewer_calculateLog;
+    } else {      
+      console.log("No calculate log in session");
+    }
+    
+    
+    // Load group by
+    if(all_settings.bar_expression_viewer_groupBy !== "undefined"){      
+      sessionStorage.setItem('bar_expression_viewer_groupBy', all_settings.bar_expression_viewer_groupBy);
+      delete all_settings.bar_expression_viewer_groupBy;
+    } else {      
+      console.log("No group by in session");
+    }
+        
+    // Load selected factors
+    sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(all_settings));
+  <% end -%>
+<% end %>
+    
+<script>  
+  $("#share").click(function() {
+      
+      // Appending other setting sessions to the main session 
+      var selectedFactorsSession = sessionStorage.bar_expression_viewer_selectedFactors;
+      var renderPropertySession = sessionStorage.bar_expression_viewer_renderProperty;
+      var showHomoeologuesSession = sessionStorage.bar_expression_viewer_showHomoeologues;
+      var calculateLogSession = sessionStorage.bar_expression_viewer_calculateLog;
+      var groupBy = sessionStorage.bar_expression_viewer_groupBy;
+      var selectedFactorsSessionObj = JSON.parse(selectedFactorsSession);
+      selectedFactorsSessionObj.bar_expression_viewer_renderProperty = renderPropertySession;
+      selectedFactorsSessionObj.bar_expression_viewer_showHomoeologues = showHomoeologuesSession;
+      selectedFactorsSessionObj.bar_expression_viewer_calculateLog = calculateLogSession;
+      selectedFactorsSessionObj.bar_expression_viewer_groupBy = groupBy;
+      selectedFactorsSession = JSON.stringify(selectedFactorsSessionObj) ;
+
+      // JSON object with all the setting data
+      var factorSettings = selectedFactorsSession;             
+
+      // Determining the data to be sent in the request based on the url parameters
+      var sendData;
+      var currentURL = window.location.href;
+      var url = new URL(currentURL);
+      var compareParam = url.searchParams.get("compare");
+      if(compareParam){        
+        sendData = {settings: factorSettings, compare: compareParam};
+      } else{       
+        sendData = {settings: factorSettings};
+      }      
+
+      // POST request for sending session data to the backend to generate the sharable link
+      $.ajax({
+        type: "POST",
+        url: "share",
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));},
+        dataType: "json",
+        data: sendData,
+        success: function(data){                              
+          $("#share_popup input").val(data.value);                    
+        },
+        error: function(){
+          alert ("There was an error while processing the data to generate the sharable link");
+        }
+      });    
+      
+      // Display the popup with the sharable link
+      $("#share_popup").show("slow");
+      
+      // Copy the link to the clipboard and close the popup
+      $("#copy_link").click(function(){
+        $("#share_popup input").select();
+        document.execCommand("Copy");
+        $("#share_popup").hide("slow");
+        $(".share_message").html("The link has been copied to your clipboard");
+      });
+
+      // Close the popup when clicked on the cross
+      $("#share_popup span").click(function (){
+        $("#share_popup").hide("fast");
+      });
+  });
+</script>
