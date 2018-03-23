@@ -9,6 +9,7 @@
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
  
+<%#*If this is a shared link removed the data from the session and reload it with shared settings%> 
 <% if @settings %>  
   <%= javascript_tag do -%>
     sessionStorage.clear();    
@@ -23,8 +24,7 @@
   <% end -%>
 <% end %>
  
-    
-    
+        
  <br>   
   <button id="share" value="settings" name="settings">Share</button>
   <p class="share_message"></p>
@@ -81,13 +81,24 @@
       // JSON object with all the setting data
       var factorSettings = selectedFactorsSession;             
 
+      // Determining the data to be sent in the request based on the url parameters
+      var sendData;
+      var currentURL = window.location.href;
+      var url = new URL(currentURL);
+      var compareParam = url.searchParams.get("compare");
+      if(compareParam){        
+        sendData = {settings: factorSettings, compare: compareParam};
+      } else{       
+        sendData = {settings: factorSettings};
+      }      
+
       // POST request for sending session data to the backend to generate the sharable link
       $.ajax({
         type: "POST",
         url: "share",
         beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));},
         dataType: "json",
-        data: {settings: factorSettings},
+        data: sendData,
         success: function(data){                              
           $("#share_popup input").val(data.value);                    
         },

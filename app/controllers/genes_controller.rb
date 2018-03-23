@@ -52,7 +52,7 @@ class GenesController < ApplicationController
     session[:gene_set_id] = gene_set.id
     @gene = findGeneName(gene_name, gene_set)
     @compare =  findGeneName params[:compare], gene_set
-    redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name  
+    redirect_to  action: "show", id: @gene.id, compare:  @compare.name  
   end
 
   def findGeneName(gene_name, gene_set)
@@ -92,7 +92,7 @@ class GenesController < ApplicationController
     # end
 end
 
-def autocomplete
+  def autocomplete
     #puts "In autocomplete!"
     gene_set_id = session[:gene_set_id] 
     @genes = Gene.order(:name).where("name LIKE ? and gene_set_id = ?", "%#{params[:term]}%", gene_set_id).limit(20)
@@ -137,9 +137,8 @@ def autocomplete
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
       @settings = data[:settings]
-      x = JSON.parse @settings
-      studies = x['study']
-           
+      settingsObj = JSON.parse @settings
+      studies = settingsObj['study']           
     end   
     
     @args = {studies: studies, compare: compare }.to_query
@@ -159,9 +158,13 @@ def autocomplete
 
     # Store the settings
     @client = MongodbHelper.getConnection unless @client    
-    @client[:share].insert_one({:gene_set => gene_set.name, :settings => params[:settings], :hash => hashedSettings}) if @client[:share].find({'hash' => hashedSettings}).count == 0                               
-
-    response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {settings: hashedSettings}.to_query
+    @client[:share].insert_one({:gene_set => gene_set.name, :settings => params[:settings], :hash => hashedSettings}) if @client[:share].find({'hash' => hashedSettings}).count == 0                                   
+    
+    if params[:compare]      
+      response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {compare: params[:compare]}.to_query + "&" + {settings: hashedSettings}.to_query
+    else      
+      response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {settings: hashedSettings}.to_query
+    end        
     
     respond_to do |format|
       format.json { render json: {"value" => response}}      
