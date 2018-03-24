@@ -2,76 +2,28 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-share_area{
-    display: inline-block;
-}
-
-#share{    
-    font-size: 1.5em;
-    padding: 10px;    
-    display: inline-block;
-}
-
-#share_popup{
-    background-color: #efe2c6;            
-    z-index: 10;        
-    border-radius: 20px;
-    padding: 70px 40px;
-    position: absolute;
-    top: inherit;
-    width: 40%;
-    left: calc(60%/2); // Centering the popup ((100-width)/2)
-    box-sizing : border-box;
-    margin: 0;
-    box-shadow: 0px 0px 20px 10px #4f4343;    
-    display: none;
-}
-
-#share_popup span{
-    background-color: #d84545;    
-    float: right;
-    padding: 10px;  
-    font-family: helvetica;                
-    margin-bottom: 10px;
-    border: none;
-    box-sizing : border-box;
-    font-size: 1.4em;
-    text-align: center;
-    border-radius: 10px;    
-}
-#share_popup span:hover{
-    cursor: pointer;
-}
-
-#share_popup input{
-    padding: 10px;  
-    font-family: helvetica;            
+#sequenceserver{        
     width: 100%;
-    margin: 0;
+    min-height:650px;
     border: none;
-    box-sizing : border-box;
-    font-size: 1.4em;
-    text-align: center;
-    border-radius: 10px;    
 }
 
-.share_message{    
-    font-family: helvetica;                
-    margin: 0;    
-    box-sizing : border-box;
-    font-size: 1.4em;
-    text-align: center;   
-    display: inline-block;    
+#search_left{
+    min-height:450px;    
+    width: 50%;
+    float: left;
 }
 
-#share_message_popup{
-    display: block !important;
-    width: 100%;    
+#search_right{        
+    width: 50%; 
+    float: right;
 }
 
-#copy_link{
-    position: relative;
-    font-size: 1.4em;
-    width: 20%;
-    left: 40%;    
+@media(max-width: 1200px){
+    
+    #search_left, #search_right{
+        width: 100%;
+        float: none;
+    }
+    
 }

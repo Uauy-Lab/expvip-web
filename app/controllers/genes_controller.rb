@@ -175,10 +175,8 @@ end
       gene_set = GeneSet.find(session[:gene_set_id])    
       gene_name = session[:gene]         
       @gene = findGeneName gene_name, gene_set
-    else
-      # need the gene_set(storing) and genes(showing)      
-      gene_set = GeneSet.find(session[:gene_set_id])      
-      
+    else        
+      gene_set = GeneSet.find(session[:gene_set_id])            
     end
 
     # Store the settings

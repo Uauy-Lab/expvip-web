@@ -123,7 +123,8 @@ ready = (function() {
     search_btn = $(this).contents().find('#method');    
     search_btn.click(function(){
       search_right.width('100%')
-      self.width('950px');
+      self.width('100%');
+      self.height('950px');
       search_left.hide();
       introblurb.hide();             
 
