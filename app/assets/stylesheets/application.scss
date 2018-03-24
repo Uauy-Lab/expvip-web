@@ -10,23 +10,22 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- *= require_tree .
- *= require_self
  *= require jquery-ui/tooltip
  *= require jquery-ui/autocomplete
  *= require jquery-ui/button
  *= require jquery-ui/core
  */
 
+@import "bootstrap-sprockets";
+@import "bootstrap";
 
 body{
-	background-color: #E6E6E6	;
+    background-color: #E6E6E6	;
     height: 100%;
 }
 
 div.navigation{    
-    width: 100%;        
-    margin-top: 10px;
+    width: 100%;            
 }
 
 div.navigation a{    
@@ -40,27 +39,12 @@ div.navigation a{
     text-decoration: inherit;
     color: #337ab7 !important;
 }
-
 div.navigation a:hover{
     background-color: #E6E6E6;
     -webkit-transition: background-color 200ms linear;
     -ms-transition: background-color 200ms linear;
-    transition: background-color 200ms linear;
-    color: black;
+    transition: background-color 200ms linear;    
     text-decoration: underline;
-}
-
-div.header {
-    background-color:  #FFFFFF;
-    border-radius: 25px;
-    padding: 10px 20px 30px 20px;
-    float: center;
-    height: 110px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
 }
 
 div.footer{
@@ -76,45 +60,7 @@ div.footer{
   max-height: 75px;
 }
 
-.left, .right { 
-   
-  float:left;  
-  height: calc(70%); 
-  width: calc(40%); 
-} 
-
-.header-form {
-    width: 300px;
-
- }
- .header-form input[type="text"]{
-    display:inline-block;
-    margin: 0;
-    width: 150px;
-    border-width: 2px;
-    border-radius: 5px;          
-}
- .header-form label {
-    width: 25%;
-    display:inline-block;
-}
-.wrapper {
-    /** Top padding so that initially, the content is below the header **/
-    border-radius: 25px;
-    padding: 20px;
-    float: center;
-    position: fixed;
-    top: 155px;
-    left: 0;
-    right: 0;
-    bottom: 120px;
-    margin: 0 auto;
-    background-color:  #FFFFFF;
-    overflow-y: auto;
-    max-height: 75%;
-    height:auto;
-}
-
+// Styling The Links In About Studies ****************************************
 #about_studies a{
     color: #337ab7;
     padding: 3px;
@@ -126,20 +72,6 @@ div.footer{
     color: #337ab7;    
     text-decoration: underline red;
     border-radius: 7px;
-}
-
-.wrapper a{
-    color: #337ab7;
-    padding: 7px;
-    text-decoration: none;
-    margin: 5px;
-    font-size: 17px;
-}
-.wrapper a:hover{
-    background-color: #E6E6E6;
-    color: #337ab7;
-    border-radius: 7px;
-    text-decoration: underline red;
 }
 
 .left  { float:left;  }
@@ -161,6 +93,7 @@ img.logo{
     margin: 0 auto -155px; /* the bottom margin is the negative value of the footer's height */
 }
 
+// Alert Stylings ****************************************
 .alert-error {
     position: fixed;
     float: center;
@@ -201,6 +134,7 @@ img.logo{
     overflow:auto;
 }
 
+// New Stylings ****************************************
 input[type="submit"], button{    
     background-color: #337ab7;
     border-radius: 7px;
@@ -235,4 +169,50 @@ select{
     cursor: pointer;
     color: white;    
     border: none;
+}
+
+// Wellcome Styling Here ****************************************
+#sequenceserver{
+    position: absolute; 
+    right:0px; 
+    width:40%; 
+    height:70%; 
+    border:none;
+}
+
+#search_left{
+    min-height:450px;    
+}
+
+#search_right{
+    min-height:550px;    
+}
+
+@media(max-width: 1700px){
+    
+    #sequenceserver{
+        position: relative;         
+        width:60%; 
+        height:800px;         
+        border:none;
+    }
+    
+    div.right{
+        float: none !important;
+    }
+    
+}
+
+// Customizing Bootstrap Stylings ****************************************
+.navbar, .container-fluid{
+    background-color: white;
+    border-radius: 25px;
+}
+
+.container-fluid{
+    padding: 10px;
+}
+
+.navbar{
+    margin-bottom: 5px;
 }
