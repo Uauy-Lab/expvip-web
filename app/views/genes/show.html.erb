@@ -1,5 +1,7 @@
 <p id="notice"><%= notice %></p>
 
+<%= render :partial => "genes/share" %>
+
 <strong>Gene:</strong> <%= @gene.name %> 
 <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
@@ -8,10 +10,6 @@
  <%= @compare.name %>   
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
-
- 
-<%= render :partial => "genes/share" %>
-  
 
 <div id="bar_expression_viewer"> </div>
 
