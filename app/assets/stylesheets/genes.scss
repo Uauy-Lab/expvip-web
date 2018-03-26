@@ -75,3 +75,22 @@ share_area{
     width: 20%;
     left: 40%;    
 }
+
+// ******************************** Styling the charts ************************************
+#bar_expression_viewer{
+    overflow: hidden !important;
+    width: 1500px !important;
+}
+
+#bar_expression_viewer_sort_div{
+    /*height: 50px !important;*/
+}
+
+#bar_expression_viewer_header_svg, #bar_expression_viewer_footer_svg, #bar_expression_viewer_chart_svg{
+    width: 1500px !important;
+    padding-left: 10px;            
+}
+
+#bar_expression_viewer_footer_svg, #bar_expression_viewer_chart_svg{    
+    height: 200px;
+}
