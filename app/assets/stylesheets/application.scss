@@ -25,6 +25,10 @@ body{
     height: 100%;
 }
 
+#content{
+    margin-bottom: 80px;       // footer height + 5
+}
+
 div.navigation{    
     width: 100%;            
 }
@@ -55,7 +59,7 @@ div.navigation a:hover{
     font-size: 16px;
     cursor: pointer;
     color: white;    
-    border: none;    
+    border: none;        
 }
 
 div.footer{
@@ -173,6 +177,7 @@ input[type="checkbox"]{
     height: 15px;
     margin: 2px;    
 }
+
 
 // Customizing Bootstrap Stylings ****************************************
 .navbar, .container-fluid{

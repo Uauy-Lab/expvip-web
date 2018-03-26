@@ -8,8 +8,7 @@
     border: none;
 }
 
-#search_left{
-    min-height:450px;    
+#search_left{        
     width: 50%;
     float: left;
 }
@@ -17,6 +16,22 @@
 #search_right{        
     width: 50%; 
     float: right;
+}
+
+.glyphicon{
+    vertical-align: bottom;
+}
+
+#select_studies:hover, .study_title:hover, input[type="checkbox"]{
+    cursor: pointer;
+}
+
+.study_title{
+    padding: 10px;
+    width: 90%;
+}
+.study_title:hover{    
+    background-color: lightyellow;
 }
 
 @media(max-width: 1200px){

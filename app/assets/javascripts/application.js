@@ -180,10 +180,10 @@ ready = (function() {
       }
     }
 
-    $("[name='studies[]']").click(function(){   // Store the study in the session if it has been checked
-      var selectedStudy = $(this).val();      
-      studies[selectedStudy] = true;      
-      sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
+    $("input[name='studies[]']").click(function(){   // Store the study in the session if it has been checked        
+        var selectedStudy = $(this).val();              
+        studies[selectedStudy] = !studies[selectedStudy];        
+        sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
     });    
 
   } else {    // If bar_expression_viewer_selectedFactors doesn't exist
@@ -209,6 +209,17 @@ ready = (function() {
     sessionStorage.setItem('bar_expression_viewer_selectedFactors', jsonObj);
   }  
   //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
+
+
+   // **********************************Slide Toggle Studies - START**********************************
+    $("#select_studies").click(function(){
+        $(".glyphicon").toggleClass("glyphicon-chevron-up", (!$(".glyphicon").is( ".glyphicon-chevron-up" )));
+        $(".glyphicon").toggleClass("glyphicon-chevron-down", (!$(".glyphicon").is( ".glyphicon-chevron-down" )));
+        $(".study_title").slideToggle("slow");
+        $("input[name='studies[]']").slideToggle("slow");
+    });
+    // **********************************Slide Toggle Studies - END**********************************
+
 
 });
 
