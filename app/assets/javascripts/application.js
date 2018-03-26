@@ -180,10 +180,10 @@ ready = (function() {
       }
     }
 
-    $("[name='studies[]']").click(function(){   // Store the study in the session if it has been checked
-      var selectedStudy = $(this).val();      
-      studies[selectedStudy] = true;      
-      sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
+    $("input[name='studies[]']").click(function(){   // Store the study in the session if it has been checked        
+        var selectedStudy = $(this).val();              
+        studies[selectedStudy] = !studies[selectedStudy];        
+        sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
     });    
 
   } else {    // If bar_expression_viewer_selectedFactors doesn't exist

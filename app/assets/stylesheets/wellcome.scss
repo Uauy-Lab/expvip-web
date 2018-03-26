@@ -8,8 +8,7 @@
     border: none;
 }
 
-#search_left{
-    min-height:450px;    
+#search_left{        
     width: 50%;
     float: left;
 }
@@ -23,16 +22,16 @@
     vertical-align: bottom;
 }
 
-#select_studies:hover{
+
+#select_studies:hover, .study_title:hover, input[type="checkbox"]{
     cursor: pointer;
 }
 
-label{
+.study_title{
     padding: 10px;
     width: 90%;
 }
-label:hover{
-    cursor: pointer;
+.study_title:hover{    
     background-color: lightyellow;
 }
 

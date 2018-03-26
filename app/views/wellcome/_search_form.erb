@@ -9,7 +9,7 @@
   <%= submit_tag "Compare" , name: 'submit' %>
 
   <br/><br/>  
-  Examples: Traes_5BS_0AFC3F795.1, Traes_4DS_1CF5D9107.1
+  <p><b>Examples: </b><i>Traes_5BS_0AFC3F795.1 </i>| <i>Traes_4DS_1CF5D9107.1</i></p>
   <h2>Multiple genes</h2>
   If you want to compare more than two genes, you can add a list of genes separated by commas or one gene in each line.
   <br><br>
@@ -24,8 +24,8 @@ Traes_6AL_DD81E0037.1", size: "56x3" %>
       <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession %>
     <% else %>
       <%= check_box_tag "studies[]", study.accession, checked = false, id: study.accession %>
-    <% end %>
-    <%= label_tag(study.accession, study.title, class: 'study_title') %>
+    <% end %>    
+    <%= label_tag(study.accession, study.title, class: 'study_title', for: study.accession) %>      
     <br/>
   <% end %>
 <% end %>
