@@ -164,8 +164,7 @@ ready = (function() {
   //*************************************SEQUENCESERVER - END*************************************  
   
   //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************
-  if(sessionStorage.bar_expression_viewer_selectedFactors){    // If bar_expression_viewer_selectedFactors exists    
-    console.log("Don't need to Make the session storage");
+  if(sessionStorage.bar_expression_viewer_selectedFactors){    // If bar_expression_viewer_selectedFactors exists        
     var expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors;
     var expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
     var studies = expBarSelectedStudiesObj.study;    
@@ -186,8 +185,7 @@ ready = (function() {
         sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
     });    
 
-  } else {    // If bar_expression_viewer_selectedFactors doesn't exist
-    console.log("Making the session storage");
+  } else {    // If bar_expression_viewer_selectedFactors doesn't exist    
     var defaultStudies = {};
     var value;
     $(":checkbox").each(function(index, el) {   // Setting the default studies if they are checked 
