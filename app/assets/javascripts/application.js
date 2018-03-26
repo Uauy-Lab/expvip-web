@@ -222,8 +222,7 @@ ready = (function() {
   // Resizing the logos dynamically  
   var totalWidth = 0;
   $(".footer img").each(function(){
-    totalWidth =  totalWidth + $(this).width();
-    console.log("This is the width of the logo: " + $(this).width());
+    totalWidth =  totalWidth + $(this).width();    
   });  
   $(".footer img").css("margin-right", totalWidth/4);
   
