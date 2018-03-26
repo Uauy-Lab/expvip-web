@@ -5,7 +5,7 @@ development:
     default:
       # Defines the name of the default database that Mongoid can connect to.
       # (required).
-      database: wheat_expression_development
+      database: testdb
       # Provides the hosts the default client can connect to. Must be an array
       # of host:port pairs. (required)
       hosts:
@@ -58,7 +58,7 @@ development:
         # server_selection_timeout: 30
 
         # The maximum number of connections in the connection pool. (default: 5)
-        # max_pool_size: 5
+        max_pool_size: 5
 
         # The minimum number of connections in the connection pool. (default: 1)
         # min_pool_size: 1
