@@ -64,8 +64,7 @@ div.navigation a:hover{
 
 div.footer{
   background-color:  #FFFFFF;
-  border-radius: 25px;
-  padding: 20px;
+  border-radius: 25px;  
   float: center;
   position: fixed;
   right: 0;
@@ -97,7 +96,9 @@ div.footer{
 
 img.logo{
     height: 75px;
+    margin: 0px (100%/15);
     padding:10px;
+    box-sizing: border-box;
 }
 
 .around {
