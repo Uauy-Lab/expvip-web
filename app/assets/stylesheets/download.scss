@@ -1,21 +1,3 @@
 // Place all the styles related to the download controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-li{
-    line-height: 25px;
-}
-
-li a{
-    font-size: larger;
-    border-radius: 10px;
-    text-decoration: inherit;
-    color: #337ab7 !important;    
-    padding: 10px;
-}
-li a:hover{
-    background-color: #E6E6E6;
-    -webkit-transition: background-color 200ms linear;
-    -ms-transition: background-color 200ms linear;
-    transition: background-color 200ms linear;    
-    text-decoration: underline;
-}
