@@ -210,6 +210,17 @@ ready = (function() {
   }  
   //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
 
+
+   // **********************************Slide Toggle Studies - START**********************************
+    $("#select_studies").click(function(){
+        $(".glyphicon").toggleClass("glyphicon-chevron-up", (!$(".glyphicon").is( ".glyphicon-chevron-up" )));
+        $(".glyphicon").toggleClass("glyphicon-chevron-down", (!$(".glyphicon").is( ".glyphicon-chevron-down" )));
+        $(".study_title").slideToggle("slow");
+        $("input[name='studies[]']").slideToggle("slow");
+    });
+    // **********************************Slide Toggle Studies - END**********************************
+
+
 });
 
 $(document).ready(ready);

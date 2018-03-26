@@ -18,14 +18,14 @@ Traes_6DL_D735731A4.2
 Traes_6AL_DD81E0037.1", size: "56x3" %>
   <%= submit_tag "Heatmap" , name: 'submit' %>
 
-  <h2>Select studies to display:</h2>
+  <h2 id="select_studies">Select studies to display <span class="glyphicon glyphicon-chevron-down"></span></h2>
   <% @studies.each do |study| %>
     <% if study.selected %>
-      <%= check_box_tag "studies[]", study.accession, checked = true %>
+      <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession %>
     <% else %>
-      <%= check_box_tag "studies[]", study.accession, checked = false %>
+      <%= check_box_tag "studies[]", study.accession, checked = false, id: study.accession %>
     <% end %>
-      <%= label_tag(study.accession, study.title) %>
+    <%= label_tag(study.accession, study.title, class: 'study_title') %>
     <br/>
   <% end %>
 <% end %>
