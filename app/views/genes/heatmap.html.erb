@@ -3,27 +3,39 @@
 <div id="bar_expression_viewer"> </div>
 
 <script type="text/javascript">
+
+  $(window).resize(function(){
+    $("#bar_expression_viewer").load(" #bar_expression_viewer", function(){
+      loadHeatmap();      
+    });
+  });
+
   var container_div="bar_expression_viewer";
   var data_url = "<%=raw "http://localhost:3000/expression_values/genes.json?#{@args}"%>" ;
-  var eb =  new biovisexpressionbar.ExpressionBar({
-    target: container_div,
-    data: data_url,
-    renderProperty: 'tpm', 
-    fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
-    groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
-    barHeight:10,
-    width:1000,
-    headerOffset:150,
-    plot:'HeatMap'
-  });   
-  
-  $(document).ready(function(){                                     
-    
+  var eb;
+  function loadHeatmap(){
+    eb =  new biovisexpressionbar.ExpressionBar({
+      target: container_div,
+      data: data_url,
+      renderProperty: 'tpm', 
+      fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
+      groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
+      barHeight:10,
+      width:window.innerWidth - 100,
+      headerOffset:150,
+      plot:'HeatMap'
+    });
+    uncheckLog2();
+  }     
+
+  function uncheckLog2(){
     setTimeout(function(){                  
-      if(sessionStorage.bar_expression_viewer_calculateLog == "false"){
+      if(sessionStorage.bar_expression_viewer_calculateLog == "false" && $("#bar_expression_viewer_log2").prop('checked', true)){
         $("#bar_expression_viewer_log2").click();
       }              
     }, 3000);
-        
-  });  
+  }
+
+  loadHeatmap();  
+ 
 </script>
