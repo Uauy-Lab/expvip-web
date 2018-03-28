@@ -21,7 +21,8 @@ Math.log2 = Math.log2 || function(x) {
 
 
 var ready;
-ready = (function() {
+ready = (function() {  
+
   $('a[href="' + this.location.pathname + '"]').parent().addClass('active');
   $("#gene-search-input").autocomplete({
     source: '/genes/autocomplete.json',
@@ -219,12 +220,23 @@ ready = (function() {
   // **********************************Slide Toggle Studies - END**********************************
 
 
-  // Resizing the logos dynamically  
+  // Initialsizing of the logos 
   var totalWidth = 0;
   $(".footer img").each(function(){
     totalWidth =  totalWidth + $(this).width();    
   });  
-  $(".footer img").css("margin-right", totalWidth/4);
+  $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/8)-10 );
+  $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/8)-10 );
+
+  // Resizing the logos dynamically 
+  var resizeLogoTimer;
+  $(window).on('resize', function(e){      
+    clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
+    resizeLogoTimer = setTimeout(function(){      
+      $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/8)-10 );
+      $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/8)-10 );
+    }, 1500);
+  });  
   
 
 });
