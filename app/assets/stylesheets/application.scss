@@ -75,13 +75,29 @@ div.footer{
 
 
 // Styling The Links In About Studies ****************************************
-#about_studies a{
+.dialogs{
+    overflow:auto; 
+    max-height:400px; 
+    padding: 50px;
+}
+
+.ui-dialog-titlebar-close{
+    background-color: #cc5d5d;
+    padding: 5px 10px;
+    color: black;
+}
+
+#about{
+    font-size: 1.2em;
+}
+
+#about_studies  a, #about a{
     color: #337ab7;
     padding: 3px;
     text-decoration: none;    
     line-height: 20px;
 }
-#about_studies a:hover{
+#about_studies a:hover, #about a:hover{
     background-color: inherit;
     color: #337ab7;    
     text-decoration: underline red;

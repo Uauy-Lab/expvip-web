@@ -94,6 +94,8 @@ ready = (function() {
       $( "#about_studies" ).dialog( "open" );
   });
 
+  $(".ui-dialog-titlebar-close").html('X');
+
    $( "#cite_button" ).click(function() {
       $( "#about" ).dialog( "open" );
   });
