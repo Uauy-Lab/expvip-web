@@ -15,10 +15,15 @@
 
 <script type="text/javascript">
 
-  $(window).resize(function(){
-    $("#bar_expression_viewer").load(" #bar_expression_viewer", function(){
-      loadBarChart();
-    });
+  // rescaling the bar chart after a 1.5 second delay
+  var resizeTimer;
+  $(window).on('resize', function(e){      
+    clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
+    resizeTimer = setTimeout(function(){      
+      $("#bar_expression_viewer").load(" #bar_expression_viewer", function(){
+        loadBarChart();
+      });
+    }, 1500);
   });
 
   var container_div="bar_expression_viewer";
