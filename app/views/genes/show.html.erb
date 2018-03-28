@@ -20,9 +20,13 @@
   $(window).on('resize', function(e){      
     clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
     resizeTimer = setTimeout(function(){      
-      $("#bar_expression_viewer").load(" #bar_expression_viewer", function(){
-        loadBarChart();
-      });
+      $("#bar_expression_viewer").css('width', (window.innerWidth - 40));
+      $("#bar_expression_viewer_header_svg").css('width', (window.innerWidth - 40));
+      // $("#bar_expression_viewer_sort_div").css('width', (window.innerWidth - 40));
+      $("#bar_expression_viewer_chart_svg").css('width', (window.innerWidth - 40));
+      $("#bar_expression_viewer_footer_svg").css('width', (window.innerWidth - 40));
+      eb.opt.width = window.innerWidth - 40;          
+      eb.refresh();
     }, 1500);
   });
 
@@ -40,9 +44,10 @@
       fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
       barHeight:10,
-      width:window.innerWidth - 100,
+      width:window.innerWidth - 40,
       headerOffset:100
     });
+
   }
   loadBarChart();     
   //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen    
