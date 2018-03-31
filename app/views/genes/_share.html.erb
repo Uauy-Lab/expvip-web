@@ -1,0 +1,86 @@
+<div id="share_area">
+  <button id="share" value="settings" name="settings">Share</button>
+  <p class="share_message"></p> 
+</div> 
+
+<div id="share_popup">
+    <span>X</span>    
+    <input type="text">
+    <br>
+    <br>
+    <p class="share_message" id="share_message_popup">Click on the below button and paste the link for sharing</p>
+    <br>
+    <button id="copy_link">Copy to Clipboard</button>
+</div>
+
+
+<%# If this is a shared link removed the data from the session and reload it with shared settings %> 
+<% if @settings %>  
+  <%= javascript_tag do %>    
+
+    sessionStorage.clear();    
+    var allSharedSettings = JSON.parse(<%= @settings.to_json.html_safe %>);        
+
+    for(var key in allSharedSettings){
+      sessionStorage.setItem(key, allSharedSettings[key]);
+    }
+  
+  <% end %>
+<% end %>
+    
+<script>  
+  $("#share").click(function() {                
+
+      // Looping through each session and storing them in an object            
+      var selectedFactorsSessionObj = {};
+      for (var i=0; i<sessionStorage.length; i++){        
+        selectedFactorsSessionObj[sessionStorage.key(i)] = sessionStorage.getItem(sessionStorage.key(i));        
+      }
+
+      // Stringify all settings to send over request
+      var allSettings = JSON.stringify(selectedFactorsSessionObj);     
+
+      // Determining the data to be sent in the ajax request based on the url parameters
+      var sendData;
+      var currentURL = window.location.href;
+      var url = new URL(currentURL);
+      var compareParam = url.searchParams.get("compare");
+
+      if(compareParam){        
+        sendData = {settings: allSettings, compare: compareParam};
+      } else{       
+        sendData = {settings: allSettings};
+      }      
+
+      // POST request for sending session data to the backend to generate the sharable link
+      $.ajax({
+        type: "POST",
+        url: "share",
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));},
+        dataType: "json",
+        data: sendData,
+        success: function(data){                              
+          $("#share_popup input").val(data.value);                    
+        },
+        error: function(){
+          alert ("There was an error while processing the data to generate the sharable link");
+        }
+      });    
+      
+      // Display the popup with the sharable link
+      $("#share_popup").show("slow");
+      
+      // Copy the link to the clipboard and close the popup
+      $("#copy_link").click(function(){
+        $("#share_popup input").select();
+        document.execCommand("Copy");
+        $("#share_popup").hide("slow");
+        $(".share_message").html("The link has been copied to your clipboard");
+      });
+
+      // Close the popup when clicked on the cross
+      $("#share_popup span").click(function (){
+        $("#share_popup").hide("fast");
+      });
+  });
+</script>

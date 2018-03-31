@@ -319,4 +319,24 @@ namespace :load_data do
       puts "Loaded #{count} ExpressionValue " 
     end
   end
+
+  desc "Selects default studies"
+  task :default_studies, [:filename] => :environment do |t, args|     
+    puts "file provided #{args.filename}"   
+    default_studies = File.read(args.filename)
+    default_studies = default_studies.gsub(/\n/, ' ').split(' ')
+    puts "Default studies:  #{default_studies}"
+    ActiveRecord::Base.transaction do
+      Study.all.each do | study |
+        if default_studies.include?(study.accession)
+          study.update_attribute :selected, true       
+          puts "Found: #{study.accession}"
+        else
+          study.update_attribute :selected, false          
+        end
+      end      
+    end    
+
+  end
+
 end

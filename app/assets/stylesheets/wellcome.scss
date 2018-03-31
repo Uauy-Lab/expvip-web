@@ -1,3 +1,45 @@
 // Place all the styles related to the Wellcome controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+#sequenceserver{        
+    width: 100%;
+    min-height:650px;
+    border: none;
+}
+
+#search_left{        
+    width: 50%;
+    float: left;
+}
+
+#search_right{        
+    width: 50%; 
+    float: right;
+}
+
+.glyphicon{
+    vertical-align: bottom;
+}
+
+
+#select_studies:hover, .study_title:hover, input[type="checkbox"]{
+    cursor: pointer;
+}
+
+.study_title{
+    padding: 0px 10px;
+    width: 90%;
+}
+.study_title:hover{    
+    background-color: #fffc56;
+}
+
+@media(max-width: 1200px){
+    
+    #search_left, #search_right{
+        width: 100%;
+        float: none;
+    }
+    
+}

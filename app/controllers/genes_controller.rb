@@ -1,6 +1,8 @@
 class GenesController < ApplicationController
-  before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
+  require 'digest'  
+
+  before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
   def getGeneIds(genes)
     ids = Array.new
@@ -25,8 +27,8 @@ class GenesController < ApplicationController
     raise "Please select less than 500 genes" if genes.size > 500
     ids = getGeneIds(genes)
     raise "Plese select some genes for the heatmap" if ids.size == 0
-    session[:genes] = ids.join(',')
-    redirect_to action: "heatmap",  studies: params[:studies]
+    session[:genes] = ids.join(',')    
+    redirect_to action: "heatmap"
   end
 
   def forwardSearch
@@ -34,11 +36,14 @@ class GenesController < ApplicationController
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
     gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
-    gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]
+    gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
+    
+    session[:heatmap] = false
+    
     @gene = findGeneName gene_name, gene_set 
     session[:gene] = @gene.name
-    session[:gene_set_id] = gene_set.id
-    redirect_to  action: "show", id: @gene.id, studies: params[:studies]
+    session[:gene_set_id] = gene_set.id    
+    redirect_to  action: "show", id: @gene.id
   end
 
   def forwardCompare
@@ -46,11 +51,13 @@ class GenesController < ApplicationController
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
 
+    session[:heatmap] = false
+    
     gene_set = GeneSet.find(params[:gene_set_selector])
     session[:gene_set_id] = gene_set.id
     @gene = findGeneName(gene_name, gene_set)
     @compare =  findGeneName params[:compare], gene_set
-    redirect_to  action: "show", id: @gene.id, studies: params[:studies], compare:  @compare.name  
+    redirect_to  action: "show", id: @gene.id, compare:  @compare.name  
   end
 
   def findGeneName(gene_name, gene_set)
@@ -90,7 +97,7 @@ class GenesController < ApplicationController
     # end
 end
 
-def autocomplete
+  def autocomplete
     #puts "In autocomplete!"
     gene_set_id = session[:gene_set_id] 
     @genes = Gene.order(:name).where("name LIKE ? and gene_set_id = ?", "%#{params[:term]}%", gene_set_id).limit(20)
@@ -109,7 +116,21 @@ def autocomplete
     genes = []
     genes = session[:genes] if  session[:genes] 
     genes = params[:genes] if params[:genes]
-
+    session[:genes] = params[:genes] if params[:genes]
+    
+    
+    #This acts as a flag for share action
+    session[:heatmap] = true
+    
+    # If parameters passed cnotain settings (it's a shared link)
+    if params[:settings]
+      @client = MongodbHelper.getConnection unless @client    
+      data = @client[:share].find({'hash' =>  params[:settings]}).first
+      @settings = data[:settings]
+      settingsObj = JSON.parse @settings
+      studies = settingsObj['study']           
+    end 
+    
     @args = {studies: studies }.to_query
     respond_to do |format|
       format.html { render :heatmap }
@@ -118,22 +139,64 @@ def autocomplete
 
   # GET /genes/1
   # GET /genes/1.json
-  def show
-    session[:studies] = params[:studies] if  params[:studies] 
-    studies = session[:studies]
+  def show 
+    studies = session[:studies]    
     compare = ""
     alert = ""
 
+    # If parameters passed contain compare
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
       @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
       compare = @compare.name
+    end    
+    
+    # If parameters passed cnotain settings (it's a shared link)
+    if params[:settings]
+      @client = MongodbHelper.getConnection unless @client    
+      data = @client[:share].find({'hash' =>  params[:settings]}).first
+      @settings = data[:settings]
+      settingsObj = JSON.parse @settings
+      studies = settingsObj['study']           
+    end   
+    
+    @args = {studies: studies, compare: compare }.to_query
+    #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
+  end  
+
+  def share 
+    # Hash the settings 
+    sha1 = Digest::SHA1.new
+    sha1 << params[:settings]
+    hashedSettings = sha1.hexdigest        
+
+    # Get the gene
+    if !session[:heatmap]
+      gene_set = GeneSet.find(session[:gene_set_id])    
+      gene_name = session[:gene]         
+      @gene = findGeneName gene_name, gene_set
+    else        
+      gene_set = GeneSet.find(session[:gene_set_id])            
     end
 
-    @args = {studies: studies, compare: compare }.to_query
-    #studies.each { |e|  @studies += "studies[]=#{e}\&" }
+    # Store the settings
+    @client = MongodbHelper.getConnection unless @client            
+    @client[:share].insert_one({:gene_set => gene_set.name, :settings => params[:settings], :hash => hashedSettings}) if @client[:share].find({'hash' => hashedSettings}).count == 0                                   
+        
+    
+    if params[:compare]      
+      response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {compare: params[:compare]}.to_query + "&" + {settings: hashedSettings}.to_query
+    elsif session[:heatmap]
+      response = request.base_url + "/" + params[:controller].to_s + "/heatmap" + "?" + {genes: session[:genes]}.to_query + "&" + {settings: hashedSettings}.to_query
+    else
+      response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {settings: hashedSettings}.to_query
+    end        
+    
+    respond_to do |format|
+      format.json { render json: {"value" => response}}      
+    end
+    
   end
-
   
   # DELETE /genes/1
   # DELETE /genes/1.json

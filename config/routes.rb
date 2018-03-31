@@ -1,4 +1,5 @@
 require 'sequenceserver'
+require "#{Rails.root}/lib/links.rb"  
 Rails.application.routes.draw do
   #map.root :controller => 'wellcome', :action => :default
   #get 'wellcome/default'
@@ -17,6 +18,7 @@ Rails.application.routes.draw do
       get 'heatmap'
       post 'forward'
       get 'forward'
+      post 'share'      
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.

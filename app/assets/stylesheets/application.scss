@@ -1,0 +1,223 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any styles
+ * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
+ * file per style scope.
+ *
+ *= require jquery-ui/tooltip
+ *= require jquery-ui/autocomplete
+ *= require jquery-ui/button
+ *= require jquery-ui/core
+ */
+
+@import "*";
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+body{
+    background-color: #E6E6E6;
+    height: 100%;
+}
+
+#content{
+    margin-bottom: 80px;       // footer height + 5
+}
+
+div.navigation{    
+    width: 100%;            
+}
+
+div.navigation a{    
+    display: inline-block;
+    padding: 10px 0px 10px 0px;
+    margin: 0px 0px 0px -4px;
+    width: calc(100%/7);
+    text-align: center;
+    font-size: larger;
+    border-radius: 10px;
+    text-decoration: inherit;
+    color: #337ab7 !important;
+}
+div.navigation a:hover{
+    background-color: #E6E6E6;
+    -webkit-transition: background-color 200ms linear;
+    -ms-transition: background-color 200ms linear;
+    transition: background-color 200ms linear;    
+    text-decoration: underline;
+}
+
+#gene_set_selector, select{
+    background-color: #489e47;    
+    padding: 4px;
+    margin: 2px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;    
+    border: none;        
+}
+
+div.footer{
+  background-color:  #FFFFFF;
+  border-radius: 25px;  
+  float: center;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-height: 75px;
+}
+
+
+// Styling The Links In About Studies ****************************************
+.dialogs{
+    overflow:auto; 
+    max-height:400px; 
+    padding: 50px;
+}
+
+.ui-dialog-titlebar-close{
+    background-color: #cc5d5d;
+    padding: 5px 10px;
+    color: black;
+}
+
+#about{
+    font-size: 1.2em;
+}
+
+#about_studies  a, #about a{
+    color: #337ab7;
+    padding: 3px;
+    text-decoration: none;    
+    line-height: 20px;
+}
+#about_studies a:hover, #about a:hover{
+    background-color: inherit;
+    color: #337ab7;    
+    text-decoration: underline red;
+    border-radius: 7px;
+}
+
+.left  { float:left;  }
+.right { float:right; } 
+
+.push {
+    height: 4em;
+}
+
+img.logo{
+    height: 75px;    
+    padding:10px 0;
+    box-sizing: border-box;
+}
+
+.around {
+    min-height: 100%;
+    height: auto !important; /* This line and the next line are not necessary unless you need IE6 support */
+    height: 100%;
+    margin: 0 auto -155px; /* the bottom margin is the negative value of the footer's height */
+}
+
+// Alert Stylings ****************************************
+.alert-error {
+    position: fixed;
+    float: center;
+    top: 130px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    cursor:pointer;
+    width:500px;
+    cursor:hand;
+    background: #FFE7E7 url('../assets/exclamation.png') center no-repeat;
+    background-position: 15px 50%;
+    text-align: left;
+    padding: 0px 0px 1px 45px;
+    border-top: 1px solid #E77D7B;
+    border-bottom: 1px solid #E77D7B;
+    border:1px solid #E77D7B;
+    overflow:auto;
+}
+
+.alert-info {
+    position: fixed;
+    float: center;
+    top: 130px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    cursor:pointer;
+    width:500px;
+    cursor:hand;
+    background: #E7F3FF url('../assets/information.png') center no-repeat;
+    background-position: 15px 50%;
+    text-align: left;
+    padding: 0px 0px 1px 45px;
+    border-top: 1px solid #7BA6D6;
+    border-bottom: 1px solid #7BA6D6;
+    border:1px solid #7BA6D6;
+    overflow:auto;
+}
+
+// New Stylings ****************************************
+input[type="submit"], button{    
+    background-color: #337ab7;
+    border-radius: 7px;
+    padding: 5px 7px;
+    margin: 5px;
+    cursor: pointer;
+    color: white;
+    box-shadow: 2px 2px 5px grey;
+    border: none;
+}
+input[type="submit"]:active, button:active{
+    transform: translateY(2px);
+}
+
+input[type="text"], textarea{    
+    padding: 5px;
+    margin: 1px;    
+}
+
+textArea{
+    width: 50%;
+}
+
+input[type="checkbox"]{        
+    width: 15px;
+    height: 15px;
+    margin: 2px;    
+}
+
+
+// Customizing Bootstrap Stylings ****************************************
+.navbar, .container-fluid{
+    background-color: white;
+    border-radius: 25px;
+}
+
+.container-fluid{
+    padding: 10px;
+}
+
+.navbar{
+    margin-bottom: 5px;
+}
+
+@media (max-width: 1200px){
+    .navbar-right{
+        float: none !important;                
+    }
+}
+
+@media(max-width: 750px){
+    h1{
+        margin: 0 30px;        
+    }
+}

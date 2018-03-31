@@ -1,11 +1,10 @@
 <p id="notice"><%= notice %></p>
 
-<p>
+<%= render :partial => "genes/share" %>
 
- <strong>Gene:</strong>
+<strong>Gene:</strong> <%= @gene.name %> 
+<%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
- <%= @gene.name %>
- <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
 <% if @compare %>
  <strong>Compare:</strong>
  <%= @compare.name %>   
@@ -15,20 +14,41 @@
 <div id="bar_expression_viewer"> </div>
 
 <script type="text/javascript">
+
+  // rescaling the bar chart after a 1.5 second delay
+  var resizeTimer;
+  $(window).on('resize', function(e){      
+    clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
+    resizeTimer = setTimeout(function(){      
+      $("#bar_expression_viewer").css('width', (window.innerWidth - 40));
+      $("#bar_expression_viewer_header_svg").css('width', (window.innerWidth - 40));
+      $("#bar_expression_viewer_sort_div").css('width', (window.innerWidth - 40));
+      $("#bar_expression_viewer_chart_svg").css('width', (window.innerWidth - 40));
+      $("#bar_expression_viewer_footer_svg").css('width', (window.innerWidth - 40));
+      eb.opt.width = window.innerWidth - 40;          
+      eb.refreshSVG();
+    }, 1500);
+  });
+
   var container_div="bar_expression_viewer";
   var data_url = "<%= "http://localhost:3000/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
-  console.log(data_url)
-  var eb =  new biovisexpressionbar.ExpressionBar({
-    target: container_div,
-    highlight: gene, 
-    data: data_url,
-    renderProperty: 'tpm', 
-    fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
-    groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
-    barHeight:10,
-    width:1000,
-    headerOffset:100
-  });
-  //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen
+  var eb;
+  console.log(data_url);  
+  function loadBarChart(){
+    eb =  new biovisexpressionbar.ExpressionBar({
+      target: container_div,
+      highlight: gene, 
+      data: data_url,
+      renderProperty: 'tpm', 
+      fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
+      groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
+      barHeight:10,
+      width:window.innerWidth - 40,
+      headerOffset:100
+    });
+
+  }
+  loadBarChart();     
+  //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen    
 </script>
