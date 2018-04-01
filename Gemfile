@@ -42,7 +42,7 @@ gem 'mongo'
 
 # gem 'sinatra', '~> 2.0'
 #gem 'sequenceserver', '~> 1.0.11'
-gem 'sequenceserver', :git => 'https://github.com/Bijan-Ghasemi-Afshar/sequenceserver.git', :branch => 'update-sinatra'
+gem 'sequenceserver', :git => 'https://github.com/homonecloco/sequenceserver.git', :branch => 'update-sinatra'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

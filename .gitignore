@@ -13,7 +13,6 @@
 # Ignore lock files.
 Gemfile.lock
 package-lock.json
-/config/database.yml
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
@@ -27,6 +26,4 @@ log/development.log
 
 /node_modules/
 npm-debug.log
-/config/database.yml
-/config/secrets.yml
 /nbproject
