@@ -23,4 +23,12 @@ module GenesHelper
 		@client[:genes].update( { :_id => gene.id }, 
 			'$set' => { type => values } )
 	end
+
+	def self.load_gene_hash(gene_set)
+	  genes = Hash.new
+      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
+        genes[g.name] = g
+      end
+      genes
+	end
 end
