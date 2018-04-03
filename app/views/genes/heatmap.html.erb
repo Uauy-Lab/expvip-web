@@ -9,13 +9,7 @@
   $(window).on('resize', function(e){      
     clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
     resizeTimer = setTimeout(function(){      
-      $("#bar_expression_viewer").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_header_svg").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_sort_div").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_chart_svg").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_footer_svg").css('width', (window.innerWidth - 40));
-      eb.opt.width = window.innerWidth - 40;          
-      eb.refreshSVG();
+      eb.resizeChart();
     }, 1500);
   });
 

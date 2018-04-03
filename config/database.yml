@@ -10,8 +10,8 @@ default: &default
   adapter: mysql2
   encoding: utf8
   database: "expvip"
-  username: root
-  password: 
+  username: expvipUSR
+  password: expvipPWD
   host: localhost
   port: 3306
 
