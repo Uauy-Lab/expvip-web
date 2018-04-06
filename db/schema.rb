@@ -13,8 +13,8 @@
 ActiveRecord::Schema.define(version: 20180312135935) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "ExperimentGroup_id", null: false
-    t.bigint "Factor_id", null: false
+    t.integer "ExperimentGroup_id", null: false
+    t.integer "Factor_id", null: false
   end
 
   create_table "experiment_groups", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 20180312135935) do
   end
 
   create_table "experiment_groups_experiments", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "experiment_group_id", null: false
-    t.bigint "experiment_id", null: false
+    t.integer "experiment_group_id", null: false
+    t.integer "experiment_id", null: false
     t.index ["experiment_group_id"], name: "index_experiment_groups_experiments_on_experiment_group_id"
     t.index ["experiment_id"], name: "index_experiment_groups_experiments_on_experiment_id"
   end

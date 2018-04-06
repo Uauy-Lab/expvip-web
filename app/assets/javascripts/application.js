@@ -199,6 +199,8 @@ ready = (function() {
         defaultStudies[value] = false;
       }      
     });
+    //TODO: Make this dynamic
+    /*
     var defaultFactors = {"study":defaultStudies,
     "Age":{"7d":true,"see":true,"14d":true,"3_lea":true,"24d":true,"till":true,"5_lea":true,"1_sp":true,"2_no":true,"f_lea":true,"anth":true,"2dpa":true,"4dpa":true,"6dpa":true,"8dpa":true,"9dpa":true,"10dpa":true,"11dpa":true,"12dpa":true,"4+dpa":true,"14dpa":true,"15dpa":true,"20dpa":true,"25dpa":true,"30dpa":true,"35dpa":true},
     "High level age":{"see":true,"veg":true,"repr":true},"High level stress-disease":{"none":true,"dis":true,"abio":true,"trans":true},
@@ -208,6 +210,7 @@ ready = (function() {
     "Variety":{"CS":true,"Hold":true,"TAM":true,"Banks":true,"Avoc":true,"Sevin":true,"Bobw":true,"GPC":true,"P271":true,"CSNIL":true,"HTS-1":true,"N9134":true,"synth":true,"CM":true,"CM_1":true,"CM_2":true,"CM_3":true,"CM_4":true,"Baxt":true,"Chara":true,"Westo":true,"Yipti":true,"0362+":true,"0807+":true,"1038+":true,"1275+":true,"1516+":true,"0807-":true,"1038-":true,"1275-":true,"0362-":true,"1516-":true,"N1ATB":true,"N1ATD":true,"N1BTA":true,"N1BTD":true,"N1DTA":true,"N1DTB":true,"N5ATB":true,"N5ATD":true,"N5BTA":true,"N5BTD":true,"N5DTA":true,"N5DTB":true}}    
     var jsonObj = JSON.stringify(defaultFactors);
     sessionStorage.setItem('bar_expression_viewer_selectedFactors', jsonObj);
+    */
   }  
   //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
 

@@ -43,7 +43,7 @@ namespace :load_data do
           factors.each do |f|
               v = row[f]
               factor = Factor.find_by factor: f, description:v
-              raise "#{f}:#{v} not found!. Make sure '#{v}' was loaded in the factors\n" unless factor
+              raise "'#{f}:#{v}' not found!. Make sure '#{v}' was loaded in the factors\n" unless factor
           
               experiment.factors << factor
           end
@@ -267,56 +267,41 @@ namespace :load_data do
   	end
   end
 
-  desc "Load the values from a csv file"
+  desc "Load the values from a tsv file"
   task :values_mongo, [:meta_experiment, :gene_set, :value_type, :filename ] => :environment do |t, args| 
     puts args
-
-    #mongo = MongodbHelper.getConnection
-
     ActiveRecord::Base::transaction do
       conn = ActiveRecord::Base.connection
-      meta_exp = MetaExperiment.find_or_create_by(:name=>args[:meta_experiment])
       gene_set = GeneSet.find_by(:name=>args[:gene_set])
+      meta_exp = MetaExperiment.find_or_create_by(:name=>args[:meta_experiment],:gene_set=>gene_set)
       value_type = TypeOfValue.find_or_create_by(:name=>args[:value_type])
       experiments = Hash.new
-      meta_exp.gene_set = gene_set
+
       #TODO: add validation if any of the find_by is null
-
-      genes = Hash.new
-      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
-        genes[g.name] = g
-      end
-      puts "Loaded #{genes.size} genes  in memory"
-
+      genes = GenesHelper.load_gene_hash(gene_set)
+      extension = File.extname(args[:filename])
+      puts "Loaded #{genes.size} genes  in memory (#{extension}) "
+      missing = []
       Experiment.find_each do | e |
         experiments[e.accession] = e.id
       end  
       puts "Loaded #{experiments.size} experiments  in memory"
       count = 0
-      inserts = Array.new
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-        gene_name = row["target_id"]
-        gene_name = row["transcript"] unless row["target_id"]
-        gene = genes[gene_name]
-        row.delete("target_id")
-        row.delete("transcript")
-        h_row = row.to_hash 
-        to_insert_h = Hash.new
-        h_row.each_pair do |name, val|
-          exp_id = experiments[name]
-          raise "Experiment #{name} not found" unless exp_id
-          to_insert_h[exp_id] = val.to_f  
-        end
-        
-        exp_val = ExpressionValue.find_or_create_by( 
-          :gene =>  gene, 
-          :meta_experiment => meta_exp ,
-          :type_of_value => value_type )
-        exp_val.save!
+        missing = ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type)
         count += 1
-        ExperimentsHelper.saveValues(exp_val, to_insert_h)
-      end
-      puts "Loaded #{count} ExpressionValue " 
+      end unless extension == ".gz"
+
+      Zlib::GzipReader.open(args[:filename]) do |gzip|
+        csv = CSV.new(gzip, :headers => true, :col_sep => "\t")
+        
+        csv.each do |row|
+          missing = ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type)
+          count += 1
+        end
+      end if extension == ".gz"
+      puts "Loaded #{count} ExpressionValue "
+      puts "Missing #{missing.to_a.join(",")}" if missing.size > 0 
     end
   end
 

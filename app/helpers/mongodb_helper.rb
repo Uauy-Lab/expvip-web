@@ -5,6 +5,7 @@ module MongodbHelper
 		config_mongo = YAML.load_file(client_path)
 		opts = config_mongo[ENV['RAILS_ENV']]["clients"]["default"]
 		opts["options"]["database"] = opts["database"]
+		Mongo::Logger.logger.level = Logger::WARN
 		opts
 	end
 
