@@ -51,7 +51,7 @@ module ExpressionValuesHelper
           :meta_experiment => meta_exp ,
           :type_of_value => value_type )
         exp_val.save!
-        ExperimentsHelper.saveValues(exp_val, to_insert_h)
+        ExperimentsHelper.saveValues(exp_val, to_insert_h) if to_insert_h.size > 0
         missing
 	end
 

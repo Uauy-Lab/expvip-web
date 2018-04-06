@@ -80,6 +80,7 @@ class ExpressionValuesController < ApplicationController
 
     order[s.accession] = s.id
     longName[s.accession] = s.title
+    longName[s.accession] = s.accession unless s.title
     selected[s.accession] = false
 
   end
@@ -119,7 +120,7 @@ def getExperimentGroups
     experiments[g.id] = Hash.new 
     exp = experiments[g.id]
     exp["name"]  = g.accession
-    exp["study"] = g.study_id.to_s
+    #exp["study"] = g.study.
     exp["group"] = g.id.to_s
     factors["study"] = g.study.accession
 
@@ -144,26 +145,18 @@ def getValuesForGene(gene)
   values = Hash.new
   client = MongodbHelper.getConnection
   ExpressionValue.where("gene_id = :gene", {gene: gene.id }).each do |ev|  
-    #byebug
     type_of_value = ev.type_of_value.name
     values[type_of_value] = Hash.new unless  values[type_of_value]
     tvh = values[type_of_value]
-
     obj = client[:experiments].find({ :_id => ev.id })
-    #byebug
-    #obj.each{ |o|  }
- #   l_vals = Hash.new
-    obj.first.each_pair { |k, val| values[type_of_value][k] = {experiment:  k, value: val}  }
+    obj.first.each_pair { |k, val| values[type_of_value][k.to_s] = {experiment:  k, value: val}  unless k == "_id" }
     
-    #obj.each{|o| o.each_pair {|k,v|  tov = TypeOfValue.find(6).name  } }
-
-    #tvh[ev.experiment.id] = { experiment:  ev.experiment.id.to_s , value: ev.value}
   end
   return values
 end
 
 def getDefaultOrder 
-    #This should be a table in the DB at some point
+    #TODO This should be a table in the DB at some point
     defOrder = [
       "study",
       "High level tissue",
@@ -173,7 +166,9 @@ def getDefaultOrder
       "High level stress-disease", 
       "Stress-disease",
       "High level variety",
-      "Variety"
+      "Variety",
+      "Intermediate",
+      "Intermediate stress"
     ]
     return defOrder
   end
@@ -265,6 +260,7 @@ def gene
   end
 
   def getDefaultSelection
+    #TODO: This should be also dynamic. 
     defSelection = {
     "Age"=> false,
     "High level stress-disease"=> true,
@@ -274,7 +270,9 @@ def gene
     "Stress-disease"=>false,
     "study"=>false,
     "Tissue" => false,
-    "Variety" => false
+    "study"=>false,
+    "Intermediate" => false,
+    "Intermediate stress" => false
   }
   return defSelection
 end

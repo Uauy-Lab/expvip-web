@@ -84,8 +84,10 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	i += 1
 	l = row["left"]
 	r = row["right"]
+	id = row["Sample.IDs"] 
+	id = row["Sample IDs"] unless id
 	study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
-	id 	  	= row["Sample.IDs"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
+	id 	  	= id.gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 	out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{study}/#{id}"
 	mkdir_str += "\"#{out_d}\"\n" 
 	output_prefix = "#{out_d}/#{id}"

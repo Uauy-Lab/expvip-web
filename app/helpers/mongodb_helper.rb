@@ -3,8 +3,6 @@ module MongodbHelper
 	def self.getConnectionConfiguration
 		client_path = Rails.root.join('config', 'mongoid.yml')
 		config_mongo = YAML.load_file(client_path)
-		puts ENV['RAILS_ENV']
-		puts config_mongo[ENV['RAILS_ENV']]
 		opts = config_mongo[ENV['RAILS_ENV']]["clients"]["default"]
 		opts["options"]["database"] = opts["database"]
 		Mongo::Logger.logger.level = Logger::WARN

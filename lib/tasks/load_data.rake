@@ -272,11 +272,11 @@ namespace :load_data do
     puts args
     ActiveRecord::Base::transaction do
       conn = ActiveRecord::Base.connection
-      meta_exp = MetaExperiment.find_or_create_by(:name=>args[:meta_experiment])
       gene_set = GeneSet.find_by(:name=>args[:gene_set])
+      meta_exp = MetaExperiment.find_or_create_by(:name=>args[:meta_experiment],:gene_set=>gene_set)
       value_type = TypeOfValue.find_or_create_by(:name=>args[:value_type])
       experiments = Hash.new
-      meta_exp.gene_set = gene_set
+
       #TODO: add validation if any of the find_by is null
       genes = GenesHelper.load_gene_hash(gene_set)
       extension = File.extname(args[:filename])
@@ -301,7 +301,7 @@ namespace :load_data do
         end
       end if extension == ".gz"
       puts "Loaded #{count} ExpressionValue "
-      puts "Missing #{missing.join(",")}" if missing.size > 0 
+      puts "Missing #{missing.to_a.join(",")}" if missing.size > 0 
     end
   end
 
