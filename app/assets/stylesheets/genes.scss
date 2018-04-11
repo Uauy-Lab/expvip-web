@@ -73,8 +73,11 @@
     font-size: 1.4em;       
 }
 
+.ui-slider-handle{
+  cursor: pointer !important;
+}
+
 // ******************************** Styling the charts ************************************
 #bar_expression_viewer{
-    overflow: hidden !important;    
-    padding-left: 10px;    
+    overflow: hidden !important;        
 }

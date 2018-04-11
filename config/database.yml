@@ -17,14 +17,14 @@ default: &default
 
 development:
   <<: *default
-  database: "wheat_expression_dev"
+  database: "expvip_dev"
 #  database: "expvip_berries"
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: "wheat_expression_test"
+  database: "expvip_test"
 
 
 #production:
