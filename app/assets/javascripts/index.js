@@ -1,5 +1,4 @@
 module.exports = biovisexpressionbar = require("bio-vis-expression-bar");
-
 //module.exports = Kinetic =  require("kinetic")
 
 //module.exports = xhr = require("xhr");
