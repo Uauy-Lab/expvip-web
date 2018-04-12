@@ -114,8 +114,19 @@ ready = (function() {
     var self = $(this);
     node.html('<h4>BLAST Scaffold</h4>');
     $(this).contents().find('#footer').html('');          
-    // Changing the checkbox input under the textarea to a radio button  
-    $(this).contents().find('#blast').find('input').eq(0).attr('type', 'radio');;
+
+    // Changing the checkbox input under the textarea to a radio button     
+    $(this).contents().find('#blast').find('.checkbox').find('input').each(function(index, el) {
+      $(this).attr('type', 'radio');
+      $(this).addClass('gene_set');
+      $(this).prop('checked', false);
+    });    
+
+    // Saving the gene set selected
+    var selectedGeneSet = '';
+    $(this).contents().find('#blast').find('.gene_set').click(function(event) {
+      selectedGeneSet = $(this).parent().text();    
+    });
 
     $($(this).contents()).click(function(event) {
       all_downloads = parent.find(".mutation_link");
@@ -124,7 +135,7 @@ ready = (function() {
 
     // Removing the form after the BLAST button has been clicked
     search_btn = $(this).contents().find('#method');    
-    search_btn.click(function(){
+    search_btn.click(function(){     
       search_right.width('100%')
       self.width('100%');
       self.height('950px');
@@ -139,20 +150,19 @@ ready = (function() {
           $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression search</th>')
 
           // Adding the data of the column
-          // ***Constructing the link(adding the gene set)
+          // ***Constructing the link(adding the gene set)          
           var geneSet = '';
-          var testPath = $('#sequenceserver').contents().find('#blast').find('.databases-container').find('input').each(function(index, el) {
-            if($(this).prop("checked", true)){
-              geneSet = $(this).parent().text();
-              geneSet = $.trim(geneSet).replace(/\s+/g, '');              
-            }else{
-              // ***If no gene set has been selected
-              alert("Weird Stuff!\nPlease select a gene set");
-            }
-          });;
-                    
+          $('#sequenceserver').contents().find('#blast').find('.databases-container').find('input').each(function(index, el) {
+            if($(this).parent().text() != selectedGeneSet){
+              $(this).prop('checked', false);
+            } else {
+              geneSet = selectedGeneSet;
+              geneSet = $.trim(geneSet).replace(/\s+/g, '');
+            }            
+          });
+          
           $('#sequenceserver').contents().find('tbody').eq(0).find('tr').each(function(index, el) {                         
-            // ***Constructing the link(adding the gene name)
+            // ***Constructing the link(adding the gene name)                        
             var geneName = $(this).find('td').eq(1).children().text();   
             var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet;
 
