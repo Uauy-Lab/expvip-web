@@ -25,7 +25,7 @@
   });
 
   var container_div="bar_expression_viewer";
-  var data_url = "<%= "http://localhost:3000/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
+  var data_url = "<%= "#{request.base_url}/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
   var eb;
   console.log(data_url);  
