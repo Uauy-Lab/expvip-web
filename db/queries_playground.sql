@@ -14,6 +14,8 @@ FROM
         INNER JOIN
     experiments ON studies.id = experiments.study_id;
 
+
+--This query doesnt work after the MongoDB update
 SELECT 
     gene_id,
     genes.name,
