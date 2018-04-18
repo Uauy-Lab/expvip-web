@@ -308,20 +308,25 @@ namespace :load_data do
   desc "Selects default studies"
   task :default_studies, [:filename] => :environment do |t, args|     
     puts "file provided #{args.filename}"   
-    default_studies = File.read(args.filename)
-    default_studies = default_studies.gsub(/\n/, ' ').split(' ')
-    puts "Default studies:  #{default_studies}"
+    default_studies = File.open(args.filename).read
+    default_studies.gsub!(/\r\n?/, "")
+    studs = []
+    default_studies.each_line do |line|
+      print "Study #{line}"
+      studs.push(line.gsub(/\n/,""))
+    end
+    puts "these are studs: #{studs}"
     ActiveRecord::Base.transaction do
       Study.all.each do | study |
-        if default_studies.include?(study.accession)
+        if studs.include?(study.accession)
           study.update_attribute :selected, true       
-          puts "Found: #{study.accession}"
+          puts "Found and Selected: #{study.accession}"
         else
           study.update_attribute :selected, false          
         end
       end      
-    end    
-
+    end
+    
   end
 
 end
