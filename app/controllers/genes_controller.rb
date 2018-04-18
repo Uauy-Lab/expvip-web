@@ -8,6 +8,7 @@ class GenesController < ApplicationController
     ids = Array.new
     missing = Array.new
     gene_set = GeneSet.find(session[:gene_set_id])
+    puts "\n\n\n\n\n\n\n\n\n\nTHis is the gene set: #{gene_set.name}\n\n\n\n\n\n\n\n\n\n"
     genes.each do |g|  
       gene = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id)
       gene = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id) unless  gene
@@ -61,9 +62,12 @@ class GenesController < ApplicationController
   end
 
   def findGeneName(gene_name, gene_set)
-    gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)
-    gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
-    raise "Gene not found: #{gene_name} for #{gene_set.name} " unless gene
+    begin 
+      gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)
+      gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
+    rescue    
+      raise "Gene not found: #{gene_name} for #{gene_set.name} " unless gene      
+    end    
     return gene  
   end
 
@@ -77,7 +81,7 @@ class GenesController < ApplicationController
 
     session[:studies] = params[:studies] if  params[:studies] 
 
-    # begin
+    begin
       case params[:submit] 
       when "Heatmap"
         forwardHeatmap 
@@ -88,13 +92,13 @@ class GenesController < ApplicationController
       else
         raise "Unknow redirect: #{params[:submit]}"
       end
-    # rescue Exception => e
-    #   flash[:error] = e.to_s
-    #   puts e
-    #   session[:return_to] ||= request.referer
-    #   redirect_to session.delete(:return_to)
-    #   return
-    # end
+    rescue Exception => e
+      flash[:error] = "Gene was not found!!!"
+      puts e
+      session[:return_to] ||= request.referer
+      redirect_to session.delete(:return_to)
+      return
+    end
 end
 
   def autocomplete

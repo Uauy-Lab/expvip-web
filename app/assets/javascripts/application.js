@@ -38,16 +38,24 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
-  $("#gene_set_selector").on("change", function(event){
+  $("select[name*='gene_set_selector']").on("change", function(event){
+    console.log(`AL fine`);
+    console.log($(this).val());
+    var geneID = $(this).val();
     $.ajax({
     type: 'get',
     url: '/gene_sets/set_gene_set_session.json',
 
-    data: {
-        gene_set_selector:$("#gene_set_selector").val()
+    data: {        
+        gene_set_selector:geneID
     },
     success: function (response) {
         document.getElementById("kalb"+parseInt(subcategory_id.match(/[0-9]+/)[0], 10)).innerHTML=response;
+        alert ("YEAHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+        console.log(`THis was successful`);
+    },
+    error: function(){
+      alert ("Didn't manage");
     }
     });
   });  

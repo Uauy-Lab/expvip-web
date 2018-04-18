@@ -145,3 +145,14 @@ test:
         read:
           mode: :primary
         max_pool_size: 1
+
+#production:
+#  clients:
+#    default:
+#      database: wheat_expression_prd
+#      hosts:
+#        - localhost:27017
+#      options:
+#        read:
+#          mode: :primary
+#        max_pool_size: 5

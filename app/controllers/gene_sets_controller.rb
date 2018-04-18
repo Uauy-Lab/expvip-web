@@ -65,8 +65,10 @@ class GeneSetsController < ApplicationController
     @gene_set = GeneSet.find(params[:gene_set_selector])
     session[:gene_set_id] = @gene_set.id if @gene_set
 
+    puts "\n\n\n\n\nThis is the set_gene_set_session method: #{@gene_set.name}\n\n\n\n\n"
+
     respond_to do |format|
-      format.html
+      # format.html
       format.json { 
         render json: @gene_set.name 
       }
