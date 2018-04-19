@@ -200,7 +200,7 @@ namespace :load_data do
         h.homology = row["homology_id"].to_i
         h.gene = genes[row["genes"]]
         h.cigar = row["cigar_line"]
-        h.cigar = nil if row["cigar_line"].length > 254
+        h.cigar = nil if row["cigar_line"] != nil and  row["cigar_line"].length > 254
         h.perc_cov = row["perc_cov"].to_f
         h.perc_id  = row["perc_id"].to_f
         h.perc_pos = row["perc_pos"].to_f
