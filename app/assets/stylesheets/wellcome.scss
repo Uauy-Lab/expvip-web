@@ -2,6 +2,11 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+.study_selector{
+    font-size: 16px;    
+    text-align: center;
+}
+
 #sequenceserver{        
     width: 100%;
     min-height:650px;
@@ -29,7 +34,12 @@
 
 .study_title{
     padding: 0px 10px;
-    width: 90%;
+    width: 90%;    
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
 .study_title:hover{    
     background-color: #fffc56;

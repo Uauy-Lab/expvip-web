@@ -113,7 +113,25 @@ ready = (function() {
    $( "#cite_button" ).click(function() {
       $( "#about" ).dialog( "open" );
   });
-  
+     
+   // Select all studies
+  $('.select_all').click(function(event) {
+
+    event.preventDefault();
+    $("input[name*='studies[]']").each(function(index, el) {          
+      $(this).prop('checked', true);                  
+    });
+  });
+
+  // Deselect all studies
+  $('.deselect_all').click(function(event) {
+
+    event.preventDefault();
+    $("input[name*='studies[]']").each(function(index, el) {          
+      $(this).prop('checked', false);                  
+    });
+  });
+
   //*************************************SEQUENCESERVER - START*************************************
   var search_right = $('#search_right');
   var search_left = $('#search_left');
@@ -190,7 +208,7 @@ ready = (function() {
   });
   //*************************************SEQUENCESERVER - END*************************************  
   
-  //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************
+  //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************  
   if(sessionStorage.bar_expression_viewer_selectedFactors){    // If bar_expression_viewer_selectedFactors exists        
     var expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors;
     var expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
@@ -206,36 +224,37 @@ ready = (function() {
       }
     }
 
+    // Select all studies
+    $('.select_all').click(function(event) {
+      event.preventDefault();
+      $("input[name*='studies[]']").each(function(index, el) {          
+        $(this).prop('checked', true);                  
+        var selectedStudy = $(this).val();              
+        studies[selectedStudy] = true;        
+        sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));
+      });
+    });
+
+    // Deselect all studies
+    $('.deselect_all').click(function(event) {
+        event.preventDefault();
+      $("input[name*='studies[]']").each(function(index, el) {          
+        $(this).prop('checked', false);                  
+        var selectedStudy = $(this).val();              
+        studies[selectedStudy] = false;        
+        sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));
+      });
+    });
+
     $("input[name='studies[]']").click(function(){   // Store the study in the session if it has been checked        
         var selectedStudy = $(this).val();              
         studies[selectedStudy] = !studies[selectedStudy];        
         sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
     });    
 
-  } else {    // If bar_expression_viewer_selectedFactors doesn't exist    
-    var defaultStudies = {};
-    var value;
-    $(":checkbox").each(function(index, el) {   // Setting the default studies if they are checked 
-      value = $(this).val();      
-      if($(this).prop("checked")){                
-        defaultStudies[value] = true;
-      } else {
-        defaultStudies[value] = false;
-      }      
-    });
-    //TODO: Make this dynamic
-    /*
-    var defaultFactors = {"study":defaultStudies,
-    "Age":{"7d":true,"see":true,"14d":true,"3_lea":true,"24d":true,"till":true,"5_lea":true,"1_sp":true,"2_no":true,"f_lea":true,"anth":true,"2dpa":true,"4dpa":true,"6dpa":true,"8dpa":true,"9dpa":true,"10dpa":true,"11dpa":true,"12dpa":true,"4+dpa":true,"14dpa":true,"15dpa":true,"20dpa":true,"25dpa":true,"30dpa":true,"35dpa":true},
-    "High level age":{"see":true,"veg":true,"repr":true},"High level stress-disease":{"none":true,"dis":true,"abio":true,"trans":true},
-    "High level tissue":{"spike":true,"grain":true,"le+sh":true,"roots":true},"High level variety":{"CS":true,"other":true,"N_CS":true},
-    "Stress-disease":{"none":true,"mo30h":true,"mo50h":true,"fu30h":true,"fu50h":true,"sr24h":true,"sr48h":true,"sr72h":true,"sr6+d":true,"pm24h":true,"pm48h":true,"pm72h":true,"st4d":true,"st10d":true,"st13d":true,"ds1h":true,"ds6h":true,"hs1h":true,"hs6h":true,"dhs1h":true,"dhs6h":true,"P-10d":true,"GPC-":true},
-    "Tissue":{"grain":true,"w_en":true,"s_en":true,"al_e":true,"e_sc":true,"sc":true,"al":true,"tc":true,"pist":true,"ps":true,"sta":true,"spike":true,"s_let":true,"see":true,"shoot":true,"lea":true,"2_lea":true,"f_lea":true,"stem":true,"root":true},
-    "Variety":{"CS":true,"Hold":true,"TAM":true,"Banks":true,"Avoc":true,"Sevin":true,"Bobw":true,"GPC":true,"P271":true,"CSNIL":true,"HTS-1":true,"N9134":true,"synth":true,"CM":true,"CM_1":true,"CM_2":true,"CM_3":true,"CM_4":true,"Baxt":true,"Chara":true,"Westo":true,"Yipti":true,"0362+":true,"0807+":true,"1038+":true,"1275+":true,"1516+":true,"0807-":true,"1038-":true,"1275-":true,"0362-":true,"1516-":true,"N1ATB":true,"N1ATD":true,"N1BTA":true,"N1BTD":true,"N1DTA":true,"N1DTB":true,"N5ATB":true,"N5ATD":true,"N5BTA":true,"N5BTD":true,"N5DTA":true,"N5DTB":true}}    
-    var jsonObj = JSON.stringify(defaultFactors);
-    sessionStorage.setItem('bar_expression_viewer_selectedFactors', jsonObj);
-    */
-  }  
+  } else {
+
+  }
   //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
 
 
