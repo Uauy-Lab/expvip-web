@@ -7,8 +7,7 @@ class GenesController < ApplicationController
   def getGeneIds(genes)
     ids = Array.new
     missing = Array.new
-    gene_set = GeneSet.find(session[:gene_set_id])
-    puts "\n\n\n\n\n\n\n\n\n\nTHis is the gene set: #{gene_set.name}\n\n\n\n\n\n\n\n\n\n"
+    gene_set = GeneSet.find(session[:gene_set_id])    
     genes.each do |g|  
       gene = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id)
       gene = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id) unless  gene

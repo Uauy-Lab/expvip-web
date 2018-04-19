@@ -38,26 +38,32 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
-  $("select[name*='gene_set_selector']").on("change", function(event){
-    console.log(`AL fine`);
-    console.log($(this).val());
+  $("select[name*='gene_set_selector']").on("change", function(event){    
     var geneID = $(this).val();
     $.ajax({
-    type: 'get',
-    url: '/gene_sets/set_gene_set_session.json',
-
-    data: {        
-        gene_set_selector:geneID
-    },
-    success: function (response) {
-        document.getElementById("kalb"+parseInt(subcategory_id.match(/[0-9]+/)[0], 10)).innerHTML=response;
-        alert ("YEAHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-        console.log(`THis was successful`);
-    },
-    error: function(){
-      alert ("Didn't manage");
-    }
-    });
+      type: 'get',
+      url: '/gene_sets/set_gene_set_session',
+      dataType: 'JSON',
+      data: {        
+          gene_set_selector:geneID
+      },
+      success: function (response) {                
+        // This part breaks after a while, unfortunatly at this time for time limitations I'll leave for later
+        $("select[name*='gene_set_selector']").each(function(index, el) {      
+          $(this).find('option').each(function(index, el) {        
+            if($(this).val() !== geneID && $(this).attr('selected')){          
+              $(this).removeAttr('selected');
+            }
+            if($(this).val() === geneID && !($(this).attr('selected'))){     
+              $(this).attr('selected', 'selected');               
+            }
+          });      
+        });   
+      },
+      error: function(){
+        alert ("There was a problem with selecting the gene set");
+      }
+    });    
   });  
 
   $(".alert-error").on("click", function(event) { 
