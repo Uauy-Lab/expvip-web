@@ -39,7 +39,8 @@ ready = (function() {
   });
 
   $("select[name*='gene_set_selector']").on("change", function(event){    
-    var geneID = $(this).val();
+    var geneID = $(this).val();    
+
     $.ajax({
       type: 'get',
       url: '/gene_sets/set_gene_set_session',
@@ -64,6 +65,25 @@ ready = (function() {
         alert ("There was a problem with selecting the gene set");
       }
     });    
+
+    var newGeneID = $(this).val();    
+
+    $.ajax({
+      type: 'get',
+      url: '/',
+      dataType: 'JSON',
+      data: {        
+          gene_set_selector:newGeneID
+      },
+      success: function (response) {    
+        $('#example1').html(response.value[0].name);
+        $('#example2').html(response.value[1].name);      
+      },
+      error: function(){
+        alert ("There was a problem with selecting the gene set");
+      }
+    });
+
   });  
 
   $(".alert-error").on("click", function(event) { 

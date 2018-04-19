@@ -9,7 +9,7 @@
   <%= submit_tag "Compare" , name: 'submit' %>
 
   <br/><br/>  
-  <p><b>Examples: </b><i>Traes_5BS_0AFC3F795.1 </i>| <i>Traes_4DS_1CF5D9107.1</i></p>
+  <p><b>Examples: </b><i id="example1"><%= @gene_example_1[0].name %>  </i>| <i id="example2"> <%= @gene_example_1[1].name %></i></p>
   <h2>Multiple genes</h2>
   If you want to compare more than two genes, you can add a list of genes separated by commas or one gene in each line.
   <br><br>
