@@ -76,8 +76,8 @@ ready = (function() {
           gene_set_selector:newGeneID
       },
       success: function (response) {    
-        $('#example1').html(response.value[0].name);
-        $('#example2').html(response.value[1].name);      
+        $('#example1').html(response.value.search[0].name);        
+        $('#example2').html(response.value.compare[0].name);      
       },
       error: function(){
         alert ("There was a problem with selecting the gene set");
@@ -150,6 +150,40 @@ ready = (function() {
     $("input[name*='studies[]']").each(function(index, el) {          
       $(this).prop('checked', false);                  
     });
+  });
+
+  // Heatmap populate example
+  $(`.heatmap_example`).click(function(event) {
+    event.preventDefault();
+    var heatmapGeneExamples = '';
+    var geneSetID = $("select[name*='gene_set_selector']").val();
+
+    console.log(`This is the gene set id: ${geneSetID}`);
+
+    // AJAX to get heatmap gene examples
+    $.ajax({
+      url: '/',
+      type: 'GET',
+      dataType: 'json',
+      data: {gene_set_selector:geneSetID},
+    })
+    .done(function(response) {          
+      //TODO complete this with the example[:heatmap]
+      
+      for (var key in response.value.heatmap) {          
+        var obj = response.value.heatmap[key];                
+        heatmapGeneExamples += `${obj["name"]}\n`;           
+      }      
+
+      $(`#genes_heatmap`).html(heatmapGeneExamples);
+    })
+    .fail(function() {
+      console.log("error");
+    })
+    .always(function() {
+      console.log("complete");
+    });
+    
   });
 
   //*************************************SEQUENCESERVER - START*************************************

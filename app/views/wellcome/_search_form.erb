@@ -8,12 +8,14 @@
   <%= text_field_tag :compare %>
   <%= submit_tag "Compare" , name: 'submit' %>
 
-  <br/><br/>  
-  <p><b>Examples: </b><i id="example1"><%= @gene_example_1[0].name %>  </i>| <i id="example2"> <%= @gene_example_1[1].name %></i></p>
+  <br/><br/>    
+  <p><b>Examples: </b><i id="example1"><%= @gene_example_1[:search].first.name %>  </i>| <i id="example2"> <%= @gene_example_1[:compare].first.name %></i></p>
   <h2>Multiple genes</h2>
   If you want to compare more than two genes, you can add a list of genes separated by commas or one gene in each line.
   <br><br>
   <%= text_area_tag :genes_heatmap, nil, size: "56x3" %>
+  <button class="heatmap_example">Populate with example</button>
+  <br>
   <%= submit_tag "Heatmap" , name: 'submit' %>
 
   <h2 id="select_studies">Select studies to display <span class="glyphicon glyphicon-chevron-down"></span></h2>
