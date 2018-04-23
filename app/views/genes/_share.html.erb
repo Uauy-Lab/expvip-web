@@ -49,7 +49,7 @@
       var compareParam = url.searchParams.get("compare");
 
       if(compareParam){        
-        sendData = {settings: allSettings, compare: compareParam};
+        sendData = {settings: allSettings, compare: compareParam, gene: geneName};
       } else{       
         sendData = {settings: allSettings, gene: geneName};
       }      

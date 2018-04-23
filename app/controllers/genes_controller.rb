@@ -63,9 +63,10 @@ class GenesController < ApplicationController
   def findGeneName(gene_name, gene_set)
     begin 
       gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)
+      puts "\n\n\n\n\n\nWE FOUND THE GENE HERE #{gene}\n\n\n\n\n\n"
       gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
     rescue    
-      raise "Gene not found: #{gene_name} for #{gene_set.name} " unless gene      
+      raise "\n\n\n\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n\n\n\n" unless gene      
     end    
     return gene  
   end
@@ -177,9 +178,14 @@ end
     # Get the gene
     if !session[:heatmap]
       gene_set = GeneSet.find(session[:gene_set_id])    
-      gene_name = params[:gene] if params[:gene]      
-      gene_name = session[:gene] unless gene_name            
-      @gene = findGeneName gene_name, gene_set      
+      if params[:gene]
+        gene_name = params[:gene]       
+        session[:gene] = gene_name      
+      else
+        gene_name = session[:gene]
+      end            
+      @gene = findGeneName gene_name, gene_set            
+      puts "\n\n\n\n\n\n\n\n\nThis is the gene #{@gene}\nAND THE GENE ID:#{@gene.id.to_s}\n\n\n\n\n\n\n\n"
     else        
       gene_set = GeneSet.find(session[:gene_set_id])            
     end
