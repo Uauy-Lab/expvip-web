@@ -157,8 +157,7 @@ ready = (function() {
     event.preventDefault();
     var heatmapGeneExamples = '';
     var geneSetID = $("select[name*='gene_set_selector']").val();
-
-    console.log(`This is the gene set id: ${geneSetID}`);
+    
 
     // AJAX to get heatmap gene examples
     $.ajax({

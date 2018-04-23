@@ -2,7 +2,7 @@
 
 <%= render :partial => "genes/share" %>
 
-<strong>Gene:</strong> <%= @gene.name %> 
+<strong>Gene:</strong> <span id="gene_name"><%= @gene.name %></span> 
 <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
 <% if @compare %>

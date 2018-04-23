@@ -172,12 +172,14 @@ end
     sha1 = Digest::SHA1.new
     sha1 << params[:settings]
     hashedSettings = sha1.hexdigest        
+    
 
     # Get the gene
     if !session[:heatmap]
       gene_set = GeneSet.find(session[:gene_set_id])    
-      gene_name = session[:gene]         
-      @gene = findGeneName gene_name, gene_set
+      gene_name = params[:gene] if params[:gene]      
+      gene_name = session[:gene] unless gene_name            
+      @gene = findGeneName gene_name, gene_set      
     else        
       gene_set = GeneSet.find(session[:gene_set_id])            
     end
