@@ -27,6 +27,7 @@
   var container_div="bar_expression_viewer";
   var data_url = "<%= "#{request.base_url}/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
+  var parentWidth = $("#bar_expression_viewer").parent().width();
   var eb;
   console.log(data_url);  
   function loadBarChart(){
@@ -34,6 +35,7 @@
       target: container_div,
       highlight: gene, 
       data: data_url,
+      width: parentWidth,
       renderProperty: 'tpm', 
       fontFamily:'Palatino Linotype, Book Antiqua, serif', 
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   
