@@ -62,11 +62,10 @@ class GenesController < ApplicationController
 
   def findGeneName(gene_name, gene_set)
     begin 
-      gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)
-      puts "\n\n\n\n\n\nWE FOUND THE GENE HERE #{gene}\n\n\n\n\n\n"
+      gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)      
       gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
     rescue    
-      raise "\n\n\n\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n\n\n\n" unless gene      
+      raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene      
     end    
     return gene  
   end
@@ -131,6 +130,9 @@ end
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
       @settings = data[:settings]
+      gene_set_name = data[:gene_set]
+      @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
+      session[:gene_set_id] = @gene_set_id.id            
       settingsObj = JSON.parse @settings
       studies = settingsObj['study']           
     end 
@@ -147,7 +149,8 @@ end
     studies = session[:studies]    
     compare = ""
     alert = ""
-
+    
+    session[:gene] = @gene.name
     # If parameters passed contain compare
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
@@ -160,6 +163,9 @@ end
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
       @settings = data[:settings]
+      gene_set_name = data[:gene_set]
+      @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
+      session[:gene_set_id] = @gene_set_id.id            
       settingsObj = JSON.parse @settings
       studies = settingsObj['study']           
     end   
@@ -176,16 +182,15 @@ end
     
 
     # Get the gene
-    if !session[:heatmap]
+    if !session[:heatmap]      
       gene_set = GeneSet.find(session[:gene_set_id])    
       if params[:gene]
         gene_name = params[:gene]       
         session[:gene] = gene_name      
       else
         gene_name = session[:gene]
-      end            
-      @gene = findGeneName gene_name, gene_set            
-      puts "\n\n\n\n\n\n\n\n\nThis is the gene #{@gene}\nAND THE GENE ID:#{@gene.id.to_s}\n\n\n\n\n\n\n\n"
+      end                     
+      @gene = findGeneName gene_name, gene_set                        
     else        
       gene_set = GeneSet.find(session[:gene_set_id])            
     end

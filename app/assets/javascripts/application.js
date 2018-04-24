@@ -38,6 +38,7 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
+  // Gene set selector
   $("select[name*='gene_set_selector']").on("change", function(event){    
     var geneID = $(this).val();    
 
@@ -267,7 +268,8 @@ ready = (function() {
     var expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
     var studies = expBarSelectedStudiesObj.study;    
 
-    for (var key in studies) {    // Checking the studies based on their value in the session
+    // Ticking the study checkboxes based on their session value
+    for (var key in studies) {    
       if (studies.hasOwnProperty(key)) {        
         if(studies[key]){          
           $("[value='" + key + "']").prop('checked', true);
@@ -277,7 +279,7 @@ ready = (function() {
       }
     }
 
-    // Select all studies
+    // Select all studies clicked
     $('.select_all').click(function(event) {
       event.preventDefault();
       $("input[name*='studies[]']").each(function(index, el) {          
@@ -288,7 +290,7 @@ ready = (function() {
       });
     });
 
-    // Deselect all studies
+    // Deselect all studies clicked
     $('.deselect_all').click(function(event) {
         event.preventDefault();
       $("input[name*='studies[]']").each(function(index, el) {          
@@ -299,7 +301,8 @@ ready = (function() {
       });
     });
 
-    $("input[name='studies[]']").click(function(){   // Store the study in the session if it has been checked        
+    // Store the study in the session if the checkbox for it has been checked        
+    $("input[name='studies[]']").click(function(){   
         var selectedStudy = $(this).val();              
         studies[selectedStudy] = !studies[selectedStudy];        
         sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
