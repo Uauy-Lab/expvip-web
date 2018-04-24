@@ -78,7 +78,7 @@ class GenesController < ApplicationController
     #Rails.logger.info session[:genes] 
     #Rails.logger.info params
 
-    session[:studies] = params[:studies] if  params[:studies] 
+    session[:studies] = params[:studies] if  params[:studies]     
 
     begin
       case params[:submit] 
@@ -150,7 +150,7 @@ end
     compare = ""
     alert = ""
     
-    session[:gene] = @gene.name
+    # session[:gene] = @gene.name
     # If parameters passed contain compare
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
@@ -212,6 +212,10 @@ end
       format.json { render json: {"value" => response}}      
     end
     
+  end
+
+  def set_studies_session
+    session[:studies] = JSON.parse params[:studies]    
   end
   
   # DELETE /genes/1

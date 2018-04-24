@@ -221,7 +221,30 @@ ready = (function() {
 
     // Removing the form after the BLAST button has been clicked
     search_btn = $(this).contents().find('#method');    
-    search_btn.click(function(){     
+    search_btn.click(function(){           
+
+      // AJAX call to save the selected studies in the session       
+      var selectedStudies = [];      
+      $("input[name*='studies[]']").each(function(index, el) {          
+        if($(this).attr('checked')){          
+          selectedStudies.push($(this).val());
+        }        
+      });      
+      var selectedStudiesObj = JSON.stringify(selectedStudies);;
+      $.ajax({
+        url: '/genes/set_studies_session',
+        type: 'GET',
+        dataType: 'JSON',        
+        data: {studies:selectedStudiesObj}
+      })
+      .done(function() {
+        
+      })
+      .fail(function() {
+        console.log("error while storing the selected studies in the backend session");
+      });
+      
+
       search_right.width('100%')
       self.width('100%');
       self.height('950px');
