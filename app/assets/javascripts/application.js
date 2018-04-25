@@ -202,8 +202,7 @@ ready = (function() {
     $(this).contents().find('#footer').html('');          
 
     // Changing the checkbox input under the textarea to a radio button     
-    $(this).contents().find('#blast').find('.checkbox').find('input').each(function(index, el) {
-      console.log(`THis is the parent of a parent or some shit: ${$(this).parents('li').html()}`)
+    $(this).contents().find('#blast').find('.checkbox').find('input').each(function(index, el) {      
       $(this).attr('type', 'radio');
       $(this).addClass('gene_set');
       $(this).prop('checked', false);
@@ -331,8 +330,6 @@ ready = (function() {
         studies[selectedStudy] = !studies[selectedStudy];        
         sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
     });    
-
-  } else {
 
   }
   //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************

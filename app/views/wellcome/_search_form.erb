@@ -26,11 +26,13 @@
   <br><br>
   <% @studies.each do |study| %>
     <% if study.selected %>
-      <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession %>
+      <div class="study_block">
+        <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession %>          
     <% else %>
+      <div class="study_block">         
       <%= check_box_tag "studies[]", study.accession, checked = false, id: study.accession %>
     <% end %>    
-    <%= label_tag(study.accession, study.title, class: 'study_title', for: study.accession) %>      
-    <br/>
-  <% end %>
+    <%= label_tag(study.accession, study.title, class: 'study_title', for: study.accession) %> 
+    </div>         
+  <% end %>  
 <% end %>
