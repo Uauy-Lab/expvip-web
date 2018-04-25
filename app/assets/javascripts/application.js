@@ -203,6 +203,7 @@ ready = (function() {
 
     // Changing the checkbox input under the textarea to a radio button     
     $(this).contents().find('#blast').find('.checkbox').find('input').each(function(index, el) {
+      console.log(`THis is the parent of a parent or some shit: ${$(this).parents('li').html()}`)
       $(this).attr('type', 'radio');
       $(this).addClass('gene_set');
       $(this).prop('checked', false);
