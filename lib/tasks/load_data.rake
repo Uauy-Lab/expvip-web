@@ -326,6 +326,29 @@ namespace :load_data do
         end
       end      
     end
+  end
+
+  desc "Adding sample genes"
+  task :sample_genes, [:filename] => :environment do |t, args|     
+    puts "file provided #{args.filename}"   
+    genes = File.open(args.filename).read
+    genes.gsub!(/\r\n?/, "")
+    all_genes = []
+    genes.each_line do |line|
+      print "gene #{line}"
+      all_genes.push(line.gsub(/\n/,""))
+    end    
+    puts "\nand this is all the genes #{all_genes}"
+    # ActiveRecord::Base.transaction do
+    #   Study.all.each do | study |
+    #     if studs.include?(study.accession)
+    #       study.update_attribute :selected, true       
+    #       puts "Found and Selected: #{study.accession}"
+    #     else
+    #       study.update_attribute :selected, false          
+    #     end
+    #   end      
+    # end
     
   end
 
