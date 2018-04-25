@@ -199,15 +199,29 @@ ready = (function() {
     var node = $(this).contents().find('body').find('.navbar');
     var self = $(this);
     node.html('<h4>BLAST Scaffold</h4>');
-    $(this).contents().find('#footer').html('');          
+    $(this).contents().find('#footer').html('');                  
 
     // Changing the checkbox input under the textarea to a radio button     
+    var gemeSetNames = '';
+    var lableName = '';
     $(this).contents().find('#blast').find('.checkbox').find('input').each(function(index, el) {
-      console.log(`THis is the parent of a parent or some shit: ${$(this).parents('li').html()}`)
+      // Getting the gene set names
+      gemeSetNames = $(this).parent().text();
+      lableName = $.trim(gemeSetNames).replace(/\s+/g, '');
+
+      // Adding a class(gene set name) to the list item 
+      $(this).parents('li').addClass(lableName);
+      
       $(this).attr('type', 'radio');
       $(this).addClass('gene_set');
       $(this).prop('checked', false);
-    });    
+    }); 
+
+    // Reordering the gene set ordering in the blast    
+    var xone = $(this).contents().find('#blast').find('[class*="IWGSC2.26"]');
+    var yone = $(this).contents().find('#blast').find('[class*="TGACv1"]');
+    $(yone).insertAfter(xone);
+
 
     // Saving the gene set selected
     var selectedGeneSet = '';
