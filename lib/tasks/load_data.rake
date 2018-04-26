@@ -334,21 +334,21 @@ namespace :load_data do
     genes = File.open(args.filename).read
     genes.gsub!(/\r\n?/, "")
     all_genes = []
-    genes.each_line do |line|
-      print "gene #{line}"
-      all_genes.push(line.gsub(/\n/,""))
-    end    
-    puts "\nand this is all the genes #{all_genes}"
-    # ActiveRecord::Base.transaction do
-    #   Study.all.each do | study |
-    #     if studs.include?(study.accession)
-    #       study.update_attribute :selected, true       
-    #       puts "Found and Selected: #{study.accession}"
-    #     else
-    #       study.update_attribute :selected, false          
-    #     end
-    #   end      
-    # end
+    genes.each_line do |line|      
+      line.gsub!(/\n/,"")      
+      all_genes = line.split(/, */).map{
+        |x| 
+        if x =~ /\A\d+\z/ ? true : false
+          x.to_i 
+        else
+          x
+        end
+      }            
+      ActiveRecord::Base.transaction do             
+        SampleGene.find_or_create_by(:gene_set_id => all_genes[0], :gene_id => all_genes[1], :kind => all_genes[2])        
+      end
+      puts "Add #{all_genes}"
+    end        
     
   end
 
