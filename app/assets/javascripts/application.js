@@ -76,9 +76,9 @@ ready = (function() {
       data: {        
           gene_set_selector:newGeneID
       },
-      success: function (response) {    
+      success: function (response) {            
         $('#example1').html(response.value.search[0].name);        
-        $('#example2').html(response.value.compare[0].name);      
+        $('#example2').html(response.value.compare[0].name );      
       },
       error: function(){
         alert ("There was a problem with selecting the gene set");
@@ -157,8 +157,9 @@ ready = (function() {
   $(`.heatmap_example`).click(function(event) {
     event.preventDefault();
     var heatmapGeneExamples = '';
-    var geneSetID = $("select[name*='gene_set_selector']").val();
-    
+
+    var geneSetID = $("select[name*='gene_set_selector']").val();    
+
 
     // AJAX to get heatmap gene examples
     $.ajax({
@@ -170,9 +171,9 @@ ready = (function() {
     .done(function(response) {          
       //TODO complete this with the example[:heatmap]
       
-      for (var key in response.value.heatmap) {          
-        var obj = response.value.heatmap[key];                
-        heatmapGeneExamples += `${obj["name"]}\n`;           
+      for (var key in response.value.heatmap) {                  
+        var obj = response.value.heatmap[key];        
+        heatmapGeneExamples += `${obj}\n`;           
       }      
 
       $(`#genes_heatmap`).html(heatmapGeneExamples);

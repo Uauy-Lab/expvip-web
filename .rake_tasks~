@@ -41,6 +41,7 @@ load_data:gff_produced_genes[gene_set,filename]
 load_data:homology_deprecated[gene_set,filename]
 load_data:homology_pairs[gene_set,filename]
 load_data:metadata[filename]
+load_data:sample_genes[filename]
 load_data:values[meta_experiment,gene_set,value_type,filename]
 load_data:values_mongo[meta_experiment,gene_set,value_type,filename]
 log:clear
