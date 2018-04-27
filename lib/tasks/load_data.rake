@@ -344,8 +344,10 @@ namespace :load_data do
           x
         end
       }            
+      gene_id = Gene.find_by(:name => all_genes[1])
+      # puts "This is the gene id: #{gene_id.id}"
       ActiveRecord::Base.transaction do             
-        SampleGene.find_or_create_by(:gene_set_id => all_genes[0], :gene_id => all_genes[1], :kind => all_genes[2])        
+        SampleGene.find_or_create_by(:gene_set_id => all_genes[0], :gene_id => gene_id.id, :kind => all_genes[2], :gene_name => all_genes[1])
       end
       puts "Add #{all_genes}"
     end        
