@@ -366,16 +366,16 @@ ready = (function() {
   $(".footer img").each(function(){
     totalWidth =  totalWidth + $(this).width();    
   });  
-  $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/8)-10 );
-  $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/8)-10 );
+  $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
+  $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
 
   // Resizing the logos dynamically 
   var resizeLogoTimer;
   $(window).on('resize', function(e){      
     clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
     resizeLogoTimer = setTimeout(function(){      
-      $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/8)-10 );
-      $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/8)-10 );
+      $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
+      $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
     }, 1500);
   });  
   
