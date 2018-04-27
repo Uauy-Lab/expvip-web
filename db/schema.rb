@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180427102034) do
+ActiveRecord::Schema.define(version: 20180427131343) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -131,8 +131,6 @@ ActiveRecord::Schema.define(version: 20180427102034) do
     t.string "kind"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "gene_name"
-    t.string "gene_set_name"
   end
 
   create_table "sessions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
