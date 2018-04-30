@@ -43,7 +43,8 @@
 
       // Determining the data to be sent in the ajax request based on the url parameters
       var sendData;
-      var currentURL = window.location.href;
+      var currentURL = document.URL;
+      console.log(`url: ${currentURL}`);
       var url = new URL(currentURL);
       var compareParam = url.searchParams.get("compare");
 
