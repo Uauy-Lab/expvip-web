@@ -179,10 +179,7 @@ ready = (function() {
       $(`#genes_heatmap`).html(heatmapGeneExamples);
     })
     .fail(function() {
-      console.log("error");
-    })
-    .always(function() {
-      console.log("complete");
+      alert("There was an error while trying to populate the textarea");
     });
     
   });
@@ -191,10 +188,7 @@ ready = (function() {
   var search_right = $('#search_right');
   var search_left = $('#search_left');
   var introblurb = $('#introblurb');
-   $('#sequenceserver').load(function(){
-
-    // SHALL BE REMOVED LATER - THIS IS JUST FOR DEVELOPMENT SAKE
-    $(this).contents().find('textarea.text-monospace').html('TCCCTATCTGTTTCCTTGGCAGCTCCCTGATCCAATCGATCCATCAGGGCTCGACTAACTTCTTCCAGCGCCTCTTCAGCGCGGGAGATCTACCAGCGTCGGCGGAGGGGCGTAGGTGCAGGCGTGCAGCCCAAGTCCGCACCCGGCTCTAGGTTTCTGCTAATCTTCTTCCACCTGTGATACGCGCTCCGGGGCTAGGAGCACTCGTTGCCGGCTGCCTCGTGCTCGGAATGGCGGATGGGGACTCGTCCGACTTCACCTTCTGCAAGGTTGACTATGCTGAAAATGATGGTCGTTTGGACTCCCCTAATTCCATCGCTGTGGCAAGTATGACACTGGAGGATGTTGCCGGTGATGGTGAGACTAAGAAGGTTCAGGATGACAAGCAAACAGTCAATCCAGTTACTGATGAAAAATCTAGTTCCATATCTAGTCGCACCAATGGTGTATCGCTTCGAGAGTCCAATATAAAAGAACCAGTTGTACCAACCAGTAGTGGAGAGTCTGTGCAGTCAAATGTGTCAGCTCAACCAAAACCTTTAAAGAAATCTGCTGTACGTGCAAAGGTTCCTTTTGAGAAGGGCTTTAGCCCAATGGACTGGCTTAAGCTGACTCGTACACATCCAGATCT')
+   $('#sequenceserver').load(function(){    
 
     var parent = $(this).contents();
     var node = $(this).contents().find('body').find('.navbar');
