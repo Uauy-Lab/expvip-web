@@ -38,20 +38,18 @@
       }
 
       // Stringify all settings to send over request
-      var allSettings = JSON.stringify(selectedFactorsSessionObj);     
-      var geneName = $('#gene_name').html();      
+      var allSettings = JSON.stringify(selectedFactorsSessionObj);           
+      
 
       // Determining the data to be sent in the ajax request based on the url parameters
       var sendData;
-      var currentURL = document.URL;
-      console.log(`url: ${currentURL}`);
-      var url = new URL(currentURL);
-      var compareParam = url.searchParams.get("compare");
-
-      if(compareParam){        
-        sendData = {settings: allSettings, compare: compareParam, gene: geneName};
+      var searchGeneName = $('#search_gene_name').html();      
+      var compareGeneName = $('#compare_gene_name').html();            
+            
+      if(compareGeneName){        
+        sendData = {settings: allSettings, compare: compareGeneName, gene: searchGeneName};
       } else{       
-        sendData = {settings: allSettings, gene: geneName};
+        sendData = {settings: allSettings, gene: searchGeneName};
       }      
 
       // POST request for sending session data to the backend to generate the sharable link
