@@ -15,6 +15,7 @@
 
   var container_div="bar_expression_viewer";
   var data_url = "<%=raw "#{request.base_url}/expression_values/genes.json?#{@args}"%>" ;
+  console.log(data_url);
   var parentWidth = $("#bar_expression_viewer").parent().width();
   var eb;
   function loadHeatmap(){
@@ -22,7 +23,7 @@
       target: container_div,
       data: data_url,
       renderProperty: 'tpm', 
-      fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif', 
+      fontFamily: 'Helvetica', 
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],             
       width: parentWidth,
       plot:'HeatMap'

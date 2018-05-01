@@ -2,12 +2,12 @@
 
 <%= render :partial => "genes/share" %>
 
-<strong>Gene:</strong> <span id="gene_name"><%= @gene.name %></span> 
+<strong>Gene:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
 <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
 <% if @compare %>
  <strong>Compare:</strong>
- <%= @compare.name %>   
+ <span id="compare_gene_name"><%= @compare.name %></span>   
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
 
@@ -37,7 +37,7 @@
       data: data_url,
       width: parentWidth,
       renderProperty: 'tpm', 
-      fontFamily:'Helvetica Neue, Helvetica, Arial, sans-serif', 
+      fontFamily:'Helvetica', 
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   
     });
 
