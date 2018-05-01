@@ -200,7 +200,7 @@ namespace :load_data do
         h.homology = row["homology_id"].to_i
         h.gene = genes[row["genes"]]
         h.cigar = row["cigar_line"]
-        h.cigar = nil if row["cigar_line"].length > 254
+        h.cigar = nil if row["cigar_line"] != nil and  row["cigar_line"].length > 254
         h.perc_cov = row["perc_cov"].to_f
         h.perc_id  = row["perc_id"].to_f
         h.perc_pos = row["perc_pos"].to_f
@@ -308,20 +308,50 @@ namespace :load_data do
   desc "Selects default studies"
   task :default_studies, [:filename] => :environment do |t, args|     
     puts "file provided #{args.filename}"   
-    default_studies = File.read(args.filename)
-    default_studies = default_studies.gsub(/\n/, ' ').split(' ')
-    puts "Default studies:  #{default_studies}"
+    default_studies = File.open(args.filename).read
+    default_studies.gsub!(/\r\n?/, "")
+    studs = []
+    default_studies.each_line do |line|
+      print "Study #{line}"
+      studs.push(line.gsub(/\n/,""))
+    end
+    puts "these are studs: #{studs}"
     ActiveRecord::Base.transaction do
       Study.all.each do | study |
-        if default_studies.include?(study.accession)
+        if studs.include?(study.accession)
           study.update_attribute :selected, true       
-          puts "Found: #{study.accession}"
+          puts "Found and Selected: #{study.accession}"
         else
           study.update_attribute :selected, false          
         end
       end      
-    end    
+    end
+  end
 
+  desc "Adding sample genes"
+  task :sample_genes, [:filename] => :environment do |t, args|     
+    puts "file provided #{args.filename}"   
+    genes = File.open(args.filename).read
+    genes.gsub!(/\r\n?/, "")
+    all_genes = []
+    genes.each_line do |line|      
+      line.gsub!(/\n/,"")      
+      all_genes = line.split(/, */).map{
+        |x| 
+        if x =~ /\A\d+\z/ ? true : false
+          x.to_i 
+        else
+          x
+        end
+      }            
+      gene_id = Gene.find_by(:name => all_genes[1])    
+      gene_set_id = GeneSet.find_by(:name => all_genes[0])
+      ActiveRecord::Base.transaction do             
+        SampleGene.find_or_create_by(:gene_set_id => gene_set_id.id, :gene_id => gene_id.id, :kind => all_genes[2])
+      end
+      puts "Add #{all_genes}"
+    end        
+    
   end
 
 end

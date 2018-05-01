@@ -63,12 +63,12 @@ class GeneSetsController < ApplicationController
 
   def set_gene_set_session
     @gene_set = GeneSet.find(params[:gene_set_selector])
-    session[:gene_set_id] = @gene_set.id if @gene_set
+    session[:gene_set_id] = @gene_set.id if @gene_set    
 
-    respond_to do |format|
+    respond_to do |format|      
       format.html
       format.json { 
-        render json: @gene_set.name 
+        render json: {"value" => @gene_set.name}
       }
     end
   end

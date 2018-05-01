@@ -179,7 +179,9 @@ def getDefaultOrder
     HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|
       hom = h.homology 
       HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
-        values[h2.gene.name] = getValuesForGene(h2.gene) unless h2.gene == gene
+        if h2.gene.gene_set_id == gene.gene_set_id
+          values[h2.gene.name] = getValuesForGene(h2.gene) unless h2.gene == gene
+        end
       end
     end
   return values
