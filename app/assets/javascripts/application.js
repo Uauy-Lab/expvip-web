@@ -38,18 +38,53 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
-  $("#gene_set_selector").on("change", function(event){
-    $.ajax({
-    type: 'get',
-    url: '/gene_sets/set_gene_set_session.json',
+  // Gene set selector
+  $("select[name*='gene_set_selector']").on("change", function(event){    
+    var geneID = $(this).val();    
 
-    data: {
-        gene_set_selector:$("#gene_set_selector").val()
-    },
-    success: function (response) {
-        document.getElementById("kalb"+parseInt(subcategory_id.match(/[0-9]+/)[0], 10)).innerHTML=response;
-    }
+    $.ajax({
+      type: 'get',
+      url: '/gene_sets/set_gene_set_session',
+      dataType: 'JSON',
+      data: {        
+          gene_set_selector:geneID
+      },
+      success: function (response) {                
+        // This part breaks after a while, unfortunatly at this time for time limitations I'll leave for later
+        $("select[name*='gene_set_selector']").each(function(index, el) {      
+          $(this).find('option').each(function(index, el) {        
+            if($(this).val() !== geneID && $(this).attr('selected')){          
+              $(this).removeAttr('selected');
+            }
+            if($(this).val() === geneID && !($(this).attr('selected'))){     
+              $(this).attr('selected', 'selected');               
+            }
+          });      
+        });   
+      },
+      error: function(){
+        alert ("There was a problem with selecting the gene set");
+      }
+    });    
+
+    var newGeneID = $(this).val();    
+
+    $.ajax({
+      type: 'get',
+      url: '/',
+      dataType: 'JSON',
+      data: {        
+          gene_set_selector:newGeneID
+      },
+      success: function (response) {            
+        $('#example1').html(response.value.search[0].name);        
+        $('#example2').html(response.value.compare[0].name );      
+      },
+      error: function(){
+        alert ("There was a problem with selecting the gene set");
+      }
     });
+
   });  
 
   $(".alert-error").on("click", function(event) { 
@@ -99,23 +134,95 @@ ready = (function() {
    $( "#cite_button" ).click(function() {
       $( "#about" ).dialog( "open" );
   });
-  
+     
+   // Select all studies
+  $('.select_all').click(function(event) {
+
+    event.preventDefault();
+    $("input[name*='studies[]']").each(function(index, el) {          
+      $(this).prop('checked', true);                  
+    });
+  });
+
+  // Deselect all studies
+  $('.deselect_all').click(function(event) {
+
+    event.preventDefault();
+    $("input[name*='studies[]']").each(function(index, el) {          
+      $(this).prop('checked', false);                  
+    });
+  });
+
+  // Heatmap populate example
+  $(`.heatmap_example`).click(function(event) {
+    event.preventDefault();
+    var heatmapGeneExamples = '';
+
+    var geneSetID = $("select[name*='gene_set_selector']").val();    
+
+
+    // AJAX to get heatmap gene examples
+    $.ajax({
+      url: '/',
+      type: 'GET',
+      dataType: 'json',
+      data: {gene_set_selector:geneSetID},
+    })
+    .done(function(response) {          
+      //TODO complete this with the example[:heatmap]
+      
+      for (var key in response.value.heatmap) {                  
+        var obj = response.value.heatmap[key];        
+        heatmapGeneExamples += `${obj}\n`;           
+      }      
+
+      $(`#genes_heatmap`).html(heatmapGeneExamples);
+    })
+    .fail(function() {
+      alert("There was an error while trying to populate the textarea");
+    });
+    
+  });
+
   //*************************************SEQUENCESERVER - START*************************************
   var search_right = $('#search_right');
   var search_left = $('#search_left');
   var introblurb = $('#introblurb');
-   $('#sequenceserver').load(function(){
-
-    // SHALL BE REMOVED LATER - THIS IS JUST FOR DEVELOPMENT SAKE
-    $(this).contents().find('textarea.text-monospace').html('TCCCTATCTGTTTCCTTGGCAGCTCCCTGATCCAATCGATCCATCAGGGCTCGACTAACTTCTTCCAGCGCCTCTTCAGCGCGGGAGATCTACCAGCGTCGGCGGAGGGGCGTAGGTGCAGGCGTGCAGCCCAAGTCCGCACCCGGCTCTAGGTTTCTGCTAATCTTCTTCCACCTGTGATACGCGCTCCGGGGCTAGGAGCACTCGTTGCCGGCTGCCTCGTGCTCGGAATGGCGGATGGGGACTCGTCCGACTTCACCTTCTGCAAGGTTGACTATGCTGAAAATGATGGTCGTTTGGACTCCCCTAATTCCATCGCTGTGGCAAGTATGACACTGGAGGATGTTGCCGGTGATGGTGAGACTAAGAAGGTTCAGGATGACAAGCAAACAGTCAATCCAGTTACTGATGAAAAATCTAGTTCCATATCTAGTCGCACCAATGGTGTATCGCTTCGAGAGTCCAATATAAAAGAACCAGTTGTACCAACCAGTAGTGGAGAGTCTGTGCAGTCAAATGTGTCAGCTCAACCAAAACCTTTAAAGAAATCTGCTGTACGTGCAAAGGTTCCTTTTGAGAAGGGCTTTAGCCCAATGGACTGGCTTAAGCTGACTCGTACACATCCAGATCT')
+   $('#sequenceserver').load(function(){    
 
     var parent = $(this).contents();
     var node = $(this).contents().find('body').find('.navbar');
     var self = $(this);
     node.html('<h4>BLAST Scaffold</h4>');
-    $(this).contents().find('#footer').html('');          
-    // Changing the checkbox input under the textarea to a radio button  
-    $(this).contents().find('#blast').find('input').eq(0).attr('type', 'radio');;
+    $(this).contents().find('#footer').html('');                  
+
+    // Changing the checkbox input under the textarea to a radio button     
+    var gemeSetNames = '';
+    var lableName = '';
+    $(this).contents().find('#blast').find('.checkbox').find('input').each(function(index, el) {
+      // Getting the gene set names
+      gemeSetNames = $(this).parent().text();
+      lableName = $.trim(gemeSetNames).replace(/\s+/g, '');
+
+      // Adding a class(gene set name) to the list item 
+      $(this).parents('li').addClass(lableName);
+      
+      $(this).attr('type', 'radio');
+      $(this).addClass('gene_set');
+      $(this).prop('checked', false);
+    }); 
+
+    // Reordering the gene set ordering in the blast    
+    var xone = $(this).contents().find('#blast').find('[class*="IWGSC2.26"]');
+    var yone = $(this).contents().find('#blast').find('[class*="TGACv1"]');
+    $(yone).insertAfter(xone);
+
+
+    // Saving the gene set selected
+    var selectedGeneSet = '';
+    $(this).contents().find('#blast').find('.gene_set').click(function(event) {
+      selectedGeneSet = $(this).parent().text();    
+    });
 
     $($(this).contents()).click(function(event) {
       all_downloads = parent.find(".mutation_link");
@@ -124,7 +231,30 @@ ready = (function() {
 
     // Removing the form after the BLAST button has been clicked
     search_btn = $(this).contents().find('#method');    
-    search_btn.click(function(){
+    search_btn.click(function(){           
+
+      // AJAX call to save the selected studies in the session       
+      var selectedStudies = [];      
+      $("input[name*='studies[]']").each(function(index, el) {          
+        if($(this).attr('checked')){          
+          selectedStudies.push($(this).val());
+        }        
+      });      
+      var selectedStudiesObj = JSON.stringify(selectedStudies);;
+      $.ajax({
+        url: '/genes/set_studies_session',
+        type: 'GET',
+        dataType: 'JSON',        
+        data: {studies:selectedStudiesObj}
+      })
+      .done(function() {
+        
+      })
+      .fail(function() {
+        console.log("error while storing the selected studies in the backend session");
+      });
+      
+
       search_right.width('100%')
       self.width('100%');
       self.height('950px');
@@ -139,20 +269,19 @@ ready = (function() {
           $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression search</th>')
 
           // Adding the data of the column
-          // ***Constructing the link(adding the gene set)
+          // ***Constructing the link(adding the gene set)          
           var geneSet = '';
-          var testPath = $('#sequenceserver').contents().find('#blast').find('.databases-container').find('input').each(function(index, el) {
-            if($(this).prop("checked", true)){
-              geneSet = $(this).parent().text();
-              geneSet = $.trim(geneSet).replace(/\s+/g, '');              
-            }else{
-              // ***If no gene set has been selected
-              alert("Weird Stuff!\nPlease select a gene set");
-            }
-          });;
-                    
+          $('#sequenceserver').contents().find('#blast').find('.databases-container').find('input').each(function(index, el) {
+            if($(this).parent().text() != selectedGeneSet){
+              $(this).prop('checked', false);
+            } else {
+              geneSet = selectedGeneSet;
+              geneSet = $.trim(geneSet).replace(/\s+/g, '');
+            }            
+          });
+          
           $('#sequenceserver').contents().find('tbody').eq(0).find('tr').each(function(index, el) {                         
-            // ***Constructing the link(adding the gene name)
+            // ***Constructing the link(adding the gene name)                        
             var geneName = $(this).find('td').eq(1).children().text();   
             var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet;
 
@@ -166,13 +295,14 @@ ready = (function() {
   });
   //*************************************SEQUENCESERVER - END*************************************  
   
-  //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************
+  //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************  
   if(sessionStorage.bar_expression_viewer_selectedFactors){    // If bar_expression_viewer_selectedFactors exists        
     var expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors;
     var expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
     var studies = expBarSelectedStudiesObj.study;    
 
-    for (var key in studies) {    // Checking the studies based on their value in the session
+    // Ticking the study checkboxes based on their session value
+    for (var key in studies) {    
       if (studies.hasOwnProperty(key)) {        
         if(studies[key]){          
           $("[value='" + key + "']").prop('checked', true);
@@ -182,36 +312,36 @@ ready = (function() {
       }
     }
 
-    $("input[name='studies[]']").click(function(){   // Store the study in the session if it has been checked        
+    // Select all studies clicked
+    $('.select_all').click(function(event) {
+      event.preventDefault();
+      $("input[name*='studies[]']").each(function(index, el) {          
+        $(this).prop('checked', true);                  
+        var selectedStudy = $(this).val();              
+        studies[selectedStudy] = true;        
+        sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));
+      });
+    });
+
+    // Deselect all studies clicked
+    $('.deselect_all').click(function(event) {
+        event.preventDefault();
+      $("input[name*='studies[]']").each(function(index, el) {          
+        $(this).prop('checked', false);                  
+        var selectedStudy = $(this).val();              
+        studies[selectedStudy] = false;        
+        sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));
+      });
+    });
+
+    // Store the study in the session if the checkbox for it has been checked        
+    $("input[name='studies[]']").click(function(){   
         var selectedStudy = $(this).val();              
         studies[selectedStudy] = !studies[selectedStudy];        
         sessionStorage.setItem('bar_expression_viewer_selectedFactors', JSON.stringify(expBarSelectedStudiesObj));      
     });    
 
-  } else {    // If bar_expression_viewer_selectedFactors doesn't exist    
-    var defaultStudies = {};
-    var value;
-    $(":checkbox").each(function(index, el) {   // Setting the default studies if they are checked 
-      value = $(this).val();      
-      if($(this).prop("checked")){                
-        defaultStudies[value] = true;
-      } else {
-        defaultStudies[value] = false;
-      }      
-    });
-    //TODO: Make this dynamic
-    /*
-    var defaultFactors = {"study":defaultStudies,
-    "Age":{"7d":true,"see":true,"14d":true,"3_lea":true,"24d":true,"till":true,"5_lea":true,"1_sp":true,"2_no":true,"f_lea":true,"anth":true,"2dpa":true,"4dpa":true,"6dpa":true,"8dpa":true,"9dpa":true,"10dpa":true,"11dpa":true,"12dpa":true,"4+dpa":true,"14dpa":true,"15dpa":true,"20dpa":true,"25dpa":true,"30dpa":true,"35dpa":true},
-    "High level age":{"see":true,"veg":true,"repr":true},"High level stress-disease":{"none":true,"dis":true,"abio":true,"trans":true},
-    "High level tissue":{"spike":true,"grain":true,"le+sh":true,"roots":true},"High level variety":{"CS":true,"other":true,"N_CS":true},
-    "Stress-disease":{"none":true,"mo30h":true,"mo50h":true,"fu30h":true,"fu50h":true,"sr24h":true,"sr48h":true,"sr72h":true,"sr6+d":true,"pm24h":true,"pm48h":true,"pm72h":true,"st4d":true,"st10d":true,"st13d":true,"ds1h":true,"ds6h":true,"hs1h":true,"hs6h":true,"dhs1h":true,"dhs6h":true,"P-10d":true,"GPC-":true},
-    "Tissue":{"grain":true,"w_en":true,"s_en":true,"al_e":true,"e_sc":true,"sc":true,"al":true,"tc":true,"pist":true,"ps":true,"sta":true,"spike":true,"s_let":true,"see":true,"shoot":true,"lea":true,"2_lea":true,"f_lea":true,"stem":true,"root":true},
-    "Variety":{"CS":true,"Hold":true,"TAM":true,"Banks":true,"Avoc":true,"Sevin":true,"Bobw":true,"GPC":true,"P271":true,"CSNIL":true,"HTS-1":true,"N9134":true,"synth":true,"CM":true,"CM_1":true,"CM_2":true,"CM_3":true,"CM_4":true,"Baxt":true,"Chara":true,"Westo":true,"Yipti":true,"0362+":true,"0807+":true,"1038+":true,"1275+":true,"1516+":true,"0807-":true,"1038-":true,"1275-":true,"0362-":true,"1516-":true,"N1ATB":true,"N1ATD":true,"N1BTA":true,"N1BTD":true,"N1DTA":true,"N1DTB":true,"N5ATB":true,"N5ATD":true,"N5BTA":true,"N5BTD":true,"N5DTA":true,"N5DTB":true}}    
-    var jsonObj = JSON.stringify(defaultFactors);
-    sessionStorage.setItem('bar_expression_viewer_selectedFactors', jsonObj);
-    */
-  }  
+  }
   //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
 
 
@@ -230,16 +360,16 @@ ready = (function() {
   $(".footer img").each(function(){
     totalWidth =  totalWidth + $(this).width();    
   });  
-  $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/8)-10 );
-  $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/8)-10 );
+  $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
+  $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
 
   // Resizing the logos dynamically 
   var resizeLogoTimer;
   $(window).on('resize', function(e){      
     clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
     resizeLogoTimer = setTimeout(function(){      
-      $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/8)-10 );
-      $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/8)-10 );
+      $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
+      $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
     }, 1500);
   });  
   

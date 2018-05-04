@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180312135935) do
+ActiveRecord::Schema.define(version: 20180503103432) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -74,6 +74,7 @@ ActiveRecord::Schema.define(version: 20180312135935) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "selected"
   end
 
   create_table "genes", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -123,6 +124,14 @@ ActiveRecord::Schema.define(version: 20180312135935) do
     t.datetime "updated_at", null: false
     t.index ["gene_set_id"], name: "index_meta_experiments_on_gene_set_id"
     t.index ["name"], name: "index_meta_experiments_on_name"
+  end
+
+  create_table "sample_genes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "gene_set_id"
+    t.integer "gene_id"
+    t.string "kind"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sessions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
