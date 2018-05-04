@@ -12,7 +12,7 @@
 }
 
 #share_popup{
-    background-color: #efe2c6;            
+    background-color: #e4e4e4;            
     z-index: 10;        
     border-radius: 20px;
     padding: 70px 40px;
@@ -73,8 +73,6 @@
     font-size: 1.4em;       
 }
 
-// ******************************** Styling the charts ************************************
-#bar_expression_viewer{
-    overflow: hidden !important;    
-    padding-left: 10px;    
+.ui-slider-handle{
+  cursor: pointer !important;
 }

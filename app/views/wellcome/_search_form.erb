@@ -1,31 +1,38 @@
 <%= form_tag "/genes/forward", method: "post" do  %>
   <h2>One or two genes</h2>
+  
   Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id])) %>
-
   <%= label_tag :gene, "Gene:" %>
-  <%= text_field_tag :gene, "Traes_5BS_0AFC3F795.1" %>
+  <%= text_field_tag :gene %>
   <%= submit_tag "Search", name: 'submit' %>
   <%= text_field_tag :compare %>
   <%= submit_tag "Compare" , name: 'submit' %>
 
-  <br/><br/>  
-  <p><b>Examples: </b><i>Traes_5BS_0AFC3F795.1 </i>| <i>Traes_4DS_1CF5D9107.1</i></p>
+  <br/><br/>    
+  <p><b>Examples: </b><i id="example1"><%= @example[:search].first.name %>  </i>| <i id="example2"> <%= @example[:compare].first.name %></i></p>
   <h2>Multiple genes</h2>
   If you want to compare more than two genes, you can add a list of genes separated by commas or one gene in each line.
   <br><br>
-  <%= text_area_tag :genes_heatmap, "Traes_6BL_9BB648D51.1
-Traes_6DL_D735731A4.2
-Traes_6AL_DD81E0037.1", size: "56x3" %>
+  <%= text_area_tag :genes_heatmap, nil, size: "56x3" %>
+  <button class="heatmap_example">Populate with example</button>
+  <br>
   <%= submit_tag "Heatmap" , name: 'submit' %>
 
   <h2 id="select_studies">Select studies to display <span class="glyphicon glyphicon-chevron-down"></span></h2>
+
+  <button class="select_all study_selector">Select All</button>
+  <button class="deselect_all study_selector">Deselect All</button>
+
+  <br><br>
   <% @studies.each do |study| %>
     <% if study.selected %>
-      <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession %>
+      <div class="study_block">
+        <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession %>          
     <% else %>
+      <div class="study_block">         
       <%= check_box_tag "studies[]", study.accession, checked = false, id: study.accession %>
     <% end %>    
-    <%= label_tag(study.accession, study.title, class: 'study_title', for: study.accession) %>      
-    <br/>
-  <% end %>
+    <%= label_tag(study.accession, study.title, class: 'study_title', for: study.accession) %> 
+    </div>         
+  <% end %>  
 <% end %>

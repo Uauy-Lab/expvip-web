@@ -2,6 +2,11 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+.study_selector{
+    font-size: 16px;    
+    text-align: center;
+}
+
 #sequenceserver{        
     width: 100%;
     min-height:650px;
@@ -23,16 +28,25 @@
 }
 
 
-#select_studies:hover, .study_title:hover, input[type="checkbox"]{
+#select_studies:hover, .study_title:hover, .study_block:hover, input[type="checkbox"]{
     cursor: pointer;
 }
 
 .study_title{
-    padding: 0px 10px;
-    width: 90%;
+    padding: 0px 10px;    
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
-.study_title:hover{    
-    background-color: #fffc56;
+
+.study_block{
+    display: inline-block;
+    width: 200px;
+}
+.study_block:hover{
+    background-color: lightgreen;
 }
 
 @media(max-width: 1200px){

@@ -7,7 +7,7 @@ class GenesController < ApplicationController
   def getGeneIds(genes)
     ids = Array.new
     missing = Array.new
-    gene_set = GeneSet.find(session[:gene_set_id])
+    gene_set = GeneSet.find(session[:gene_set_id])    
     genes.each do |g|  
       gene = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id)
       gene = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id) unless  gene
@@ -61,9 +61,12 @@ class GenesController < ApplicationController
   end
 
   def findGeneName(gene_name, gene_set)
-    gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)
-    gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
-    raise "Gene not found: #{gene_name} for #{gene_set.name} " unless gene
+    begin 
+      gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)      
+      gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
+    rescue    
+      raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene      
+    end    
     return gene  
   end
 
@@ -75,9 +78,9 @@ class GenesController < ApplicationController
     #Rails.logger.info session[:genes] 
     #Rails.logger.info params
 
-    session[:studies] = params[:studies] if  params[:studies] 
+    session[:studies] = params[:studies] if  params[:studies]     
 
-    # begin
+    begin
       case params[:submit] 
       when "Heatmap"
         forwardHeatmap 
@@ -88,13 +91,13 @@ class GenesController < ApplicationController
       else
         raise "Unknow redirect: #{params[:submit]}"
       end
-    # rescue Exception => e
-    #   flash[:error] = e.to_s
-    #   puts e
-    #   session[:return_to] ||= request.referer
-    #   redirect_to session.delete(:return_to)
-    #   return
-    # end
+    rescue Exception => e
+      flash[:error] = "Gene was not found!!!"
+      puts e
+      session[:return_to] ||= request.referer
+      redirect_to session.delete(:return_to)
+      return
+    end
 end
 
   def autocomplete
@@ -127,6 +130,9 @@ end
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
       @settings = data[:settings]
+      gene_set_name = data[:gene_set]
+      @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
+      session[:gene_set_id] = @gene_set_id.id            
       settingsObj = JSON.parse @settings
       studies = settingsObj['study']           
     end 
@@ -143,7 +149,8 @@ end
     studies = session[:studies]    
     compare = ""
     alert = ""
-
+    
+    # session[:gene] = @gene.name
     # If parameters passed contain compare
     if params[:compare]
       @compare =  Gene.find_by(:name=>params[:compare])
@@ -156,6 +163,9 @@ end
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
       @settings = data[:settings]
+      gene_set_name = data[:gene_set]
+      @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
+      session[:gene_set_id] = @gene_set_id.id            
       settingsObj = JSON.parse @settings
       studies = settingsObj['study']           
     end   
@@ -169,12 +179,18 @@ end
     sha1 = Digest::SHA1.new
     sha1 << params[:settings]
     hashedSettings = sha1.hexdigest        
+    
 
     # Get the gene
-    if !session[:heatmap]
+    if !session[:heatmap]      
       gene_set = GeneSet.find(session[:gene_set_id])    
-      gene_name = session[:gene]         
-      @gene = findGeneName gene_name, gene_set
+      if params[:gene]
+        gene_name = params[:gene]       
+        session[:gene] = gene_name      
+      else
+        gene_name = session[:gene]
+      end                     
+      @gene = findGeneName gene_name, gene_set                        
     else        
       gene_set = GeneSet.find(session[:gene_set_id])            
     end
@@ -196,6 +212,10 @@ end
       format.json { render json: {"value" => response}}      
     end
     
+  end
+
+  def set_studies_session
+    session[:studies] = JSON.parse params[:studies]    
   end
   
   # DELETE /genes/1

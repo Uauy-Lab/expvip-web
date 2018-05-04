@@ -2,12 +2,12 @@
 
 <%= render :partial => "genes/share" %>
 
-<strong>Gene:</strong> <%= @gene.name %> 
+<strong>Gene:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
 <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
 <% if @compare %>
  <strong>Compare:</strong>
- <%= @compare.name %>   
+ <span id="compare_gene_name"><%= @compare.name %></span>   
  <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@compare.gene}" %>
 <% end %>
 
@@ -20,19 +20,14 @@
   $(window).on('resize', function(e){      
     clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
     resizeTimer = setTimeout(function(){      
-      $("#bar_expression_viewer").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_header_svg").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_sort_div").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_chart_svg").css('width', (window.innerWidth - 40));
-      $("#bar_expression_viewer_footer_svg").css('width', (window.innerWidth - 40));
-      eb.opt.width = window.innerWidth - 40;          
-      eb.refreshSVG();
+      eb.resizeChart();
     }, 1500);
   });
 
   var container_div="bar_expression_viewer";
-  var data_url = "<%= "http://localhost:3000/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
+  var data_url = "<%= "#{request.base_url}/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
+  var parentWidth = $("#bar_expression_viewer").parent().width();
   var eb;
   console.log(data_url);  
   function loadBarChart(){
@@ -40,12 +35,10 @@
       target: container_div,
       highlight: gene, 
       data: data_url,
+      width: parentWidth,
       renderProperty: 'tpm', 
-      fontFamily:'Palatino Linotype, Book Antiqua, Palatino, serif', 
-      groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"], 
-      barHeight:10,
-      width:window.innerWidth - 40,
-      headerOffset:100
+      fontFamily:'Helvetica', 
+      groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   
     });
 
   }

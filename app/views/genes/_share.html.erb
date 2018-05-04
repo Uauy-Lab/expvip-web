@@ -16,7 +16,7 @@
 
 <%# If this is a shared link removed the data from the session and reload it with shared settings %> 
 <% if @settings %>  
-  <%= javascript_tag do %>    
+  <%= javascript_tag do %>        
 
     sessionStorage.clear();    
     var allSharedSettings = JSON.parse(<%= @settings.to_json.html_safe %>);        
@@ -38,18 +38,18 @@
       }
 
       // Stringify all settings to send over request
-      var allSettings = JSON.stringify(selectedFactorsSessionObj);     
+      var allSettings = JSON.stringify(selectedFactorsSessionObj);           
+      
 
       // Determining the data to be sent in the ajax request based on the url parameters
       var sendData;
-      var currentURL = window.location.href;
-      var url = new URL(currentURL);
-      var compareParam = url.searchParams.get("compare");
-
-      if(compareParam){        
-        sendData = {settings: allSettings, compare: compareParam};
+      var searchGeneName = $('#search_gene_name').html();      
+      var compareGeneName = $('#compare_gene_name').html();            
+            
+      if(compareGeneName){        
+        sendData = {settings: allSettings, compare: compareGeneName, gene: searchGeneName};
       } else{       
-        sendData = {settings: allSettings};
+        sendData = {settings: allSettings, gene: searchGeneName};
       }      
 
       // POST request for sending session data to the backend to generate the sharable link
