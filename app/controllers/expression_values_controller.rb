@@ -207,13 +207,20 @@ def gene
     compare = Gene.find_by name: params["compare"] if params["compare"]
     ret['gene'] = gene.name
 
+    
     values = Hash.new
     
     if compare  
       values = getValuesToCompare(gene, compare)
       ret["compare"] = params["compare"]
     else
-      values = getValuesForHomologues(gene)
+      values = getValuesForHomologues(gene)            
+      ret["tern_order"] = ["A", "D", "B"]
+      ret["tern"] = {
+        "A" => "TRIAE_CS42_5AS_TGACv1_393365_AA1271860.1",
+        "B" => "TRIAE_CS42_5BS_TGACv1_424091_AA1386830.1",
+        "D" => "TRIAE_CS42_5DS_TGACv1_457120_AA1482630.1"
+      }
     end
     ret["values"] = values
     add_ret_values(ret, params)
