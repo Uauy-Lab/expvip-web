@@ -13,6 +13,7 @@
 # Ignore lock files.
 Gemfile.lock
 package-lock.json
+yarn.lock
 
 # Ignore the default SQLite database.
 /db/*.sqlite3

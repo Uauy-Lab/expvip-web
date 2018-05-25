@@ -215,12 +215,8 @@ def gene
       ret["compare"] = params["compare"]
     else
       values = getValuesForHomologues(gene)            
-      ret["tern_order"] = ["A", "D", "B"]
-      ret["tern"] = {
-        "A" => "TRIAE_CS42_5AS_TGACv1_393365_AA1271860.1",
-        "B" => "TRIAE_CS42_5BS_TGACv1_424091_AA1386830.1",
-        "D" => "TRIAE_CS42_5DS_TGACv1_457120_AA1482630.1"
-      }
+      gene_set_name = GeneSet.find(gene.gene_set_id).name      
+      add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
     add_ret_values(ret, params)
@@ -304,6 +300,45 @@ end
     ret["groups"] = groups
 
   end
+
+  def add_triads(ret, gene_set, triads)
+    # Adding the tern order
+    ret["tern_order"] = ["A", "D", "B"]
+
+    # Adding the tern (ternkey => gene name)
+    terns = Hash.new    
+
+    triads.each do |triad|                
+
+      # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
+      # Returns an array of all digits in the gene name
+      first_number = triad.scan(/[[:digit:]]/)
+
+      # Getting the index of the tern key
+      if gene_set == "TGACv1"
+        tern_key_index = triad.index(first_number[2]) + 1
+      else
+        tern_key_index = triad.index(first_number[0]) + 1
+      end      
+
+      # Getting the tern key from its index
+      tern_key = triad[tern_key_index]        
+
+      case tern_key
+      when "A"
+        terns["A"] = triad        
+      when "B"
+        terns["B"] = triad         
+      when "D"
+        terns["D"] = triad           
+      else
+        puts "\n\n\nCouldn't find a tern key :(\n\n\n" 
+      end     
+
+    end
+    ret["tern"] = terns
+    
+  end  
 
     # Use callbacks to share common setup or constraints between actions.
     def set_expression_value
