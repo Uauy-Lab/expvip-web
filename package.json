@@ -10,6 +10,6 @@
     "watchify": "^3.2.2"
   },
   "dependencies": {
-    "bio-vis-expression-bar": "https://github.com/Bijan-Ghasemi-Afshar/biojs-vis-expression-bar.git#ternary_plot"
+    "bio-vis-expression-bar": "https://github.com/Bijan-Ghasemi-Afshar/biojs-vis-expression-bar.git#session_bug"
   }
 }
