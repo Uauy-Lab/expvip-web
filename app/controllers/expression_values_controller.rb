@@ -308,6 +308,8 @@ end
     # Adding the tern (ternkey => gene name)
     terns = Hash.new    
 
+    puts "\n\n\n\n\n\nThis is the number of triads: #{triads.length}\n\n\n\n\n\n"
+
     triads.each do |triad|                
 
       # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
@@ -326,11 +328,74 @@ end
 
       case tern_key
       when "A"
-        terns["A"] = triad        
+
+        if terns["A"].nil?
+          puts "\nA doesn't have any value\n"
+          terns["A"] = triad
+        else
+          puts "\nA HAS a value\n"
+
+          first_triad = Gene.find_by name: terns["A"]          
+          first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
+          first_perc_cov = first_homology_pair.perc_cov
+          second_triad = Gene.find_by name: triad          
+          second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
+          second_perc_cov = second_homology_pair.perc_cov
+
+          if first_perc_cov < second_perc_cov
+            puts "\n\n\nsecond perc_cov is larger with #{second_perc_cov}\n\n\n"
+            terns["A"] = triad
+          else
+            puts "\n\n\nsecond perc_cov is NOT larger with #{second_perc_cov}\n\n\n"
+          end                    
+        end              
+
       when "B"
-        terns["B"] = triad         
+
+        if terns["B"].nil?
+          puts "\nB doesn't have any value\n"
+          terns["B"] = triad
+        else
+          puts "\nB HAS a value\n"
+
+          first_triad = Gene.find_by name: terns["B"]          
+          first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
+          first_perc_cov = first_homology_pair.perc_cov
+          second_triad = Gene.find_by name: triad          
+          second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
+          second_perc_cov = second_homology_pair.perc_cov
+
+          if first_perc_cov < second_perc_cov
+            puts "\n\n\nsecond perc_cov is larger with #{second_perc_cov}\n\n\n"
+            terns["B"] = triad
+          else
+            puts "\n\n\nsecond perc_cov is NOT larger with #{second_perc_cov}\n\n\n"
+          end                    
+        end
+                
       when "D"
-        terns["D"] = triad           
+
+        if terns["D"].nil?
+          puts "\nD doesn't have any value\n"
+          terns["D"] = triad
+        else
+          puts "\nD HAS a value\n"
+
+          first_triad = Gene.find_by name: terns["D"]
+          first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
+          first_perc_cov = first_homology_pair.perc_cov
+          second_triad = Gene.find_by name: triad          
+          second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
+          second_perc_cov = second_homology_pair.perc_cov
+
+          if first_perc_cov < second_perc_cov
+            puts "\n\n\nsecond perc_cov is larger with #{second_perc_cov}\n\n\n"
+            terns["D"] = triad
+          else
+            puts "\n\n\nsecond perc_cov is NOT larger with #{second_perc_cov}\n\n\n"
+          end                    
+        end
+                  
       else
         puts "\n\n\nCouldn't find a tern key :(\n\n\n" 
       end     
