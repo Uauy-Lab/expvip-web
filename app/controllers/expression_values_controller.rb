@@ -301,16 +301,16 @@ end
 
   end
 
+  # Adding the tern_order and tern values (triads) to the data which enables the ternary plot to be displayed
   def add_triads(ret, gene_set, triads)
+
     # Adding the tern order
     ret["tern_order"] = ["A", "D", "B"]
 
     # Adding the tern (ternkey => gene name)
     terns = Hash.new    
 
-    puts "\n\n\n\n\n\nThis is the number of triads: #{triads.length}\n\n\n\n\n\n"
-
-    triads.each do |triad|                
+    triads.each do |triad|
 
       # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
       # Returns an array of all digits in the gene name
@@ -327,83 +327,53 @@ end
       tern_key = triad[tern_key_index]        
 
       case tern_key
-      when "A"
+      when "A"          
 
-        if terns["A"].nil?
-          puts "\nA doesn't have any value\n"
-          terns["A"] = triad
-        else
-          puts "\nA HAS a value\n"
-
-          first_triad = Gene.find_by name: terns["A"]          
-          first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
-          first_perc_cov = first_homology_pair.perc_cov
-          second_triad = Gene.find_by name: triad          
-          second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
-          second_perc_cov = second_homology_pair.perc_cov
-
-          if first_perc_cov < second_perc_cov
-            puts "\n\n\nsecond perc_cov is larger with #{second_perc_cov}\n\n\n"
-            terns["A"] = triad
-          else
-            puts "\n\n\nsecond perc_cov is NOT larger with #{second_perc_cov}\n\n\n"
-          end                    
-        end              
+        allocate_triad_to_tern("A")
 
       when "B"
-
-        if terns["B"].nil?
-          puts "\nB doesn't have any value\n"
-          terns["B"] = triad
-        else
-          puts "\nB HAS a value\n"
-
-          first_triad = Gene.find_by name: terns["B"]          
-          first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
-          first_perc_cov = first_homology_pair.perc_cov
-          second_triad = Gene.find_by name: triad          
-          second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
-          second_perc_cov = second_homology_pair.perc_cov
-
-          if first_perc_cov < second_perc_cov
-            puts "\n\n\nsecond perc_cov is larger with #{second_perc_cov}\n\n\n"
-            terns["B"] = triad
-          else
-            puts "\n\n\nsecond perc_cov is NOT larger with #{second_perc_cov}\n\n\n"
-          end                    
-        end
-                
+        
+        allocate_triad_to_tern("B")
+                  
       when "D"
-
-        if terns["D"].nil?
-          puts "\nD doesn't have any value\n"
-          terns["D"] = triad
-        else
-          puts "\nD HAS a value\n"
-
-          first_triad = Gene.find_by name: terns["D"]
-          first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
-          first_perc_cov = first_homology_pair.perc_cov
-          second_triad = Gene.find_by name: triad          
-          second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
-          second_perc_cov = second_homology_pair.perc_cov
-
-          if first_perc_cov < second_perc_cov
-            puts "\n\n\nsecond perc_cov is larger with #{second_perc_cov}\n\n\n"
-            terns["D"] = triad
-          else
-            puts "\n\n\nsecond perc_cov is NOT larger with #{second_perc_cov}\n\n\n"
-          end                    
-        end
+      
+        allocate_triad_to_tern("D")
                   
       else
         puts "\n\n\nCouldn't find a tern key :(\n\n\n" 
       end     
 
     end
+
     ret["tern"] = terns
     
   end  
+
+  # Allocating triads to their corresponding tern (and compare perc_cov with already existing triad allocated to its tern) which prepares data for ternary plot display
+  def allocate_triad_to_tern(tern_key)    
+
+    if terns[tern_key].nil?
+      puts "\n#{tern_key} doesn't have any value\n"
+      terns[tern_key] = triad
+    else
+      puts "\n#{tern_key} already HAS a value\n"
+
+      first_triad = Gene.find_by name: terns[tern_key]
+      first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
+      first_perc_cov = first_homology_pair.perc_cov
+      second_triad = Gene.find_by name: triad          
+      second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
+      second_perc_cov = second_homology_pair.perc_cov
+
+      if first_perc_cov < second_perc_cov
+        puts "\n\n\nsecond perc_cov:#{second_perc_cov} > first perc_cov:#{first_perc_cov}\n\n\n"
+        terns[tern_key] = triad
+      else
+        puts "\n\n\nsecond perc_cov:#{second_perc_cov} < first perc_cov:#{first_perc_cov}\n\n\n"
+      end                    
+    end
+
+  end
 
     # Use callbacks to share common setup or constraints between actions.
     def set_expression_value
