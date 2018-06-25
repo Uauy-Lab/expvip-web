@@ -176,7 +176,7 @@ ready = (function() {
         heatmapGeneExamples += `${obj}\n`;           
       }      
 
-      $(`#genes_heatmap`).html(heatmapGeneExamples);
+      $(`#genes_heatmap`).val(heatmapGeneExamples);
     })
     .fail(function() {
       alert("There was an error while trying to populate the textarea");
