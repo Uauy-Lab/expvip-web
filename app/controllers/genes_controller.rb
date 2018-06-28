@@ -92,7 +92,7 @@ class GenesController < ApplicationController
         raise "Unknow redirect: #{params[:submit]}"
       end
     rescue Exception => e
-      flash[:error] = "Gene was not found!!!"
+      flash[:error] = "Gene Was Not Found"
       puts e
       session[:return_to] ||= request.referer
       redirect_to session.delete(:return_to)

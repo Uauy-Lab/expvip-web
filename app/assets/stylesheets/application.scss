@@ -122,45 +122,40 @@ img.logo{
 }
 
 // Alert Stylings ****************************************
-.alert-error {
-    position: fixed;
-    float: center;
-    top: 130px;
+.alert{
+    position: fixed;    
+    top: 200px;
     left: 0;
     right: 0;
     margin: 0 auto;
     cursor:pointer;
-    width:500px;
-    cursor:hand;
-    background: #FFE7E7 url('../assets/exclamation.png') center no-repeat;
-    background-position: 15px 50%;
+    width:500px;            
     text-align: left;
-    padding: 0px 0px 1px 45px;
-    border-top: 1px solid #E77D7B;
-    border-bottom: 1px solid #E77D7B;
+    padding: 0px 0px 1px 45px;   
     border:1px solid #E77D7B;
     overflow:auto;
 }
-
-.alert-info {
-    position: fixed;
-    float: center;
-    top: 130px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    cursor:pointer;
-    width:500px;
-    cursor:hand;
-    background: #E7F3FF url('../assets/information.png') center no-repeat;
-    background-position: 15px 50%;
-    text-align: left;
-    padding: 0px 0px 1px 45px;
-    border-top: 1px solid #7BA6D6;
-    border-bottom: 1px solid #7BA6D6;
-    border:1px solid #7BA6D6;
-    overflow:auto;
+.alert p{
+    margin: 0;
+    display: inline;
+    padding-right: 20px;
 }
+
+.error{
+    background: #FFE7E7;
+}
+.error p{   
+    background: #FFE7E7 url('../assets/exclamation.png') right no-repeat;   
+}
+
+
+.info{
+    background: #E7F3FF;
+}
+.info p{
+    background: #E7F3FF url('../assets/information.png') right no-repeat;
+}
+
 
 // New Stylings ****************************************
 input[type="submit"], button{    
