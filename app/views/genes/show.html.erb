@@ -24,6 +24,7 @@
     }, 1500);
   });
 
+
   var container_div="bar_expression_viewer";
   var data_url = "<%= "#{request.base_url}/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
@@ -42,6 +43,6 @@
     });
 
   }
-  loadBarChart();     
+  loadBarChart();       
   //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen    
 </script>

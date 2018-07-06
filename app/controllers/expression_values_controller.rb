@@ -207,13 +207,16 @@ def gene
     compare = Gene.find_by name: params["compare"] if params["compare"]
     ret['gene'] = gene.name
 
+    
     values = Hash.new
     
     if compare  
       values = getValuesToCompare(gene, compare)
       ret["compare"] = params["compare"]
     else
-      values = getValuesForHomologues(gene)
+      values = getValuesForHomologues(gene)            
+      gene_set_name = GeneSet.find(gene.gene_set_id).name      
+      add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
     add_ret_values(ret, params)
@@ -281,22 +284,96 @@ end
 
   private
 
-  def add_ret_values(ret, params)
-    factorOrder, longFactorName, selectedFactors = getFactorOrder 
-    experiments, groups = getExperimentGroups
-    params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
+    def add_ret_values(ret, params)
+      factorOrder, longFactorName, selectedFactors = getFactorOrder 
+      experiments, groups = getExperimentGroups
+      params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
 
-    ret["factorOrder"]= factorOrder
-    ret["longFactorName"]= longFactorName
-    
-    ret["selectedFactors"]= selectedFactors
-    ret["defaultFactorSelection"] = getDefaultSelection
-    ret["defaultFactorOrder"] = getDefaultOrder
-    
-    ret["experiments"] = experiments
-    ret["groups"] = groups
+      ret["factorOrder"]= factorOrder
+      ret["longFactorName"]= longFactorName
+      
+      ret["selectedFactors"]= selectedFactors
+      ret["defaultFactorSelection"] = getDefaultSelection
+      ret["defaultFactorOrder"] = getDefaultOrder
+      
+      ret["experiments"] = experiments
+      ret["groups"] = groups
 
-  end
+    end
+
+    # Adding the tern_order and tern values (triads) to the data which enables the ternary plot to be displayed
+    def add_triads(ret, gene_set, triads)
+
+      # Adding the tern order
+      ret["tern_order"] = ["A", "D", "B"]
+
+      # Adding the tern (ternkey => gene name)
+      terns = Hash.new    
+
+      triads.each do |triad|
+
+        # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
+        # Returns an array of all digits in the gene name
+        first_number = triad.scan(/[[:digit:]]/)
+
+        # Getting the index of the tern key
+        if gene_set == "TGACv1"
+          tern_key_index = triad.index(first_number[2]) + 1
+        else
+          tern_key_index = triad.index(first_number[0]) + 1
+        end      
+
+        # Getting the tern key from its index
+        tern_key = triad[tern_key_index]        
+
+        case tern_key
+        when "A"          
+
+          allocate_triad_to_tern("A", terns, triad)
+
+        when "B"
+          
+          allocate_triad_to_tern("B", terns, triad)
+                    
+        when "D"
+        
+          allocate_triad_to_tern("D", terns, triad)
+                    
+        else
+          puts "\n\n\nCouldn't find a tern key :(\n\n\n" 
+        end     
+
+      end
+
+      ret["tern"] = terns
+      
+    end  
+
+    # Allocating triads to their corresponding tern (and compare perc_cov with already existing triad allocated to its tern) which prepares data for ternary plot display
+    def allocate_triad_to_tern(tern_key, terns, triad)    
+
+      if terns[tern_key].nil?
+        puts "\n#{tern_key} doesn't have any value\n"
+        terns[tern_key] = triad
+      else
+        puts "\n#{tern_key} already HAS a value\n"
+
+        first_triad = Gene.find_by name: terns[tern_key]
+        first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
+        first_perc_cov = first_homology_pair.perc_cov
+        second_triad = Gene.find_by name: triad          
+        second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
+        second_perc_cov = second_homology_pair.perc_cov
+
+        if first_perc_cov < second_perc_cov
+          puts "\n\n\nsecond perc_cov:#{second_perc_cov} > first perc_cov:#{first_perc_cov}\n\n\n"
+          terns[tern_key] = triad
+        else
+          puts "\n\n\nsecond perc_cov:#{second_perc_cov} < first perc_cov:#{first_perc_cov}\n\n\n"
+        end                    
+      end
+
+    end
 
     # Use callbacks to share common setup or constraints between actions.
     def set_expression_value
@@ -307,4 +384,5 @@ end
     def expression_value_params
       params.require(:expression_value).permit(:compare, :experiment_id, :gene_id, :meta_experiment_id, :type_of_value_id, :value)
     end
+
   end

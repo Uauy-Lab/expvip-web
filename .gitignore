@@ -11,8 +11,9 @@
 /app/assets/javascripts/bundle.js
 
 # Ignore lock files.
-Gemfile.lock
+*.lock
 package-lock.json
+
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
