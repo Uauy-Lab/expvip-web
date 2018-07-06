@@ -108,7 +108,7 @@ end
     respond_to do |format|
       format.html
       format.json { 
-        render json: @genes.map(&:name)
+        render json: [@genes.map(&:gene).uniq, @genes.map(&:transcript) ].flatten
       }
     end
   end
