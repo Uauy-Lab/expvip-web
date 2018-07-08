@@ -37,13 +37,15 @@ class GenesController < ApplicationController
     gene_name = params[:query] if params[:query]
     gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
     gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
-    
     session[:heatmap] = false
-    
-    @gene = findGeneName gene_name, gene_set 
-    session[:gene] = @gene.name
+    @gene, @search_by = findGeneName gene_name, gene_set 
+    session[:gene] = @search_by == "gene" ? @gene.gene : @gene.name 
+    session[:search_by] = @search_by
     session[:gene_set_id] = gene_set.id    
-    redirect_to  action: "show", id: @gene.id
+    redirect_to  action: "show", 
+      search_by: @search_by, 
+      gene: session[:gene], 
+      gene_set: gene_set.name
   end
 
   def forwardCompare
@@ -67,19 +69,13 @@ class GenesController < ApplicationController
     rescue    
       raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene      
     end    
-    return gene  
+    return [gene,  gene_name == gene.gene ? "gene": "transcript" ]  
   end
 
   # GET /genes
   # GET /genes.json
   def forward
-    #puts "Index: #{params}"
-    #Rails.logger.info "In forward"
-    #Rails.logger.info session[:genes] 
-    #Rails.logger.info params
-
     session[:studies] = params[:studies] if  params[:studies]     
-
     begin
       case params[:submit] 
       when "Heatmap"
@@ -92,7 +88,7 @@ class GenesController < ApplicationController
         raise "Unknow redirect: #{params[:submit]}"
       end
     rescue Exception => e
-      flash[:error] = "Gene was not found!!!"
+      flash[:error] = "Error forwarding."
       puts e
       session[:return_to] ||= request.referer
       redirect_to session.delete(:return_to)
@@ -101,7 +97,6 @@ class GenesController < ApplicationController
 end
 
   def autocomplete
-    #puts "In autocomplete!"
     gene_set_id = session[:gene_set_id] 
     @genes = Gene.order(:name).where("name LIKE ? and gene_set_id = ?", "%#{params[:term]}%", gene_set_id).limit(20)
 

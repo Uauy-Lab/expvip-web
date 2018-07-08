@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       get 'forward'
       post 'share' 
       get 'set_studies_session'     
+      get 'show'
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.
