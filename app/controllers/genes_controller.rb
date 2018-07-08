@@ -31,35 +31,42 @@ class GenesController < ApplicationController
     redirect_to action: "heatmap"
   end
 
-  def forwardSearch
+  def forwardCommon
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
-    gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
-    gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
+    @gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
+    @gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
     session[:heatmap] = false
-    @gene, @search_by = findGeneName gene_name, gene_set 
+    @gene, @search_by = findGeneName gene_name, @gene_set 
     session[:gene] = @search_by == "gene" ? @gene.gene : @gene.name 
     session[:search_by] = @search_by
-    session[:gene_set_id] = gene_set.id    
+    session[:gene_set_id] = @gene_set.id
+  end
+
+  def forwardSearch
+    forwardCommon    
     redirect_to  action: "show", 
       search_by: @search_by, 
       gene: session[:gene], 
-      gene_set: gene_set.name
+      gene_set: @gene_set.name
   end
 
   def forwardCompare
-    gene_name = nil
-    gene_name = params[:gene]
-    gene_name = params[:query] if params[:query]
+    forwardCommon
+    @compare, @search_by_compare = findGeneName params[:compare], @gene_set
 
-    session[:heatmap] = false
-    
-    gene_set = GeneSet.find(params[:gene_set_selector])
-    session[:gene_set_id] = gene_set.id
-    @gene = findGeneName(gene_name, gene_set)
-    @compare =  findGeneName params[:compare], gene_set
-    redirect_to  action: "show", id: @gene.id, compare:  @compare.name  
+    unless @search_by == @search_by_compare
+      flash[:error] =  "Can't compare gene vs transcript" 
+      session[:return_to] ||= request.referer
+      redirect_to session.delete(:return_to)
+      return
+    end
+    redirect_to  action: "show", 
+      search_by: @search_by, 
+      gene: session[:gene], 
+      gene_set: @gene_set.name,
+      compare:  @compare.name  
   end
 
   def findGeneName(gene_name, gene_set)
@@ -88,7 +95,7 @@ class GenesController < ApplicationController
         raise "Unknow redirect: #{params[:submit]}"
       end
     rescue Exception => e
-      flash[:error] = "Error forwarding."
+      flash[:error] = e
       puts e
       session[:return_to] ||= request.referer
       redirect_to session.delete(:return_to)
@@ -141,6 +148,7 @@ end
   # GET /genes/1
   # GET /genes/1.json
   def show 
+    #Use TRIAE_CS42_2BL_TGACv1_130848_AA0418720 as it has multiple transcripts
     studies = session[:studies]    
     compare = ""
     alert = ""
