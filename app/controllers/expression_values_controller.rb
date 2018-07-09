@@ -195,7 +195,6 @@ def getValuesToCompare(gene, compare)
 end
 
 
-
 def gene
     #puts @gene_id
    #ret = Hash.new
@@ -221,6 +220,37 @@ def gene
     ret["values"] = values
     add_ret_values(ret, params)
    
+    respond_to do |format|
+      format.json {render json: ret, format: :json}
+    end
+
+  end
+
+
+  def transcript
+    
+    puts "TRANSCRIPT!!!"
+    puts params.inspect
+    puts "Gene set: '#{params[:name]}'"
+    ret = Hash.new 
+
+    gene_set = GeneSet.find_by name: params["gene_set"]
+    gene     = Gene.find_by    name: params["name"],    gene_set: gene_set
+    compare  = Gene.find_by    name: params["compare"], gene_set: gene_set if params["compare"]
+    ret['gene'] = gene.name
+
+    values = Hash.new
+    if compare  
+      values = getValuesToCompare(gene, compare)
+      ret["compare"] = params["compare"]
+    else
+      values = getValuesForHomologues(gene,)            
+      gene_set_name = GeneSet.find(gene.gene_set_id).name      
+      add_triads(ret, gene_set_name, values.keys)
+    end
+    ret["values"] = values
+    add_ret_values(ret, params)
+
     respond_to do |format|
       format.json {render json: ret, format: :json}
     end
@@ -275,7 +305,6 @@ def gene
     "Stress-disease"=>false,
     "study"=>false,
     "Tissue" => false,
-    "study"=>false,
     "Intermediate" => false,
     "Intermediate stress" => false
   }
@@ -382,7 +411,12 @@ end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def expression_value_params
-      params.require(:expression_value).permit(:compare, :experiment_id, :gene_id, :meta_experiment_id, :type_of_value_id, :value)
+      params.require(:expression_value).permit(:compare, 
+        :experiment_id, 
+        :gene_id, 
+        :meta_experiment_id, 
+        :type_of_value_id, 
+        :value)
     end
 
   end

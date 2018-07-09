@@ -153,6 +153,13 @@ end
     compare = ""
     alert = ""
     
+    gene = {
+      name: params[:gene],
+      gene: params[:gene], 
+      search_by: params[:search_by]
+    }
+
+
     # session[:gene] = @gene.name
     # If parameters passed contain compare
     if params[:compare]
@@ -161,7 +168,7 @@ end
       compare = @compare.name
     end    
     
-    # If parameters passed cnotain settings (it's a shared link)
+    # If parameters passed contain settings (it's a shared link)
     if params[:settings]
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
@@ -172,8 +179,9 @@ end
       settingsObj = JSON.parse @settings
       studies = settingsObj['study']           
     end   
+    @gene = OpenStruct.new(gene)
     
-    @args = {studies: studies, compare: compare }.to_query
+    @args = {studies: studies, compare: compare, name: @gene.name, gene_set: params[:gene_set]  }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  
 
