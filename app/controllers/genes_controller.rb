@@ -66,7 +66,7 @@ class GenesController < ApplicationController
       search_by: @search_by, 
       gene: session[:gene], 
       gene_set: @gene_set.name,
-      compare:  @compare.name  
+      compare:  params[:compare] 
   end
 
   def findGeneName(gene_name, gene_set)
