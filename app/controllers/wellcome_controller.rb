@@ -47,7 +47,9 @@ class WellcomeController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: {"value" => @example}}
+      format.json do
+        render json: {"value" => @example}
+      end
     end
   end
 

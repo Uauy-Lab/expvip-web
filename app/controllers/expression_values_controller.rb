@@ -130,9 +130,7 @@ end
 def getValuesForTranscripts(transcripts_in_gene)
   values = Hash.new { |hash, key| hash[key] = Hash.new { |h,k| h[k] = 0 } }
   transcripts_in_gene.each do |t|  
-    #puts t.inspect
     v_t = getValuesForTranscript(t)
-    #puts v_t.inspect
     v_t.each_pair do |type, h|
       h.each_pair do |exp, val|
         current = values[type][exp]
@@ -154,8 +152,7 @@ def getValuesForTranscript(gene)
     values[type_of_value] = Hash.new unless  values[type_of_value]
     tvh = values[type_of_value]
     obj = client[:experiments].find({ :_id => ev.id })
-    obj.first.each_pair { |k, val| values[type_of_value][k.to_s] = {experiment:  k, value: val}  unless k == "_id" }
-    
+    obj.first.each_pair {|k, val| values[type_of_value][k.to_s] = {experiment:  k, value: val}  unless k == "_id" }    
   end
   return values
 end
@@ -181,10 +178,8 @@ def getDefaultOrder
   def getValuesForHomologuesTranscripts(gene)
     values = Hash.new
     values[gene.name] = getValuesForTranscript(gene)  
-    puts "In hom transcripts"
     HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|
       hom = h.homology 
-      puts hom
       HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
         if h2.gene.gene_set_id == gene.gene_set_id
           values[h2.gene.name] = getValuesForTranscript(h2.gene) unless h2.gene == gene
@@ -194,17 +189,29 @@ def getDefaultOrder
   return values
 end
 
+def getHomologueGenesForGene(transcripts_in_gene)
+  ret = Set.new
+  transcripts_in_gene.each do |t|  
+    HomologyPair.where("gene_id = :gene_id", {gene_id: t.id}).each do |h|
+      hom = h.homology 
+      HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
+        if h2.gene.gene_set_id == t.gene_set_id
+          ret << h2.gene.gene unless h2.gene == t.gene
+        end
+      end
+    end
+  end
+  ret
+end
+
 def getValuesForHomologueGenes(gene_name, transcripts)
   values = Hash.new
   values[gene_name] = getValuesForTranscripts(transcripts)  
-    #HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|
-    #  hom = h.homology 
-    #  HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
-    #    if h2.gene.gene_set_id == gene.gene_set_id
-    #      values[h2.gene.name] = getValuesForTranscript(h2.gene) unless h2.gene == gene
-    #    end
-    #  end
-    #end
+  homs = getHomologueGenesForGene transcripts
+  puts homs.inspect
+  homs.each do |e|  
+    values[e] = getValuesForTranscripts(GenesHelper.findTranscripts(e))
+  end
   return values
 end
 
@@ -239,9 +246,9 @@ def gene
       ret["compare"] = compare_name
     else
       puts "In homoeologues"
-      #values = getValuesForHomologueGenes(gene_name, transcripts)            
-      #gene_set_name = GeneSet.find(gene.gene_set_id).name      
-      #add_triads(ret, gene_set_name, values.keys)
+      values = getValuesForHomologueGenes(gene_name, transcripts)            
+      gene_set_name = params["gene_set"]    
+      add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
     add_ret_values(ret, params)   
@@ -368,29 +375,19 @@ end
         end      
 
         # Getting the tern key from its index
-        tern_key = triad[tern_key_index]        
-
+        tern_key = triad[tern_key_index]
         case tern_key
         when "A"          
-
           allocate_triad_to_tern("A", terns, triad)
-
         when "B"
-          
-          allocate_triad_to_tern("B", terns, triad)
-                    
+          allocate_triad_to_tern("B", terns, triad)    
         when "D"
-        
-          allocate_triad_to_tern("D", terns, triad)
-                    
+          allocate_triad_to_tern("D", terns, triad)    
         else
           puts "\n\n\nCouldn't find a tern key :(\n\n\n" 
         end     
-
       end
-
       ret["tern"] = terns
-      
     end  
 
     # Allocating triads to their corresponding tern (and compare perc_cov with already existing triad allocated to its tern) which prepares data for ternary plot display
