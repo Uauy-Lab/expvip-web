@@ -17,6 +17,15 @@ module GenesHelper
 		
 	end
 
+	def self.findTranscripts(gene_name)
+		transcripts = Array.new
+
+		Gene.where("gene = :gene_name", {gene_name: gene_name}).each do |t|
+		 transcripts<<t
+		end if gene_name.size > 2
+		transcripts
+	end
+
 
 	def self.saveValues(gene, type, values)		
 		@client = MongodbHelper.getConnection unless @client 

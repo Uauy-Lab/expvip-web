@@ -163,9 +163,10 @@ end
     # session[:gene] = @gene.name
     # If parameters passed contain compare
     if params[:compare]
-      @compare =  Gene.find_by(:name=>params[:compare])
-      @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
-      compare = @compare.name
+
+      #@compare =  Gene.find_by(:name=>params[:compare])
+      #@compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
+      compare = params[:compare]
     end    
     
     # If parameters passed contain settings (it's a shared link)

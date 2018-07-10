@@ -140,7 +140,25 @@ def getExperimentGroups
   return [experiments, groups]
 end
 
-def getValuesForGene(gene)
+def getValuesForTranscripts(transcripts)
+  values = Hash.new { |hash, key| hash[key] = Hash.new { |h,k| h[k] = 0 } }
+  transcripts.each do |t|  
+    #puts t.inspect
+    v_t = getValuesForTranscript(t)
+    #puts v_t.inspect
+    v_t.each_pair do |type, h|
+      h.each_pair do |exp, val|
+        current = values[type][exp]
+        current = {:experiment=>exp, :value=>0.0} if current == 0
+        current[:value] += val[:value]
+        values[type][exp] = current 
+     end
+    end
+  end
+  values
+end
+
+def getValuesForTranscript(gene)
   #TODO: Add code to validate for different experiments. 
   values = Hash.new
   client = MongodbHelper.getConnection
@@ -173,92 +191,101 @@ def getDefaultOrder
     return defOrder
   end
 
-  def getValuesForHomologues(gene)
+  def getValuesForHomologuesTranscripts(gene)
     values = Hash.new
-    values[gene.name] = getValuesForGene(gene)  
+    values[gene.name] = getValuesForTranscript(gene)  
+    puts "In hom transcripts"
     HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|
       hom = h.homology 
+      puts hom
       HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
         if h2.gene.gene_set_id == gene.gene_set_id
-          values[h2.gene.name] = getValuesForGene(h2.gene) unless h2.gene == gene
+          values[h2.gene.name] = getValuesForTranscript(h2.gene) unless h2.gene == gene
         end
       end
     end
   return values
 end
 
-def getValuesToCompare(gene, compare)
+def getValuesForHomologueGenes(gene_name, transcripts)
   values = Hash.new
-  values[gene.name]    = getValuesForGene(gene)
-  values[compare.name] = getValuesForGene(compare) 
+  values[gene_name] = getValuesForTranscripts(transcripts)  
+    #HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|
+    #  hom = h.homology 
+    #  HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
+    #    if h2.gene.gene_set_id == gene.gene_set_id
+    #      values[h2.gene.name] = getValuesForTranscript(h2.gene) unless h2.gene == gene
+    #    end
+    #  end
+    #end
+  return values
+end
+
+def getValuesToCompareTranscipts(gene, compare)
+  values = Hash.new
+  values[gene.name]    = getValuesForTranscript(gene)
+  values[compare.name] = getValuesForTranscript(compare) 
+  return values
+end
+
+def getValuesToCompareGene(gene_name, compare_name, gene, compare)
+  values = Hash.new
+  values[gene_name]    = getValuesForTranscripts(gene)
+  values[compare_name] = getValuesForTranscripts(compare) 
   return values
 end
 
 
 def gene
-    #puts @gene_id
-   #ret = Hash.new
-    #ret["Hello"] = params
-    #ret = ExpressionValue.find_expression_for_gene(params["gene_id"])
-    
     ret = Hash.new 
-    gene = Gene.find params["gene_id"]
-    compare = Gene.find_by name: params["compare"] if params["compare"]
-    ret['gene'] = gene.name
-
-    
+    gene_name    = params["name"]
+    compare_name = params["compare"]
+    transcripts  = GenesHelper.findTranscripts(gene_name)
+    compare      = GenesHelper.findTranscripts(compare_name) if compare_name
+  
+    ret['gene'] = gene_name
     values = Hash.new
-    
-    if compare  
-      values = getValuesToCompare(gene, compare)
-      ret["compare"] = params["compare"]
+    if compare.size > 0     
+      #puts "In compare"
+      values = getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
+      ret["compare"] = compare_name
     else
-      values = getValuesForHomologues(gene)            
-      gene_set_name = GeneSet.find(gene.gene_set_id).name      
-      add_triads(ret, gene_set_name, values.keys)
+      puts "In homoeologues"
+      values = getValuesForHomologueGenes(gene_name, transcripts)            
+      #gene_set_name = GeneSet.find(gene.gene_set_id).name      
+      #add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
-    add_ret_values(ret, params)
-   
+    add_ret_values(ret, params)   
     respond_to do |format|
       format.json {render json: ret, format: :json}
     end
-
   end
 
-
   def transcript
-    
-    puts "TRANSCRIPT!!!"
-    puts params.inspect
-    puts "Gene set: '#{params[:name]}'"
     ret = Hash.new 
-
+    add_ret_values(ret, params)
     gene_set = GeneSet.find_by name: params["gene_set"]
     gene     = Gene.find_by    name: params["name"],    gene_set: gene_set
     compare  = Gene.find_by    name: params["compare"], gene_set: gene_set if params["compare"]
     ret['gene'] = gene.name
-
     values = Hash.new
     if compare  
-      values = getValuesToCompare(gene, compare)
+      values = getValuesToCompareTranscipts(gene, compare)
       ret["compare"] = params["compare"]
     else
-      values = getValuesForHomologues(gene,)            
+      values = getValuesForHomologuesTranscripts(gene,)            
       gene_set_name = GeneSet.find(gene.gene_set_id).name      
       add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
-    add_ret_values(ret, params)
-
+    
     respond_to do |format|
       format.json {render json: ret, format: :json}
     end
-
   end
 
   def genes
-
     old_logger = ActiveRecord::Base.logger
     ActiveRecord::Base.logger.level  = 1
     Rails.logger.info "genes"
@@ -281,7 +308,7 @@ def gene
         gene = Gene.find_by(:name=>g)
         gene = Gene.find_by(:gene=>g) unless  gene
       end
-      values[gene.name] = getValuesForGene(gene)  if gene
+      values[gene.name] = getValuesForTranscript(gene)  if gene
     end
 
     ret["values"] = values
