@@ -107,12 +107,10 @@ def getExperimentGroups
   groups          = Hash.new 
   Experiment.find_each do | g |
     group = Hash.new
-    #byebug
-    #puts g.inspect
+   
     #Should we use description instead?
     group["name"] = g.accession
     group["description"] = g.accession
-    #group["group"] = g.id.to_s
     factors = Hash.new
     g.factors.each { |f| factors[f.factor] = f.name }
 
@@ -120,20 +118,9 @@ def getExperimentGroups
     experiments[g.id] = Hash.new 
     exp = experiments[g.id]
     exp["name"]  = g.accession
-    #exp["study"] = g.study.
     exp["group"] = g.id.to_s
     factors["study"] = g.study.accession
 
-    #g.experiments.each do |e|  
-    #  unless experiments[e.id]
-    #    experiments[e.id] = Hash.new 
-    #    exp = experiments[e.id]
-    #    exp["name"] = e.accession
-    #    exp["study"] = e.study_id.to_s
-    #    exp["group"] = g.id.to_s
-    #    factors["study"] = e.study.accession
-    #  end
-    #end
     group['factors'] = factors
     groups[g.id] = group
   end
