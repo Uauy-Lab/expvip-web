@@ -140,9 +140,9 @@ def getExperimentGroups
   return [experiments, groups]
 end
 
-def getValuesForTranscripts(transcripts)
+def getValuesForTranscripts(transcripts_in_gene)
   values = Hash.new { |hash, key| hash[key] = Hash.new { |h,k| h[k] = 0 } }
-  transcripts.each do |t|  
+  transcripts_in_gene.each do |t|  
     #puts t.inspect
     v_t = getValuesForTranscript(t)
     #puts v_t.inspect
@@ -239,19 +239,20 @@ end
 def gene
     ret = Hash.new 
     gene_name    = params["name"]
+    puts params.inspect
     compare_name = params["compare"]
     transcripts  = GenesHelper.findTranscripts(gene_name)
     compare      = GenesHelper.findTranscripts(compare_name) if compare_name
-  
+    puts gene_name
     ret['gene'] = gene_name
     values = Hash.new
     if compare.size > 0     
-      #puts "In compare"
+      puts "In compare"
       values = getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
       ret["compare"] = compare_name
     else
       puts "In homoeologues"
-      values = getValuesForHomologueGenes(gene_name, transcripts)            
+      #values = getValuesForHomologueGenes(gene_name, transcripts)            
       #gene_set_name = GeneSet.find(gene.gene_set_id).name      
       #add_triads(ret, gene_set_name, values.keys)
     end
@@ -264,7 +265,7 @@ def gene
 
   def transcript
     ret = Hash.new 
-    add_ret_values(ret, params)
+    
     gene_set = GeneSet.find_by name: params["gene_set"]
     gene     = Gene.find_by    name: params["name"],    gene_set: gene_set
     compare  = Gene.find_by    name: params["compare"], gene_set: gene_set if params["compare"]
@@ -279,7 +280,7 @@ def gene
       add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
-    
+    add_ret_values(ret, params)
     respond_to do |format|
       format.json {render json: ret, format: :json}
     end

@@ -22,7 +22,7 @@ module GenesHelper
 
 		Gene.where("gene = :gene_name", {gene_name: gene_name}).each do |t|
 		 transcripts<<t
-		end if gene_name.size > 2
+		end
 		transcripts
 	end
 

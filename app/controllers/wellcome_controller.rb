@@ -11,18 +11,14 @@ class WellcomeController < ApplicationController
 
   def get_example_genes(gene_set_id)
     example = {}
-
     example[:search]  = SampleGene.where(gene_set_id: gene_set_id, kind:'search')
     example[:compare] = SampleGene.where(gene_set_id: gene_set_id, kind:'compare')
     example[:heatmap] = SampleGene.where(gene_set_id: gene_set_id, kind:'heatmap')
-
     if example[:search].size == 0
       return get_random_genes(gene_set_id)  
     end
-
-    example[:search]  = Gene.where(id: @example[:search] .first.gene_id).first
-    example[:compare] = Gene.where(id: @example[:compare].first.gene_id).first
-   
+    example[:search]  = Gene.where(id: example[:search] .first.gene_id).first
+    example[:compare] = Gene.where(id: example[:compare].first.gene_id).first
     example
   end
 

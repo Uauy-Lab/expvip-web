@@ -182,7 +182,7 @@ end
     end   
     @gene = OpenStruct.new(gene)
     
-    @args = {studies: studies, compare: compare, name: @gene.name, gene_set: params[:gene_set]  }.to_query
+    @args = {studies: studies, compare: compare, gene_set: params[:gene_set]  }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  
 
