@@ -347,15 +347,12 @@ end
 
     # Adding the tern_order and tern values (triads) to the data which enables the ternary plot to be displayed
     def add_triads(ret, gene_set, triads)
-
       # Adding the tern order
       ret["tern_order"] = ["A", "D", "B"]
 
       # Adding the tern (ternkey => gene name)
       terns = Hash.new    
-
       triads.each do |triad|
-
         # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
         # Returns an array of all digits in the gene name
         first_number = triad.scan(/[[:digit:]]/)
@@ -369,16 +366,7 @@ end
 
         # Getting the tern key from its index
         tern_key = triad[tern_key_index]
-        case tern_key
-        when "A"          
-          allocate_triad_to_tern("A", terns, triad)
-        when "B"
-          allocate_triad_to_tern("B", terns, triad)    
-        when "D"
-          allocate_triad_to_tern("D", terns, triad)    
-        else
-          puts "\n\n\nCouldn't find a tern key :(\n\n\n" 
-        end     
+        allocate_triad_to_tern(tern_key, terns, triad) if ["A", "D", "B"].include?(tern_key)
       end
       ret["tern"] = terns
     end  
