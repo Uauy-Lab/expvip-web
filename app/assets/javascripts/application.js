@@ -49,9 +49,18 @@ ready = (function() {
       data: {        
           gene_set_selector:geneID
       },
-      success: function (response) {                
+      success: function (response) { 
+        $('#example1').html(response.search.gene);        
+        $('#example2').html(response.compare.gene ); 
+        $('#example3').html(response.search.name);        
+        $('#example4').html(response.compare.name );                     
         // This part breaks after a while, unfortunatly at this time for time limitations I'll leave for later
-        $("select[name*='gene_set_selector']").each(function(index, el) {      
+        //Setup all the selectors
+        console.log("Changing examples")
+        $("select[name*='gene_set_selector']").each(function(index, el) {
+          console.log("Setting selector!") 
+          console.log(index);
+          console.log(el)     
           $(this).find('option').each(function(index, el) {        
             if($(this).val() !== geneID && $(this).attr('selected')){          
               $(this).removeAttr('selected');
@@ -67,8 +76,9 @@ ready = (function() {
       }
     });    
 
-    var newGeneID = $(this).val();    
+    //var newGeneID = $(this).val();    
     //TODO: Move this function to the previous selector. 
+    /*
     $.ajax({
       type: 'get',
       url: '/',
@@ -77,15 +87,15 @@ ready = (function() {
           gene_set_selector:newGeneID
       },
       success: function (response) {  
-        $('#example1').html(response.value.search.gene);        
-        $('#example2').html(response.value.compare.gene ); 
-        $('#example3').html(response.value.search.name);        
-        $('#example4').html(response.value.compare.name );      
+        $('#example1').html(response.search.gene);        
+        $('#example2').html(response.compare.gene ); 
+        $('#example3').html(response.search.name);        
+        $('#example4').html(response.compare.name );      
       },
       error: function(){
         alert ("There was a problem with selecting the gene set");
       }
-    });
+    });*/
 
   });  
 
@@ -160,21 +170,18 @@ ready = (function() {
     event.preventDefault();
     var heatmapGeneExamples = '';
 
-    var geneSetID = $("select[name*='gene_set_selector']").val();    
-
-
     // AJAX to get heatmap gene examples
     $.ajax({
-      url: '/',
+      url: '/genes/examples',
       type: 'GET',
       dataType: 'json',
-      data: {gene_set_selector:geneSetID},
+      data: {},
     })
     .done(function(response) {          
       //TODO complete this with the example[:heatmap]
       
-      for (var key in response.value.heatmap) {                  
-        var obj = response.value.heatmap[key];        
+      for (var key in response.heatmap) {                  
+        var obj = response.heatmap[key];        
         heatmapGeneExamples += `${obj}\n`;           
       }      
 

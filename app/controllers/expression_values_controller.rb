@@ -294,9 +294,10 @@ def gene
     gene_set = GeneSet.find(session[:gene_set_id]) 
     genes.each do |g|
       gene, search_by = GenesHelper.findGeneName(g, gene_set)
+      #puts ""
       values[g] = search_by == "transcript" ?
        getValuesForTranscript(gene)  :
-       getValuesForTranscripts()
+       getValuesForTranscripts(GenesHelper.findTranscripts(g, gene_set))
     end
 
     ret["values"] = values
@@ -356,14 +357,12 @@ end
         # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
         # Returns an array of all digits in the gene name
         first_number = triad.scan(/[[:digit:]]/)
-
         # Getting the index of the tern key
         if gene_set == "TGACv1"
           tern_key_index = triad.index(first_number[2]) + 1
         else
           tern_key_index = triad.index(first_number[0]) + 1
         end      
-
         # Getting the tern key from its index
         tern_key = triad[tern_key_index]
         allocate_triad_to_tern(tern_key, terns, triad) if ["A", "D", "B"].include?(tern_key)
@@ -379,14 +378,12 @@ end
         terns[tern_key] = triad
       else
         puts "\n#{tern_key} already HAS a value\n"
-
         first_triad = Gene.find_by name: terns[tern_key]
         first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
         first_perc_cov = first_homology_pair.perc_cov
         second_triad = Gene.find_by name: triad          
         second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
         second_perc_cov = second_homology_pair.perc_cov
-
         if first_perc_cov < second_perc_cov
           puts "\n\n\nsecond perc_cov:#{second_perc_cov} > first perc_cov:#{first_perc_cov}\n\n\n"
           terns[tern_key] = triad

@@ -1,5 +1,28 @@
 module GenesHelper
 
+	def self.get_random_genes(gene_set, count: 50)
+		random_genes = Gene.where(gene_set_id: gene_set.id).order("RAND()").limit(count)
+		example = {}
+		example[:search]  = random_genes.first
+		example[:compare] = random_genes.last
+		example[:heatmap] = random_genes.map { |e| e.gene }
+		example
+	end
+
+	def self.get_example_genes(gene_set)
+		example = {}
+		example[:search]  = SampleGene.where(gene_set_id: gene_set.id, kind:'search')
+		example[:compare] = SampleGene.where(gene_set_id: gene_set.id, kind:'compare')
+		example[:heatmap] = SampleGene.where(gene_set_id: gene_set.id, kind:'heatmap')
+		if example[:search].size == 0
+			return get_random_genes(gene_set)  
+		end
+		example[:search]  = Gene.where(id: example[:search] .first.gene_id).first
+		example[:compare] = Gene.where(id: example[:compare].first.gene_id).first
+		example[:heatmap] = example[:heatmap].map { |e| e.gene.gene  }
+		example
+	end
+
 	def self.find(gene)
 		@client = MongodbHelper.getConnection unless @client 
 		gene_mongo = @client[:genes].find({:_id => gene.id}).first

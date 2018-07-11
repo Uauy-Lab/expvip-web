@@ -64,11 +64,11 @@ class GeneSetsController < ApplicationController
   def set_gene_set_session
     @gene_set = GeneSet.find(params[:gene_set_selector])
     session[:gene_set_id] = @gene_set.id if @gene_set    
-    
+    puts "Changing sesion gene_set to: #{@gene_set.inspect}"
     respond_to do |format|      
       format.html
       format.json { 
-        render json: {"value" => @gene_set.name}
+        render json: {value: @gene_set.name}.merge(GenesHelper.get_example_genes(@gene_set))
       }
     end
   end

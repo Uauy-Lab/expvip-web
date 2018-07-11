@@ -4,6 +4,17 @@ class GenesController < ApplicationController
 
   before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
+  def examples
+    @gene_set = GeneSet.find(session[:gene_set_id])
+    examples = GenesHelper.get_example_genes(@gene_set)
+    puts examples.inspect
+    respond_to do |format|      
+      format.json { 
+        render json: examples
+      }
+    end
+  end
+
   def getGeneIds(genes)
     gs = Set.new
     gene_set = GeneSet.find(session[:gene_set_id])    
