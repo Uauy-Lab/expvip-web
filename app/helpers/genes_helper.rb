@@ -19,7 +19,6 @@ module GenesHelper
 
 	def self.findTranscripts(gene_name)
 		transcripts = Array.new
-
 		Gene.where("gene = :gene_name", {gene_name: gene_name}).each do |t|
 		 transcripts<<t
 		end
@@ -29,8 +28,10 @@ module GenesHelper
 
 	def self.saveValues(gene, type, values)		
 		@client = MongodbHelper.getConnection unless @client 
-		@client[:genes].update( { :_id => gene.id }, 
-			'$set' => { type => values } )
+		@client[:genes].update({ 
+			:_id => gene.id }, 
+			'$set' => { type => values 
+		})
 	end
 
 	def self.load_gene_hash(gene_set)

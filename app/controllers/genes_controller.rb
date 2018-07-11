@@ -12,6 +12,7 @@ class GenesController < ApplicationController
     gene_set = GeneSet.find(session[:gene_set_id])    
     
     genes.each do |g|  
+      next if g.size == 0
       gene       = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id)
       transcript = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id) unless  gene
       if gene
@@ -25,7 +26,7 @@ class GenesController < ApplicationController
     end
     raise "Genes not found: #{missing.to_a.join(", ")}" if missing.size != 0
     raise "Please dont mix gene and transcript names.\nGenes: #{genes.to_a.join(", ")}\nTranscripts: #{ts.to_a.join(", ")}\n" if ts.size > 0 && gs.size > 0
-    ids = genes
+    ids = gs
     ids = transcripts if transcripts.size > 0
     return ids
   end
