@@ -26,7 +26,7 @@
 
 
   var container_div="bar_expression_viewer";
-  var data_url = "<%= "#{request.base_url}/expression_values/#{@gene.search_by}.json?name=#{@gene.name}&#{@args}" %>" ;
+  var data_url = "<%= "#{request.base_url}/expression_values/#{@gene.search_by}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
   var parentWidth = $("#bar_expression_viewer").parent().width();
   var eb;

@@ -17,10 +17,14 @@ module GenesHelper
 		
 	end
 
-	def self.findTranscripts(gene_name)
+	def self.findTranscripts(gene_name, gene_set)
 		transcripts = Array.new
-		Gene.where("gene = :gene_name", {gene_name: gene_name}).each do |t|
-		 transcripts<<t
+		Gene.where("gene = :gene_name AND gene_set_id = :gene_set", 
+			{
+				gene_name: gene_name, 
+				gene_set: gene_set.id
+			}).each do |t|
+			transcripts << t
 		end
 		transcripts
 	end
@@ -41,4 +45,11 @@ module GenesHelper
       end
       genes
 	end
+
+	def self.findGeneName(gene_name, gene_set)
+    gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)      
+    gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene     
+    raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene
+    return [gene,  gene_name == gene.gene ? "gene": "transcript" ]  
+  end
 end

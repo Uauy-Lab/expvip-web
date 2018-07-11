@@ -204,21 +204,21 @@ def getHomologueGenesForGene(transcripts_in_gene)
   ret
 end
 
-def getValuesForHomologueGenes(gene_name, transcripts)
+def getValuesForHomologueGenes(gene_name, transcripts, gene_set)
   values = Hash.new
   values[gene_name] = getValuesForTranscripts(transcripts)  
   homs = getHomologueGenesForGene transcripts
   puts homs.inspect
   homs.each do |e|  
-    values[e] = getValuesForTranscripts(GenesHelper.findTranscripts(e))
+    values[e] = getValuesForTranscripts(GenesHelper.findTranscripts(e, gene_set))
   end
   return values
 end
 
 def getValuesToCompareTranscipts(gene, compare)
   values = Hash.new
-  values[gene.name]    = getValuesForTranscript(gene)
-  values[compare.name] = getValuesForTranscript(compare) 
+  values[gene.name]    = getValuesForTranscript(gene, gene_set)
+  values[compare.name] = getValuesForTranscript(compare, gene_set) 
   return values
 end
 
@@ -233,21 +233,20 @@ end
 def gene
     ret = Hash.new 
     gene_name    = params["name"]
-    puts params.inspect
     compare_name = params["compare"]
-    transcripts  = GenesHelper.findTranscripts(gene_name)
-    compare      = GenesHelper.findTranscripts(compare_name) if compare_name
-    puts gene_name
+    gene_set_name = params["gene_set"]    
+    gene_set = GeneSet.find_by name: gene_set_name
+
+    transcripts  = GenesHelper.findTranscripts(gene_name, gene_set)
+    compare      = GenesHelper.findTranscripts(compare_name, gene_set) if compare_name
     ret['gene'] = gene_name
     values = Hash.new
     if compare.size > 0     
-      puts "In compare"
       values = getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
       ret["compare"] = compare_name
     else
-      puts "In homoeologues"
-      values = getValuesForHomologueGenes(gene_name, transcripts)            
-      gene_set_name = params["gene_set"]    
+
+      values = getValuesForHomologueGenes(gene_name, transcripts, gene_set)            
       add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
@@ -259,7 +258,7 @@ def gene
 
   def transcript
     ret = Hash.new 
-    
+    puts params.inspect
     gene_set = GeneSet.find_by name: params["gene_set"]
     gene     = Gene.find_by    name: params["name"],    gene_set: gene_set
     compare  = Gene.find_by    name: params["compare"], gene_set: gene_set if params["compare"]
@@ -289,21 +288,15 @@ def gene
     values = Hash.new
     genes = []
     useIDs = false
-    if  session[:genes] 
-      useIDs = true
-      genes = session[:genes] 
-    end
-    genes = params["genes"] if params["genes"] 
+
+    genes = session[:genes] 
     genes = genes.split(',')
-    genes. each do |g|
-      gene = false
-      if useIDs 
-        gene = Gene.find(g.to_i)
-      else
-        gene = Gene.find_by(:name=>g)
-        gene = Gene.find_by(:gene=>g) unless  gene
-      end
-      values[gene.name] = getValuesForTranscript(gene)  if gene
+    gene_set = GeneSet.find(session[:gene_set_id]) 
+    genes.each do |g|
+      gene, search_by = GenesHelper.findGeneName(g, gene_set)
+      values[g] = search_by == "transcript" ?
+       getValuesForTranscript(gene)  :
+       getValuesForTranscripts()
     end
 
     ret["values"] = values
