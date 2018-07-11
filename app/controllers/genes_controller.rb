@@ -5,19 +5,28 @@ class GenesController < ApplicationController
   before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
   def getGeneIds(genes)
-    ids = Array.new
-    missing = Array.new
+    gs          = Set.new
+    transcripts = Set.new
+    missing     = Set.new
+    ts = Set.new
     gene_set = GeneSet.find(session[:gene_set_id])    
+    
     genes.each do |g|  
-      gene = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id)
-      gene = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id) unless  gene
+      gene       = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id)
+      transcript = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id) unless  gene
       if gene
-        ids << gene.id
+        gs         << gene.gene
+      elsif transcript
+        transcripts << transcript.id
+        ts << g
       else
         missing << g
       end
     end
-    raise "Genes not found: #{missing.join(",")}" if missing.size != 0
+    raise "Genes not found: #{missing.to_a.join(", ")}" if missing.size != 0
+    raise "Please dont mix gene and transcript names.\nGenes: #{genes.to_a.join(", ")}\nTranscripts: #{ts.to_a.join(", ")}\n" if ts.size > 0 && gs.size > 0
+    ids = genes
+    ids = transcripts if transcripts.size > 0
     return ids
   end
 
@@ -27,7 +36,7 @@ class GenesController < ApplicationController
     raise "Please select less than 500 genes" if genes.size > 500
     ids = getGeneIds(genes)
     raise "Plese select some genes for the heatmap" if ids.size == 0
-    session[:genes] = ids.join(',')    
+    session[:genes] = ids.to_a.join(',')    
     redirect_to action: "heatmap"
   end
 
@@ -55,13 +64,7 @@ class GenesController < ApplicationController
   def forwardCompare
     forwardCommon
     @compare, @search_by_compare = findGeneName params[:compare], @gene_set
-
-    unless @search_by == @search_by_compare
-      flash[:error] =  "Can't compare gene vs transcript" 
-      session[:return_to] ||= request.referer
-      redirect_to session.delete(:return_to)
-      return
-    end
+    raise "Can't compare gene vs transcript" unless @search_by == @search_by_compare
     redirect_to  action: "show", 
       search_by: @search_by, 
       gene: session[:gene], 
@@ -95,11 +98,9 @@ class GenesController < ApplicationController
         raise "Unknow redirect: #{params[:submit]}"
       end
     rescue Exception => e
-      flash[:error] = e
-      puts e
-      session[:return_to] ||= request.referer
-      redirect_to session.delete(:return_to)
-      return
+      flash[:error] = e.to_s
+      redirect_back fallback_location: request.base_url.to_s
+      return 
     end
 end
 
@@ -122,11 +123,10 @@ end
     genes = session[:genes] if  session[:genes] 
     genes = params[:genes] if params[:genes]
     session[:genes] = params[:genes] if params[:genes]
-    
-    
+    puts "____"
+    puts genes
     #This acts as a flag for share action
     session[:heatmap] = true
-    
     # If parameters passed cnotain settings (it's a shared link)
     if params[:settings]
       @client = MongodbHelper.getConnection unless @client    

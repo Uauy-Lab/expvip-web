@@ -79,7 +79,7 @@
   <% flash.each do |key, value| %>
 
     <div class="alert-<%= key %>">
-     <p> <%= value %>  </p>
+     <p> <%= simple_format(value) %>  </p>
     </div>
 
   <% end %>

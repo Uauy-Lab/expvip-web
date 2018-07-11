@@ -68,7 +68,7 @@ ready = (function() {
     });    
 
     var newGeneID = $(this).val();    
-
+    //TODO: Move this function to the previous selector. 
     $.ajax({
       type: 'get',
       url: '/',
