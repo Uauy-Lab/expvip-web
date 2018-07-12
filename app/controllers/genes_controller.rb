@@ -47,6 +47,7 @@ class GenesController < ApplicationController
     @gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
     session[:heatmap] = false
     @gene, @search_by = GenesHelper.findGeneName gene_name, @gene_set 
+    @search_by = params[:search_by] if ["gene", "transcript"].include? params[:search_by]
     session[:name] = @search_by == "gene" ? @gene.gene : @gene.name 
     session[:search_by] = @search_by
     session[:gene_set_id] = @gene_set.id

@@ -234,12 +234,10 @@ ready = (function() {
 
       // Adding a new column to the results table (with a time delay to let the content to be generated first and then changed)  
       $(document).ready(function($) {
-        console.log("Searching for results")
         setTimeout(function(){
           console.log("inside timeout")
           // Adding the header of the column
-          $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression search</th>')
-
+          $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression</th><th class="text-left"></th>')
           // Adding the data of the column
           // ***Constructing the link(adding the gene set)          
           var geneSet = '';
@@ -257,9 +255,9 @@ ready = (function() {
             var geneName = $(this).find('td').eq(1).children().text();   
             var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet + "&search_by=";
             var secondColResTable = $(this).find('td').eq(1);            
-            secondColResTable.after("<td> <a href='" + link  + "transcript' target=\"_top\">Expression</a> </td>");            
+            secondColResTable.after("<td> <a href='" + link  + "gene' target=\"_top\">gene</a></td><td>  <a href='" + link  + "transcript' target=\"_top\">transcript</a> </td>");            
           });          
-        }, 3000);        
+        }, 20000);  //RHRG: This timout is a bit arbitrary. As it is now, it doesn't show the table first. We need to find a betteer trigger.       
       });
 
     });
