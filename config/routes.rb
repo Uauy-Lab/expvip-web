@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       post 'share' 
       get 'set_studies_session'     
       get 'show'
+      get 'examples'
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.
@@ -34,7 +35,7 @@ Rails.application.routes.draw do
   get 'expression_values/gene' => 'expression_values#gene'
   get 'expression_values/transcript' => 'expression_values#transcript'
   get 'expression_values/genes' => 'expression_values#genes'
- 
+
   resources :gene_sets  do
     collection do
       get 'set_gene_set_session'     
