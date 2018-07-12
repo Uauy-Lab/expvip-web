@@ -15,7 +15,6 @@ class WellcomeController < ApplicationController
     
     @example = GenesHelper.get_example_genes(gene_set)
     session[:gene_set_id] = gene_set.id
-    puts "The current gene set: #{gene_set.name}"
     respond_to do |format|
       format.html
     end

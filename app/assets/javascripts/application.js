@@ -57,19 +57,8 @@ ready = (function() {
         // This part breaks after a while, unfortunatly at this time for time limitations I'll leave for later
         //Setup all the selectors
         console.log("Changing examples")
-        $("select[name*='gene_set_selector']").each(function(index, el) {
-          console.log("Setting selector!") 
-          console.log(index);
-          console.log(el)     
-          $(this).find('option').each(function(index, el) {        
-            if($(this).val() !== geneID && $(this).attr('selected')){          
-              $(this).removeAttr('selected');
-            }
-            if($(this).val() === geneID && !($(this).attr('selected'))){     
-              $(this).attr('selected', 'selected');               
-            }
-          });      
-        });   
+         $("select[name*='gene_set_selector']").val(geneID)
+        
       },
       error: function(){
         alert ("There was a problem with selecting the gene set");
@@ -184,7 +173,6 @@ ready = (function() {
         var obj = response.heatmap[key];        
         heatmapGeneExamples += `${obj}\n`;           
       }      
-
       $(`#genes_heatmap`).html(heatmapGeneExamples);
     })
     .fail(function() {
