@@ -54,38 +54,12 @@ ready = (function() {
         $('#example2').html(response.compare.gene ); 
         $('#example3').html(response.search.name);        
         $('#example4').html(response.compare.name );                     
-        // This part breaks after a while, unfortunatly at this time for time limitations I'll leave for later
-        //Setup all the selectors
-        console.log("Changing examples")
-         $("select[name*='gene_set_selector']").val(geneID)
-        
+        $("select[name*='gene_set_selector']").val(geneID)
       },
       error: function(){
         alert ("There was a problem with selecting the gene set");
       }
     });    
-
-    //var newGeneID = $(this).val();    
-    //TODO: Move this function to the previous selector. 
-    /*
-    $.ajax({
-      type: 'get',
-      url: '/',
-      dataType: 'JSON',
-      data: {        
-          gene_set_selector:newGeneID
-      },
-      success: function (response) {  
-        $('#example1').html(response.search.gene);        
-        $('#example2').html(response.compare.gene ); 
-        $('#example3').html(response.search.name);        
-        $('#example4').html(response.compare.name );      
-      },
-      error: function(){
-        alert ("There was a problem with selecting the gene set");
-      }
-    });*/
-
   });  
 
   $(".alert-error").on("click", function(event) { 
@@ -260,8 +234,9 @@ ready = (function() {
 
       // Adding a new column to the results table (with a time delay to let the content to be generated first and then changed)  
       $(document).ready(function($) {
+        console.log("Searching for results")
         setTimeout(function(){
-
+          console.log("inside timeout")
           // Adding the header of the column
           $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression search</th>')
 
@@ -280,10 +255,9 @@ ready = (function() {
           $('#sequenceserver').contents().find('tbody').eq(0).find('tr').each(function(index, el) {                         
             // ***Constructing the link(adding the gene name)                        
             var geneName = $(this).find('td').eq(1).children().text();   
-            var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet;
-
+            var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet + "&search_by=";
             var secondColResTable = $(this).find('td').eq(1);            
-            secondColResTable.after("<td> <a href=" + link + " target=\"_top\">Expression</a> </td>");            
+            secondColResTable.after("<td> <a href='" + link  + "transcript' target=\"_top\">Expression</a> </td>");            
           });          
         }, 3000);        
       });

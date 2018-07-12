@@ -43,6 +43,7 @@ class GenesController < ApplicationController
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
     @gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
+    @gene_set = GeneSet.find(params[:gene_set_selector_main]) if params[:gene_set_selector_main]
     @gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
     session[:heatmap] = false
     @gene, @search_by = GenesHelper.findGeneName gene_name, @gene_set 
@@ -87,6 +88,8 @@ class GenesController < ApplicationController
       end
     rescue Exception => e
       flash[:error] = e.to_s
+      #puts "ERROR: #{e.inspect}"
+      #puts e.backtrace
       redirect_back fallback_location: request.base_url.to_s
       return 
     end
@@ -111,12 +114,8 @@ end
     genes = session[:genes] if  session[:genes] 
     genes = params[:genes]  if  params[:genes]
     session[:genes] = params[:genes] if params[:genes]
-    #puts "____"
-    #puts genes
-    #This acts as a flag for share action
     session[:heatmap] = true
-    # If parameters passed cnotain settings (it's a shared link)
-    
+    # If parameters passed contain settings (it's a shared link)
     if params[:settings]
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
