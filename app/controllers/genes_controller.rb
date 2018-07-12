@@ -142,10 +142,12 @@ end
     compare = ""
     alert = ""
     
+    #search_by = params[:search_by]
+    #search_by.capitalize! if search_by
     gene = {
       name: params[:name],
       gene: params[:name], 
-      search_by: params[:search_by]
+      search_by:  params[:search_by]
     }
     compare = params[:compare] if params[:compare]
     
