@@ -49,42 +49,17 @@ ready = (function() {
       data: {        
           gene_set_selector:geneID
       },
-      success: function (response) {                
-        // This part breaks after a while, unfortunatly at this time for time limitations I'll leave for later
-        $("select[name*='gene_set_selector']").each(function(index, el) {      
-          $(this).find('option').each(function(index, el) {        
-            if($(this).val() !== geneID && $(this).attr('selected')){          
-              $(this).removeAttr('selected');
-            }
-            if($(this).val() === geneID && !($(this).attr('selected'))){     
-              $(this).attr('selected', 'selected');               
-            }
-          });      
-        });   
+      success: function (response) { 
+        $('#example1').html(response.search.gene);        
+        $('#example2').html(response.compare.gene ); 
+        $('#example3').html(response.search.name);        
+        $('#example4').html(response.compare.name );                     
+        $("select[name*='gene_set_selector']").val(geneID)
       },
       error: function(){
         alert ("There was a problem with selecting the gene set");
       }
     });    
-
-    var newGeneID = $(this).val();    
-
-    $.ajax({
-      type: 'get',
-      url: '/',
-      dataType: 'JSON',
-      data: {        
-          gene_set_selector:newGeneID
-      },
-      success: function (response) {            
-        $('#example1').html(response.value.search[0].name);        
-        $('#example2').html(response.value.compare[0].name );      
-      },
-      error: function(){
-        alert ("There was a problem with selecting the gene set");
-      }
-    });
-
   });  
 
   $(".alert-error").on("click", function(event) { 
@@ -158,24 +133,20 @@ ready = (function() {
     event.preventDefault();
     var heatmapGeneExamples = '';
 
-    var geneSetID = $("select[name*='gene_set_selector']").val();    
-
-
     // AJAX to get heatmap gene examples
     $.ajax({
-      url: '/',
+      url: '/genes/examples',
       type: 'GET',
       dataType: 'json',
-      data: {gene_set_selector:geneSetID},
+      data: {},
     })
     .done(function(response) {          
       //TODO complete this with the example[:heatmap]
       
-      for (var key in response.value.heatmap) {                  
-        var obj = response.value.heatmap[key];        
+      for (var key in response.heatmap) {                  
+        var obj = response.heatmap[key];        
         heatmapGeneExamples += `${obj}\n`;           
       }      
-
       $(`#genes_heatmap`).html(heatmapGeneExamples);
     })
     .fail(function() {
@@ -264,10 +235,9 @@ ready = (function() {
       // Adding a new column to the results table (with a time delay to let the content to be generated first and then changed)  
       $(document).ready(function($) {
         setTimeout(function(){
-
+          console.log("inside timeout")
           // Adding the header of the column
-          $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression search</th>')
-
+          $('#sequenceserver').contents().find('thead').eq(0).find('th').eq(1).after('<th class="text-left">Expression</th><th class="text-left"></th>')
           // Adding the data of the column
           // ***Constructing the link(adding the gene set)          
           var geneSet = '';
@@ -283,12 +253,11 @@ ready = (function() {
           $('#sequenceserver').contents().find('tbody').eq(0).find('tr').each(function(index, el) {                         
             // ***Constructing the link(adding the gene name)                        
             var geneName = $(this).find('td').eq(1).children().text();   
-            var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet;
-
+            var link = "genes/forward?submit=Search&gene=" + geneName + "&gene_set=" + geneSet + "&search_by=";
             var secondColResTable = $(this).find('td').eq(1);            
-            secondColResTable.after("<td> <a href=" + link + " target=\"_top\">Expression</a> </td>");            
+            secondColResTable.after("<td> <a href='" + link  + "gene' target=\"_top\">gene</a></td><td>  <a href='" + link  + "transcript' target=\"_top\">transcript</a> </td>");            
           });          
-        }, 3000);        
+        }, 20000);  //RHRG: This timout is a bit arbitrary. As it is now, it doesn't show the table first. We need to find a betteer trigger.       
       });
 
     });

@@ -107,12 +107,10 @@ def getExperimentGroups
   groups          = Hash.new 
   Experiment.find_each do | g |
     group = Hash.new
-    #byebug
-    #puts g.inspect
+   
     #Should we use description instead?
     group["name"] = g.accession
     group["description"] = g.accession
-    #group["group"] = g.id.to_s
     factors = Hash.new
     g.factors.each { |f| factors[f.factor] = f.name }
 
@@ -120,27 +118,32 @@ def getExperimentGroups
     experiments[g.id] = Hash.new 
     exp = experiments[g.id]
     exp["name"]  = g.accession
-    #exp["study"] = g.study.
     exp["group"] = g.id.to_s
     factors["study"] = g.study.accession
 
-    #g.experiments.each do |e|  
-    #  unless experiments[e.id]
-    #    experiments[e.id] = Hash.new 
-    #    exp = experiments[e.id]
-    #    exp["name"] = e.accession
-    #    exp["study"] = e.study_id.to_s
-    #    exp["group"] = g.id.to_s
-    #    factors["study"] = e.study.accession
-    #  end
-    #end
     group['factors'] = factors
     groups[g.id] = group
   end
   return [experiments, groups]
 end
 
-def getValuesForGene(gene)
+def getValuesForTranscripts(transcripts_in_gene)
+  values = Hash.new { |hash, key| hash[key] = Hash.new { |h,k| h[k] = 0 } }
+  transcripts_in_gene.each do |t|  
+    v_t = getValuesForTranscript(t)
+    v_t.each_pair do |type, h|
+      h.each_pair do |exp, val|
+        current = values[type][exp]
+        current = {:experiment=>exp, :value=>0.0} if current == 0
+        current[:value] += val[:value]
+        values[type][exp] = current 
+     end
+    end
+  end
+  values
+end
+
+def getValuesForTranscript(gene)
   #TODO: Add code to validate for different experiments. 
   values = Hash.new
   client = MongodbHelper.getConnection
@@ -149,8 +152,7 @@ def getValuesForGene(gene)
     values[type_of_value] = Hash.new unless  values[type_of_value]
     tvh = values[type_of_value]
     obj = client[:experiments].find({ :_id => ev.id })
-    obj.first.each_pair { |k, val| values[type_of_value][k.to_s] = {experiment:  k, value: val}  unless k == "_id" }
-    
+    obj.first.each_pair {|k, val| values[type_of_value][k.to_s] = {experiment:  k, value: val}  unless k == "_id" }    
   end
   return values
 end
@@ -173,62 +175,111 @@ def getDefaultOrder
     return defOrder
   end
 
-  def getValuesForHomologues(gene)
+  def getValuesForHomologuesTranscripts(gene)
     values = Hash.new
-    values[gene.name] = getValuesForGene(gene)  
+    values[gene.name] = getValuesForTranscript(gene)  
     HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|
       hom = h.homology 
       HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
         if h2.gene.gene_set_id == gene.gene_set_id
-          values[h2.gene.name] = getValuesForGene(h2.gene) unless h2.gene == gene
+          values[h2.gene.name] = getValuesForTranscript(h2.gene) unless h2.gene == gene
         end
       end
     end
   return values
 end
 
-def getValuesToCompare(gene, compare)
+def getHomologueGenesForGene(transcripts_in_gene)
+  ret = Set.new
+  transcripts_in_gene.each do |t|  
+    HomologyPair.where("gene_id = :gene_id", {gene_id: t.id}).each do |h|
+      hom = h.homology 
+      HomologyPair.where("homology = :hom", {hom: hom}).each do |h2|
+        if h2.gene.gene_set_id == t.gene_set_id
+          ret << h2.gene.gene unless h2.gene == t.gene
+        end
+      end
+    end
+  end
+  ret
+end
+
+def getValuesForHomologueGenes(gene_name, transcripts, gene_set)
   values = Hash.new
-  values[gene.name]    = getValuesForGene(gene)
-  values[compare.name] = getValuesForGene(compare) 
+  values[gene_name] = getValuesForTranscripts(transcripts)  
+  homs = getHomologueGenesForGene transcripts
+  puts homs.inspect
+  homs.each do |e|  
+    values[e] = getValuesForTranscripts(GenesHelper.findTranscripts(e, gene_set))
+  end
+  return values
+end
+
+def getValuesToCompareTranscipts(gene, compare)
+  values = Hash.new
+  values[gene.name]    = getValuesForTranscript(gene, gene_set)
+  values[compare.name] = getValuesForTranscript(compare, gene_set) 
+  return values
+end
+
+def getValuesToCompareGene(gene_name, compare_name, gene, compare)
+  values = Hash.new
+  values[gene_name]    = getValuesForTranscripts(gene)
+  values[compare_name] = getValuesForTranscripts(compare) 
   return values
 end
 
 
-
 def gene
-    #puts @gene_id
-   #ret = Hash.new
-    #ret["Hello"] = params
-    #ret = ExpressionValue.find_expression_for_gene(params["gene_id"])
-    
     ret = Hash.new 
-    gene = Gene.find params["gene_id"]
-    compare = Gene.find_by name: params["compare"] if params["compare"]
-    ret['gene'] = gene.name
+    gene_name    = params["name"]
+    compare_name = params["compare"]
+    gene_set_name = params["gene_set"]    
+    gene_set = GeneSet.find_by name: gene_set_name
 
-    
+    transcripts  = GenesHelper.findTranscripts(gene_name, gene_set)
+    compare      = GenesHelper.findTranscripts(compare_name, gene_set) if compare_name
+    ret['gene'] = gene_name
     values = Hash.new
-    
+    if compare.size > 0     
+      values = getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
+      ret["compare"] = compare_name
+    else
+
+      values = getValuesForHomologueGenes(gene_name, transcripts, gene_set)            
+      add_triads(ret, gene_set_name, values.keys)
+    end
+    ret["values"] = values
+    add_ret_values(ret, params)   
+    respond_to do |format|
+      format.json {render json: ret, format: :json}
+    end
+  end
+
+  def transcript
+    ret = Hash.new 
+    puts params.inspect
+    gene_set = GeneSet.find_by name: params["gene_set"]
+    gene     = Gene.find_by    name: params["name"],    gene_set: gene_set
+    compare  = Gene.find_by    name: params["compare"], gene_set: gene_set if params["compare"]
+    ret['gene'] = gene.name
+    values = Hash.new
     if compare  
-      values = getValuesToCompare(gene, compare)
+      values = getValuesToCompareTranscipts(gene, compare)
       ret["compare"] = params["compare"]
     else
-      values = getValuesForHomologues(gene)            
+      values = getValuesForHomologuesTranscripts(gene,)            
       gene_set_name = GeneSet.find(gene.gene_set_id).name      
       add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
     add_ret_values(ret, params)
-   
     respond_to do |format|
       format.json {render json: ret, format: :json}
     end
-
   end
 
   def genes
-
     old_logger = ActiveRecord::Base.logger
     ActiveRecord::Base.logger.level  = 1
     Rails.logger.info "genes"
@@ -237,21 +288,16 @@ def gene
     values = Hash.new
     genes = []
     useIDs = false
-    if  session[:genes] 
-      useIDs = true
-      genes = session[:genes] 
-    end
-    genes = params["genes"] if params["genes"] 
+
+    genes = session[:genes] 
     genes = genes.split(',')
-    genes. each do |g|
-      gene = false
-      if useIDs 
-        gene = Gene.find(g.to_i)
-      else
-        gene = Gene.find_by(:name=>g)
-        gene = Gene.find_by(:gene=>g) unless  gene
-      end
-      values[gene.name] = getValuesForGene(gene)  if gene
+    gene_set = GeneSet.find(session[:gene_set_id]) 
+    genes.each do |g|
+      gene, search_by = GenesHelper.findGeneName(g, gene_set)
+      #puts ""
+      values[g] = search_by == "transcript" ?
+       getValuesForTranscript(gene)  :
+       getValuesForTranscripts(GenesHelper.findTranscripts(g, gene_set))
     end
 
     ret["values"] = values
@@ -275,7 +321,6 @@ def gene
     "Stress-disease"=>false,
     "study"=>false,
     "Tissue" => false,
-    "study"=>false,
     "Intermediate" => false,
     "Intermediate stress" => false
   }
@@ -303,50 +348,26 @@ end
 
     # Adding the tern_order and tern values (triads) to the data which enables the ternary plot to be displayed
     def add_triads(ret, gene_set, triads)
-
       # Adding the tern order
       ret["tern_order"] = ["A", "D", "B"]
 
       # Adding the tern (ternkey => gene name)
       terns = Hash.new    
-
       triads.each do |triad|
-
         # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
         # Returns an array of all digits in the gene name
         first_number = triad.scan(/[[:digit:]]/)
-
         # Getting the index of the tern key
         if gene_set == "TGACv1"
           tern_key_index = triad.index(first_number[2]) + 1
         else
           tern_key_index = triad.index(first_number[0]) + 1
         end      
-
         # Getting the tern key from its index
-        tern_key = triad[tern_key_index]        
-
-        case tern_key
-        when "A"          
-
-          allocate_triad_to_tern("A", terns, triad)
-
-        when "B"
-          
-          allocate_triad_to_tern("B", terns, triad)
-                    
-        when "D"
-        
-          allocate_triad_to_tern("D", terns, triad)
-                    
-        else
-          puts "\n\n\nCouldn't find a tern key :(\n\n\n" 
-        end     
-
+        tern_key = triad[tern_key_index]
+        allocate_triad_to_tern(tern_key, terns, triad) if ["A", "D", "B"].include?(tern_key)
       end
-
       ret["tern"] = terns
-      
     end  
 
     # Allocating triads to their corresponding tern (and compare perc_cov with already existing triad allocated to its tern) which prepares data for ternary plot display
@@ -357,14 +378,12 @@ end
         terns[tern_key] = triad
       else
         puts "\n#{tern_key} already HAS a value\n"
-
         first_triad = Gene.find_by name: terns[tern_key]
         first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
         first_perc_cov = first_homology_pair.perc_cov
         second_triad = Gene.find_by name: triad          
         second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
         second_perc_cov = second_homology_pair.perc_cov
-
         if first_perc_cov < second_perc_cov
           puts "\n\n\nsecond perc_cov:#{second_perc_cov} > first perc_cov:#{first_perc_cov}\n\n\n"
           terns[tern_key] = triad
@@ -382,7 +401,12 @@ end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def expression_value_params
-      params.require(:expression_value).permit(:compare, :experiment_id, :gene_id, :meta_experiment_id, :type_of_value_id, :value)
+      params.require(:expression_value).permit(:compare, 
+        :experiment_id, 
+        :gene_id, 
+        :meta_experiment_id, 
+        :type_of_value_id, 
+        :value)
     end
 
   end

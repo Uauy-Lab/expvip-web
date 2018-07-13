@@ -2,7 +2,7 @@
 
 <%= render :partial => "genes/share" %>
 
-<strong>Gene:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
+<strong><%= @gene.search_by%>:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
 <%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
 <% if @compare %>
@@ -26,7 +26,7 @@
 
 
   var container_div="bar_expression_viewer";
-  var data_url = "<%= "#{request.base_url}/expression_values/gene/#{@gene.id}.json?#{@args}" %>" ;
+  var data_url = "<%= "#{request.base_url}/expression_values/#{@gene.search_by}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>" ;
   var parentWidth = $("#bar_expression_viewer").parent().width();
   var eb;

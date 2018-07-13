@@ -63,12 +63,29 @@ module SequenceServer
       gene  = encode self.accession                        
       gene_set = encode whichdb.first.title.sub(/\s+/, '') # Removing any whitespace between the characters
       url = "genes/forward?submit=Search&gene=#{gene}" \
-            "&gene_set=#{gene_set}"        
+            "&gene_set=#{gene_set}&search_by=gene"        
 
       {
         :order => 0,
         :url   => url,
-        :title => 'Expression',
+        :title => 'Gene expression',
+        :class => 'mutation_link',
+        :icon  => 'fa-eye'
+      }
+
+    end
+
+    def transcript_expression
+          
+      gene  = encode self.accession                        
+      gene_set = encode whichdb.first.title.sub(/\s+/, '') # Removing any whitespace between the characters
+      url = "genes/forward?submit=Search&gene=#{gene}" \
+            "&gene_set=#{gene_set}&search_by=transcript"        
+
+      {
+        :order => 0,
+        :url   => url,
+        :title => 'Transcript expression',
         :class => 'mutation_link',
         :icon  => 'fa-eye'
       }
