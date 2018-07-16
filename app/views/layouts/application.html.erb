@@ -44,7 +44,7 @@
              <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>
              <%= submit_tag "Compare", name: 'submit', class: "btn btn-default"  %>
               <br>
-              Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]), class: 'form-control' ) %>
+              Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
           </div>
         <% end %>
 
@@ -78,8 +78,8 @@
 
   <% flash.each do |key, value| %>
 
-    <div class="alert <%= key %>">
-     <p> <%= value %>  </p>
+    <div class="alert-<%= key %>">
+     <p> <%= simple_format(value) %>  </p>
     </div>
 
   <% end %>

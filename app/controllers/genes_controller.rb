@@ -4,24 +4,31 @@ class GenesController < ApplicationController
 
   before_action :set_gene, only: [:show, :edit, :update, :destroy]
 
-  def getGeneIds(genes)
-    ids = Array.new
-    missing = Array.new
-    gene_set = GeneSet.find(session[:gene_set_id])    
-    genes.each do |g|  
-      gene = Gene.find_by(:name=>g, :gene_set_id=>gene_set.id)
-      gene = Gene.find_by(:gene=>g, :gene_set_id=>gene_set.id) unless  gene
-      if gene
-        ids << gene.id
-      else
-        missing << g
-      end
+  def examples
+    @gene_set = GeneSet.find(session[:gene_set_id])
+    examples = GenesHelper.get_example_genes(@gene_set)
+    respond_to do |format|      
+      format.json { 
+        render json: examples
+      }
     end
-    raise "Genes not found: #{missing.join(",")}" if missing.size != 0
-    return ids
   end
 
-  #
+  def getGeneIds(genes)
+    gs = Set.new
+    gene_set = GeneSet.find(session[:gene_set_id])    
+    old_search_by = false
+    genes.each do |g|  
+      next if g.size == 0
+      gene, search_by = GenesHelper.findGeneName(g, gene_set)
+      l_name = search_by == "gene" ?  gene.gene : gene.name
+      gs << l_name
+      old_search_by = search_by unless old_search_by
+      raise "Unable to compare a mix of genes and transcripts." unless search_by == old_search_by
+    end
+    return gs.to_a
+  end
+
   def forwardHeatmap
     genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
     raise "Please select less than 500 genes" if genes.size > 500
@@ -31,55 +38,44 @@ class GenesController < ApplicationController
     redirect_to action: "heatmap"
   end
 
-  def forwardSearch
+  def forwardCommon
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
-    gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
-    gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
-    
+    @gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
+    @gene_set = GeneSet.find(params[:gene_set_selector_main]) if params[:gene_set_selector_main]
+    @gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
     session[:heatmap] = false
-    
-    @gene = findGeneName gene_name, gene_set 
-    session[:gene] = @gene.name
-    session[:gene_set_id] = gene_set.id    
-    redirect_to  action: "show", id: @gene.id
+    @gene, @search_by = GenesHelper.findGeneName gene_name, @gene_set 
+    @search_by = params[:search_by] if ["gene", "transcript"].include? params[:search_by]
+    session[:name] = @search_by == "gene" ? @gene.gene : @gene.name 
+    session[:search_by] = @search_by
+    session[:gene_set_id] = @gene_set.id
+  end
+
+  def forwardSearch
+    forwardCommon    
+    redirect_to  action: "show", 
+      search_by: @search_by, 
+      name: session[:name], 
+      gene_set: @gene_set.name
   end
 
   def forwardCompare
-    gene_name = nil
-    gene_name = params[:gene]
-    gene_name = params[:query] if params[:query]
-
-    session[:heatmap] = false
-    
-    gene_set = GeneSet.find(params[:gene_set_selector])
-    session[:gene_set_id] = gene_set.id
-    @gene = findGeneName(gene_name, gene_set)
-    @compare =  findGeneName params[:compare], gene_set
-    redirect_to  action: "show", id: @gene.id, compare:  @compare.name  
-  end
-
-  def findGeneName(gene_name, gene_set)
-    begin 
-      gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)      
-      gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene
-    rescue    
-      raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene      
-    end    
-    return gene  
+    forwardCommon
+    @compare, @search_by_compare = GenesHelper.findGeneName params[:compare], @gene_set
+    raise "Can't compare gene vs transcript" unless @search_by == @search_by_compare
+    redirect_to  action: "show", 
+      search_by: @search_by, 
+      name: session[:name], 
+      gene_set: @gene_set.name,
+      compare:  params[:compare] 
   end
 
   # GET /genes
   # GET /genes.json
   def forward
-    #puts "Index: #{params}"
-    #Rails.logger.info "In forward"
-    #Rails.logger.info session[:genes] 
-    #Rails.logger.info params
-
     session[:studies] = params[:studies] if  params[:studies]     
-
     begin
       case params[:submit] 
       when "Heatmap"
@@ -92,23 +88,22 @@ class GenesController < ApplicationController
         raise "Unknow redirect: #{params[:submit]}"
       end
     rescue Exception => e
-      flash[:error] = "Gene Was Not Found"
-      puts e
-      session[:return_to] ||= request.referer
-      redirect_to session.delete(:return_to)
-      return
+      flash[:error] = e.to_s
+      #puts "ERROR: #{e.inspect}"
+      #puts e.backtrace
+      redirect_back fallback_location: request.base_url.to_s
+      return 
     end
 end
 
   def autocomplete
-    #puts "In autocomplete!"
     gene_set_id = session[:gene_set_id] 
     @genes = Gene.order(:name).where("name LIKE ? and gene_set_id = ?", "%#{params[:term]}%", gene_set_id).limit(20)
 
     respond_to do |format|
       format.html
       format.json { 
-        render json: @genes.map(&:name)
+        render json: [@genes.map(&:gene).uniq, @genes.map(&:transcript) ].flatten
       }
     end
   end
@@ -118,14 +113,10 @@ end
     studies = session[:studies]
     genes = []
     genes = session[:genes] if  session[:genes] 
-    genes = params[:genes] if params[:genes]
+    genes = params[:genes]  if  params[:genes]
     session[:genes] = params[:genes] if params[:genes]
-    
-    
-    #This acts as a flag for share action
     session[:heatmap] = true
-    
-    # If parameters passed cnotain settings (it's a shared link)
+    # If parameters passed contain settings (it's a shared link)
     if params[:settings]
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
@@ -146,19 +137,21 @@ end
   # GET /genes/1
   # GET /genes/1.json
   def show 
+    #Use TRIAE_CS42_2BL_TGACv1_130848_AA0418720 as it has multiple transcripts
     studies = session[:studies]    
     compare = ""
     alert = ""
     
-    # session[:gene] = @gene.name
-    # If parameters passed contain compare
-    if params[:compare]
-      @compare =  Gene.find_by(:name=>params[:compare])
-      @compare =  Gene.find_by(:gene=>params[:compare]) unless  @compare
-      compare = @compare.name
-    end    
+    #search_by = params[:search_by]
+    #search_by.capitalize! if search_by
+    gene = {
+      name: params[:name],
+      gene: params[:name], 
+      search_by:  params[:search_by]
+    }
+    compare = params[:compare] if params[:compare]
     
-    # If parameters passed cnotain settings (it's a shared link)
+    # If parameters passed contain settings (it's a shared link)
     if params[:settings]
       @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
@@ -169,8 +162,9 @@ end
       settingsObj = JSON.parse @settings
       studies = settingsObj['study']           
     end   
+    @gene = OpenStruct.new(gene)
     
-    @args = {studies: studies, compare: compare }.to_query
+    @args = {studies: studies,name: @gene.name ,compare: compare, gene_set: params[:gene_set]  }.to_query
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  
 
@@ -190,7 +184,7 @@ end
       else
         gene_name = session[:gene]
       end                     
-      @gene = findGeneName gene_name, gene_set                        
+      @gene, @search_by = GenesHelper.findGeneName gene_name, gene_set                        
     else        
       gene_set = GeneSet.find(session[:gene_set_id])            
     end
@@ -218,16 +212,6 @@ end
     session[:studies] = JSON.parse params[:studies]    
   end
   
-  # DELETE /genes/1
-  # DELETE /genes/1.json
-  #def destroy
-    #@gene.destroy
-  #  respond_to do |format|
-      #format.html { redirect_to genes_url, notice: 'Gene was successfully destroyed.' }
-      #format.json { head :no_content }
-  #  end
-  #end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_gene
