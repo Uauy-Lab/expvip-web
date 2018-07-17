@@ -217,8 +217,8 @@ end
 
 def getValuesToCompareTranscipts(gene, compare)
   values = Hash.new
-  values[gene.name]    = getValuesForTranscript(gene, gene_set)
-  values[compare.name] = getValuesForTranscript(compare, gene_set) 
+  values[gene.name]    = getValuesForTranscript(gene)
+  values[compare.name] = getValuesForTranscript(compare) 
   return values
 end
 
@@ -268,7 +268,7 @@ def gene
       values = getValuesToCompareTranscipts(gene, compare)
       ret["compare"] = params["compare"]
     else
-      values = getValuesForHomologuesTranscripts(gene,)            
+      values = getValuesForHomologuesTranscripts(gene)            
       gene_set_name = GeneSet.find(gene.gene_set_id).name      
       add_triads(ret, gene_set_name, values.keys)
     end
