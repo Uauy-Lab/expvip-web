@@ -147,9 +147,11 @@ end
     gene = {
       name: params[:name],
       gene: params[:name], 
-      search_by:  params[:search_by]
+      search_by:  params[:search_by],
+      gene_set: params[:gene_set]
     }
-    compare = params[:compare] if params[:compare]
+    @compare = params[:compare] if params[:compare]
+    
     
     # If parameters passed contain settings (it's a shared link)
     if params[:settings]
@@ -161,46 +163,41 @@ end
       session[:gene_set_id] = @gene_set_id.id            
       settingsObj = JSON.parse @settings
       studies = settingsObj['study']           
-    end   
-    @gene = OpenStruct.new(gene)
+    end         
     
-    @args = {studies: studies,name: @gene.name ,compare: compare, gene_set: params[:gene_set]  }.to_query
+    @gene = OpenStruct.new(gene)    
+
+    @args = {studies: studies,name: @gene.name ,compare: @compare, gene_set: params[:gene_set]  }.to_query  
+
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  
 
   def share 
-    # Hash the settings 
+    # Hash the settings sent by the clinet's request
     sha1 = Digest::SHA1.new
     sha1 << params[:settings]
-    hashedSettings = sha1.hexdigest        
-    
+    hashedSettings = sha1.hexdigest
 
-    # Get the gene
-    if !session[:heatmap]      
-      gene_set = GeneSet.find(session[:gene_set_id])    
-      if params[:gene]
-        gene_name = params[:gene]       
-        session[:gene] = gene_name      
-      else
-        gene_name = session[:gene]
-      end                     
-      @gene, @search_by = GenesHelper.findGeneName gene_name, gene_set                        
-    else        
-      gene_set = GeneSet.find(session[:gene_set_id])            
-    end
-
-    # Store the settings
-    @client = MongodbHelper.getConnection unless @client            
-    @client[:share].insert_one({:gene_set => gene_set.name, :settings => params[:settings], :hash => hashedSettings}) if @client[:share].find({'hash' => hashedSettings}).count == 0                                   
-        
+    # Get the gene set name and gene
+    gene_set = GeneSet.find(session[:gene_set_id])          
+    gene_name = params[:gene]       
+    session[:gene] = gene_name                
+    @gene, @search_by = GenesHelper.findGeneName gene_name, gene_set unless session[:heatmap]    
     
+    # Store the settings in the DB  
+    gene_name = @gene.name if gene_name
+    db_record = {:gene_set => gene_set.name, :name => gene_name, :search_by => @search_by, :settings => params[:settings], :hash => hashedSettings}
+    @client = MongodbHelper.getConnection unless @client
+    @client[:share].insert_one(db_record) if @client[:share].find({'hash' => hashedSettings}).count == 0
+    
+    #Generate the sharable URL and pass it to the client
     if params[:compare]      
-      response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {compare: params[:compare]}.to_query + "&" + {settings: hashedSettings}.to_query
+      response = request.base_url + "/" + params[:controller].to_s + "/" + @gene.id.to_s + "?" + {gene_set: gene_set.name}.to_query + "&" +{compare: params[:compare]}.to_query + "&" + {name: session[:name]}.to_query + "&" + {search_by: @search_by}.to_query + "&" + {settings: hashedSettings}.to_query
     elsif session[:heatmap]
-      response = request.base_url + "/" + params[:controller].to_s + "/heatmap" + "?" + {genes: session[:genes]}.to_query + "&" + {settings: hashedSettings}.to_query
+      response = request.base_url + "/" + params[:controller].to_s + "/heatmap?" + {genes: session[:genes]}.to_query + "&" + {settings: hashedSettings}.to_query
     else
-      response = request.base_url + "/" + params[:controller].to_s + "/"  + @gene.id.to_s + "?" + {settings: hashedSettings}.to_query
-    end        
+      response = request.base_url + "/" + params[:controller].to_s + "/" + @gene.id.to_s + "?" + {gene_set: gene_set.name}.to_query + "&" + {name: session[:name]}.to_query + "&" + {search_by: @search_by}.to_query + "&" + {settings: hashedSettings}.to_query
+    end            
     
     respond_to do |format|
       format.json { render json: {"value" => response}}      
