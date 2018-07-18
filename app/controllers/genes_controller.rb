@@ -179,12 +179,6 @@ class GenesController < ApplicationController
     
     #Generate the sharable URL and pass it to the client
     response = create_sharable_link gene_set.name, hashed_settings
-
-
-      # response = request.base_url + "/" + params[:controller].to_s + "/" + @gene.id.to_s + "?" + {gene_set: gene_set.name}.to_query + "&" +{compare: params[:compare]}.to_query + "&" + {name: session[:name]}.to_query + "&" + {search_by: @search_by}.to_query + "&" + {settings: hashedSettings}.to_query    
-      # response = request.base_url + "/" + params[:controller].to_s + "/heatmap?" + {settings: hashedSettings}.to_query          
-      # response = "#{request.base_url}/#{params[:controller]}/#{@gene.id}?#{{gene_set: gene_set.name}.to_query}&#{{name: session[:name]}.to_query}&#{{search_by: @search_by}.to_query}&#{{settings: hashedSettings}.to_query}"
-          
     
     respond_to do |format|
       format.json { render json: {"value" => response}}      
@@ -233,12 +227,12 @@ class GenesController < ApplicationController
     def set_shared_settings
     	@client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
+      session[:genes] = data[:genes] if data[:genes]
       @settings = data[:settings]
       gene_set_name = data[:gene_set]
       @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
       session[:gene_set_id] = @gene_set_id.id
       settingsObj = JSON.parse @settings
-      session[:genes] = settingsObj['genes'] if settingsObj['genes']
       return settingsObj['study']
     end
 
