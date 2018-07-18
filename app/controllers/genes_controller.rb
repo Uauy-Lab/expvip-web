@@ -42,6 +42,7 @@ class GenesController < ApplicationController
     gene_name = nil
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
+    gene_name.gsub!(/\s+/, '')
     @gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
     @gene_set = GeneSet.find(params[:gene_set_selector_main]) if params[:gene_set_selector_main]
     @gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
@@ -63,7 +64,8 @@ class GenesController < ApplicationController
 
   def forwardCompare
     forwardCommon
-    @compare, @search_by_compare = GenesHelper.findGeneName params[:compare], @gene_set
+    compare = params[:compare].gsub(/\s+/, '')
+    @compare, @search_by_compare = GenesHelper.findGeneName compare, @gene_set
     raise "Can't compare gene vs transcript" unless @search_by == @search_by_compare
     redirect_to  action: "show", 
       search_by: @search_by, 
