@@ -94,7 +94,7 @@ class GenesController < ApplicationController
       redirect_back fallback_location: request.base_url.to_s
       return 
     end
-end
+	end
 
   def autocomplete
     gene_set_id = session[:gene_set_id] 
@@ -108,26 +108,18 @@ end
     end
   end
 
-  def heatmap
-    session[:studies] = params[:studies] if  params[:studies] 
-    studies = session[:studies]
+  def heatmap    
     genes = []
     genes = session[:genes] if  session[:genes] 
     genes = params[:genes]  if  params[:genes]
+    session[:studies] = params[:studies] if  params[:studies] 
+    studies = session[:studies]
     session[:genes] = params[:genes] if params[:genes]
     session[:heatmap] = true
+
     # If parameters passed contain settings (it's a shared link)
-    if params[:settings]
-      @client = MongodbHelper.getConnection unless @client    
-      data = @client[:share].find({'hash' =>  params[:settings]}).first
-      @settings = data[:settings]
-      gene_set_name = data[:gene_set]
-      @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
-      session[:gene_set_id] = @gene_set_id.id            
-      settingsObj = JSON.parse @settings
-      studies = settingsObj['study']           
-    end 
-    
+    studies = set_shared_settings if params[:settings]
+
     @args = {studies: studies }.to_query
     respond_to do |format|
       format.html { render :heatmap }
@@ -154,16 +146,8 @@ end
     
     
     # If parameters passed contain settings (it's a shared link)
-    if params[:settings]
-      @client = MongodbHelper.getConnection unless @client    
-      data = @client[:share].find({'hash' =>  params[:settings]}).first
-      @settings = data[:settings]
-      gene_set_name = data[:gene_set]
-      @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
-      session[:gene_set_id] = @gene_set_id.id            
-      settingsObj = JSON.parse @settings
-      studies = settingsObj['study']           
-    end         
+    studies = set_shared_settings if params[:settings]
+     
     
     @gene = OpenStruct.new(gene)    
 
@@ -176,28 +160,31 @@ end
     # Hash the settings sent by the clinet's request
     sha1 = Digest::SHA1.new
     sha1 << params[:settings]
-    hashedSettings = sha1.hexdigest
+    hashed_settings = sha1.hexdigest
 
-    # Get the gene set name and gene
+    # Get the gene set & gene
     gene_set = GeneSet.find(session[:gene_set_id])          
     gene_name = params[:gene]       
-    session[:gene] = gene_name                
+    session[:gene] = gene_name
     @gene, @search_by = GenesHelper.findGeneName gene_name, gene_set unless session[:heatmap]    
     
+    # Preparing the DB record
+    gene_name = @gene.name if gene_name    
+    db_record = {:gene_set => gene_set.name, :name => gene_name, :search_by => @search_by, :settings => params[:settings], :hash => hashed_settings}
+    db_record[:genes] = session[:genes] if session[:genes] and session[:heatmap]
+
     # Store the settings in the DB  
-    gene_name = @gene.name if gene_name
-    db_record = {:gene_set => gene_set.name, :name => gene_name, :search_by => @search_by, :settings => params[:settings], :hash => hashedSettings}
     @client = MongodbHelper.getConnection unless @client
-    @client[:share].insert_one(db_record) if @client[:share].find({'hash' => hashedSettings}).count == 0
+    @client[:share].insert_one(db_record) if @client[:share].find({'hash' => hashed_settings}).count == 0
     
     #Generate the sharable URL and pass it to the client
-    if params[:compare]      
-      response = request.base_url + "/" + params[:controller].to_s + "/" + @gene.id.to_s + "?" + {gene_set: gene_set.name}.to_query + "&" +{compare: params[:compare]}.to_query + "&" + {name: session[:name]}.to_query + "&" + {search_by: @search_by}.to_query + "&" + {settings: hashedSettings}.to_query
-    elsif session[:heatmap]
-      response = request.base_url + "/" + params[:controller].to_s + "/heatmap?" + {genes: session[:genes]}.to_query + "&" + {settings: hashedSettings}.to_query
-    else
-      response = request.base_url + "/" + params[:controller].to_s + "/" + @gene.id.to_s + "?" + {gene_set: gene_set.name}.to_query + "&" + {name: session[:name]}.to_query + "&" + {search_by: @search_by}.to_query + "&" + {settings: hashedSettings}.to_query
-    end            
+    response = create_sharable_link gene_set.name, hashed_settings
+
+
+      # response = request.base_url + "/" + params[:controller].to_s + "/" + @gene.id.to_s + "?" + {gene_set: gene_set.name}.to_query + "&" +{compare: params[:compare]}.to_query + "&" + {name: session[:name]}.to_query + "&" + {search_by: @search_by}.to_query + "&" + {settings: hashedSettings}.to_query    
+      # response = request.base_url + "/" + params[:controller].to_s + "/heatmap?" + {settings: hashedSettings}.to_query          
+      # response = "#{request.base_url}/#{params[:controller]}/#{@gene.id}?#{{gene_set: gene_set.name}.to_query}&#{{name: session[:name]}.to_query}&#{{search_by: @search_by}.to_query}&#{{settings: hashedSettings}.to_query}"
+          
     
     respond_to do |format|
       format.json { render json: {"value" => response}}      
@@ -222,9 +209,37 @@ end
     end
 
     def numeric?(string)
-    # `!!` converts parsed number to `true`
-    !!Kernel.Float(string) 
-  rescue TypeError, ArgumentError
-    false
-  end
+      # `!!` converts parsed number to `true`
+      !!Kernel.Float(string) 
+    rescue TypeError, ArgumentError
+      false
+    end
+    
+    def create_sharable_link gene_set_name, hashed_settings
+    	if session[:heatmap]
+
+    		response = "#{request.base_url}/#{params[:controller]}/heatmap?#{{settings: hashed_settings}.to_query}"
+
+    	else
+
+    		response = "#{request.base_url}/#{params[:controller]}/#{@gene.id}?#{{gene_set: gene_set_name}.to_query}&#{{name: session[:name]}.to_query}&#{{search_by: @search_by}.to_query}&#{{settings: hashed_settings}.to_query}"
+    		response += "&" +{compare: params[:compare]}.to_query if params[:compare]
+
+    	end
+    	
+    	return response
+    end    
+
+    def set_shared_settings
+    	@client = MongodbHelper.getConnection unless @client    
+      data = @client[:share].find({'hash' =>  params[:settings]}).first
+      @settings = data[:settings]
+      gene_set_name = data[:gene_set]
+      @gene_set_id = GeneSet.find_by(:name=>gene_set_name)
+      session[:gene_set_id] = @gene_set_id.id
+      settingsObj = JSON.parse @settings
+      session[:genes] = settingsObj['genes'] if settingsObj['genes']
+      return settingsObj['study']
+    end
+
 end
