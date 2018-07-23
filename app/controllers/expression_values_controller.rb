@@ -350,6 +350,7 @@ end
     def add_triads(ret, gene_set, triads)
       # Adding the tern order
       ret["tern_order"] = ["A", "D", "B"]
+      ret["tooltip_order"] = ["A", "B", "D"]
 
       # Adding the tern (ternkey => gene name)
       terns = Hash.new    
