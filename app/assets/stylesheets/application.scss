@@ -18,16 +18,18 @@
 @import "bootstrap";
 
 body{
-    background-color: #E6E6E6;
-    height: 100%;
+    background-color: #E6E6E6;    
 }
 
-#content{
-    margin-bottom: 80px;       // footer height + 5
+#content{    
+    margin-bottom: 5px;       // margin between footer 5
+    height: 78%;
+    overflow-y: scroll;
 }
 
 div.navigation{    
-    width: 100%;            
+    width: 100%;
+    height: 13%;
 }
 
 div.navigation a{    
@@ -66,8 +68,8 @@ div.footer{
   position: fixed;
   right: 0;
   bottom: 0;
-  left: 0;
-  max-height: 75px;
+  left: 0;  
+  height: 7%;
 }
 
 
