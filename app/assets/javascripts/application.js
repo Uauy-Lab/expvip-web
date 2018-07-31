@@ -24,8 +24,7 @@ var ready;
 ready = (function() {  
 
   // set the document height
-  var windowHeight = $(window).height();  
-  $('body').height(windowHeight);
+  setDocumentHeight();
 
   $('a[href="' + this.location.pathname + '"]').parent().addClass('active');
   $("#gene-search-input").autocomplete({
@@ -342,11 +341,17 @@ function logoMargin(){
   $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
 }
 
+function setDocumentHeight(){
+  var windowHeight = $(window).height();  
+  $('body').height(windowHeight);
+}
+
 // Resizing the logos dynamically 
 var resizeLogoTimer;
 $(window).on('resize', function(e){      
   clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
   resizeLogoTimer = setTimeout(function(){      
+    setDocumentHeight();
     logoMargin();
   }, 1500);
 });  
