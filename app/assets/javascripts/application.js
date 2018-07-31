@@ -342,8 +342,16 @@ function logoMargin(){
 }
 
 function setDocumentHeight(){
+
   var windowHeight = $(window).height();  
+  var navHeight = $('nav').height();
+  var footerHeight = 75;
+  var contentHeight = 0;
+  
   $('body').height(windowHeight);
+  contentHeight = windowHeight - (navHeight + footerHeight) - 35;   // 35 is the sum of margins and paddings form top and bottom 
+  $('#content').height(contentHeight);
+
 }
 
 // Resizing the logos dynamically 

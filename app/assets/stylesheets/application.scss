@@ -22,14 +22,13 @@ body{
 }
 
 #content{    
-    margin-bottom: 5px;       // margin between footer 5
-    height: 78%;
+    margin-bottom: 5px;       // margin between footer 5    
     overflow-y: scroll;
 }
 
 div.navigation{    
     width: 100%;
-    height: 13%;
+    // height: 13%;
 }
 
 div.navigation a{    
@@ -63,13 +62,12 @@ div.navigation a:hover{
 
 div.footer{
   background-color:  #FFFFFF;
-  border-radius: 25px;  
-  float: center;
-  position: fixed;
+  border-radius: 25px;    
   right: 0;
   bottom: 0;
   left: 0;  
-  height: 7%;
+  // height: 7%;
+  max-height: 75px;
 }
 
 
