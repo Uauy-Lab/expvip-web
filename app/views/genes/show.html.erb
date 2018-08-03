@@ -31,7 +31,7 @@
   var contentHeight = 0;
   
   $('body').height(windowHeight);
-  contentHeight = windowHeight - (navHeight + footerHeight) - 35;
+  contentHeight = windowHeight - (navHeight + footerHeight) - 115;
 
 
   console.log('ava height: ' + contentHeight);
@@ -47,7 +47,7 @@
       target: container_div,
       highlight: gene, 
       data: data_url,
-      height: 600, 
+      height: contentHeight, 
       renderProperty: 'tpm', 
       fontFamily:'Helvetica', 
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   
