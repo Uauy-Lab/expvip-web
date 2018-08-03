@@ -345,7 +345,7 @@ function setDocumentHeight(){
 
   var windowHeight = $(window).height();  
   var navHeight = $('nav').height();
-  var footerHeight = 75;
+  var footerHeight = 55;
   var contentHeight = 0;
   
   $('body').height(windowHeight);

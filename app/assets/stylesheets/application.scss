@@ -33,7 +33,7 @@ div.navigation{
 
 div.navigation a{    
     display: inline-block;
-    padding: 10px 0px 10px 0px;
+    padding: 5px 0px 5px 0px;
     margin: 0px 0px 0px -4px;
     width: calc(100%/7);
     text-align: center;
@@ -65,9 +65,8 @@ div.footer{
   border-radius: 25px;    
   right: 0;
   bottom: 0;
-  left: 0;  
-  // height: 7%;
-  max-height: 75px;
+  left: 0;    
+  max-height: 55px;
 }
 
 
@@ -109,7 +108,7 @@ div.footer{
 }
 
 img.logo{
-    height: 75px;    
+    height: 55px;    
     padding:10px 0;
     box-sizing: border-box;
 }

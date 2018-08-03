@@ -25,10 +25,21 @@
   });
 
 
+  var windowHeight = $(window).height();  
+  var navHeight = $('nav').height();
+  var footerHeight = 75;
+  var contentHeight = 0;
+  
+  $('body').height(windowHeight);
+  contentHeight = windowHeight - (navHeight + footerHeight) - 35;
+
+
+  console.log('ava height: ' + contentHeight);
+
+
   var container_div="bar_expression_viewer";
   var data_url = "<%= "#{request.base_url}/expression_values/#{@gene.search_by}.json?#{@args}" %>" ;
-  var gene = "<%= @gene.name %>" ;
-  var parentWidth = $("#bar_expression_viewer").parent().width();
+  var gene = "<%= @gene.name %>";
   var eb;
   console.log(data_url);  
   function loadBarChart(){
@@ -36,7 +47,7 @@
       target: container_div,
       highlight: gene, 
       data: data_url,
-      width: parentWidth,
+      height: 600, 
       renderProperty: 'tpm', 
       fontFamily:'Helvetica', 
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   
