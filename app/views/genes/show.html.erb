@@ -19,8 +19,16 @@
   var resizeTimer;
   $(window).on('resize', function(e){      
     clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
-    resizeTimer = setTimeout(function(){      
-      eb.resizeChart();
+    resizeTimer = setTimeout(function(){     
+      var windowHeight = $(window).height();  
+      var navHeight = $('nav').height();
+      var footerHeight = 75;
+      var contentHeight = 0;
+      
+      $('body').height(windowHeight);
+      contentHeight = windowHeight - (navHeight + footerHeight) - 115;
+     
+      eb.resizeChart(contentHeight);
     }, 1500);
   });
 
