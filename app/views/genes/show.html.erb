@@ -18,32 +18,27 @@
   // rescaling the bar chart after a 1.5 second delay
   var resizeTimer;
   $(window).on('resize', function(e){      
-    clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
+    clearTimeout(resizeTimer);  // Making sure that the reload doesnt happen if the window is resized within 1.5 seconds
     resizeTimer = setTimeout(function(){     
-      var windowHeight = $(window).height();  
-      var navHeight = $('nav').height();
-      var footerHeight = 75;
+
+      var windowHeight = $(window).outerHeight();  
+      var navHeight = $('nav').outerHeight();
+      var footerHeight = 55;
       var contentHeight = 0;
-      
-      $('body').height(windowHeight);
-      contentHeight = windowHeight - (navHeight + footerHeight) - 115;
+            
+      contentHeight = windowHeight - (navHeight + footerHeight) - 90;
      
       eb.resizeChart(contentHeight);
     }, 1500);
   });
 
 
-  var windowHeight = $(window).height();  
-  var navHeight = $('nav').height();
-  var footerHeight = 75;
+  var windowHeight = $(window).outerHeight();  
+  var navHeight = $('nav').outerHeight();
+  var footerHeight = 55;
   var contentHeight = 0;
-  
-  $('body').height(windowHeight);
-  contentHeight = windowHeight - (navHeight + footerHeight) - 115;
-
-
-  console.log('ava height: ' + contentHeight);
-
+    
+  contentHeight = windowHeight - (navHeight + footerHeight) - 90;
 
   var container_div="bar_expression_viewer";
   var data_url = "<%= "#{request.base_url}/expression_values/#{@gene.search_by}.json?#{@args}" %>" ;
