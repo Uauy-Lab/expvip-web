@@ -8,10 +8,26 @@
   var resizeTimer;
   $(window).on('resize', function(e){      
     clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
-    resizeTimer = setTimeout(function(){      
-      eb.resizeChart();
+    resizeTimer = setTimeout(function(){
+
+      var windowHeight = $(window).outerHeight();
+      var navHeight = $('nav').outerHeight();
+      var footerHeight = 55;
+      var contentHeight = 0;
+            
+      contentHeight = windowHeight - (navHeight + footerHeight) - 90;
+
+      eb.resizeChart(contentHeight);
     }, 1500);
   });
+
+
+  var windowHeight = $(window).outerHeight();  
+  var navHeight = $('nav').outerHeight();
+  var footerHeight = 55;
+  var contentHeight = 0;
+    
+  contentHeight = windowHeight - (navHeight + footerHeight) - 90;
 
   var container_div="bar_expression_viewer";
   var data_url = "<%=raw "#{request.base_url}/expression_values/genes.json?#{@args}"%>" ;
@@ -24,6 +40,7 @@
       data: data_url,
       renderProperty: 'tpm', 
       fontFamily: 'Helvetica', 
+      height: contentHeight,
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],             
       width: parentWidth,
       plot:'HeatMap'

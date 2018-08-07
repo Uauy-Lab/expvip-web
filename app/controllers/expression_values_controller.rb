@@ -348,8 +348,16 @@ end
 
     # Adding the tern_order and tern values (triads) to the data which enables the ternary plot to be displayed
     def add_triads(ret, gene_set, triads)
+
       # Adding the tern order
       ret["tern_order"] = ["A", "D", "B"]
+      ret["tooltip_order"] = ["A", "B", "D"]
+
+      # Adding data for expression bias
+      exp_bias = Hash.new
+      exp_bias["Azhurnaya"] = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9]
+      exp_bias["Chinese Spring"] = [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]
+      ret["expression_bias"] = {:"Azhurnaya" => [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9], :"Chinese Spring" => [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]}
 
       # Adding the tern (ternkey => gene name)
       terns = Hash.new    
