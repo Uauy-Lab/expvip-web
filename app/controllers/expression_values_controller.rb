@@ -135,7 +135,6 @@ def getValuesForTranscripts(transcripts_in_gene)
     v_t = getValuesForTranscript(t)
     v_t.each_pair do |type, h|
       h.each_pair do |exp, val|
-        puts val
         current = values[type][exp]
         current = {:experiment=>exp, :value=>0.0} if current == 0
         current[:value] += val[:value] 
