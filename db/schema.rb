@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180709080701) do
+ActiveRecord::Schema.define(version: 20180808183743) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -155,11 +155,17 @@ ActiveRecord::Schema.define(version: 20180709080701) do
   create_table "studies", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "accession"
     t.string "title"
-    t.string "manuscript"
+    t.string "manuscript", limit: 500
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "species_id"
     t.boolean "selected"
+    t.string "summary", limit: 500
+    t.string "sra_description", limit: 500
+    t.string "grouping"
+    t.string "doi"
+    t.integer "order"
+    t.boolean "active"
     t.index ["accession"], name: "index_studies_on_accession"
     t.index ["species_id"], name: "index_studies_on_species_id"
     t.index ["title"], name: "index_studies_on_title"
