@@ -29,16 +29,15 @@
   <button class="select_all study_selector">Select All</button>
   <button class="deselect_all study_selector">Deselect All</button>
 
-  <br><br>
+  <br>
   <% @studies.each do |study| %>
+   <div class="study_block">
     <% if study.selected %>
-      <div class="study_block">
-        <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession %>          
-    <% else %>
-      <div class="study_block">         
-      <%= check_box_tag "studies[]", study.accession, checked = false, id: study.accession %>
+        <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession  %>          
+    <% else %>    
+        <%= check_box_tag "studies[]", study.accession, checked = false, id: study.accession  %>
     <% end %>    
-    <%= label_tag(study.accession, study.title, class: 'study_title', for: study.accession) %> 
+    <%= label_tag(study.accession, study.summary, class: 'study_title' , for: study.accession) %> 
     </div>         
   <% end %>  
 <% end %>
