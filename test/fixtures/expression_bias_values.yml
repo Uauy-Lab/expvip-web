@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  decile: 1
+  min: 
+  max: 
+  expresion_bias: one
+
+two:
+  decile: 1
+  min: 
+  max: 
+  expresion_bias: two

@@ -368,10 +368,17 @@ end
       ret["tooltip_order"] = ["A", "B", "D"]
 
       # Adding data for expression bias
-      exp_bias = Hash.new
-      exp_bias["Azhurnaya"] = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9]
-      exp_bias["Chinese Spring"] = [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]
-      ret["expression_bias"] = {:"Azhurnaya" => [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9], :"Chinese Spring" => [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]}
+      ret["expression_bias"] = {}
+      
+      ExpressionBias.all.each do |eb|
+        puts eb
+        #byebug
+        ret["expression_bias"][eb.name] = eb.expression_bias_values.map{|e| e.max }.sort
+
+      end
+
+      #      :"Azhurnaya" => [0.03869857,0.05198225,0.06524463,0.07952061,0.09685581,0.11707254,0.14157094,0.17533911,0.22946794],
+      # :"Chinese Spring" => [0.05176466,0.06697828,0.08153751,0.09615515,0.11227235,0.13183942,0.15494804, 0.18387096, 0.23329810]}
 
       # Adding the tern (ternkey => gene name)
       terns = Hash.new    

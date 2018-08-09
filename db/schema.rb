@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180808183743) do
+ActiveRecord::Schema.define(version: 20180809151038) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -46,6 +46,23 @@ ActiveRecord::Schema.define(version: 20180808183743) do
     t.bigint "experiment_id", null: false
     t.bigint "factor_id", null: false
     t.index ["experiment_id", "factor_id"], name: "index_experiments_factors_on_experiment_id_and_factor_id"
+  end
+
+  create_table "expression_bias", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "expression_bias_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "decile"
+    t.float "min", limit: 24
+    t.float "max", limit: 24
+    t.bigint "expression_bias_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expression_bias_id"], name: "index_expression_bias_values_on_expression_bias_id"
   end
 
   create_table "expression_values", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -195,6 +212,7 @@ ActiveRecord::Schema.define(version: 20180808183743) do
   end
 
   add_foreign_key "experiments", "studies"
+  add_foreign_key "expression_bias_values", "expression_bias", column: "expression_bias_id"
   add_foreign_key "expression_values", "genes"
   add_foreign_key "expression_values", "meta_experiments"
   add_foreign_key "expression_values", "type_of_values"
