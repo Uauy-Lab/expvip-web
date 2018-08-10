@@ -10,5 +10,5 @@
     end
 
 %>
-| <%= s.title.gsub("_"," ") %>          | <%= s.summary  %>  |<%= s.sra_description %> | <%= url_s %> <%= s.manuscript %> <%= url %> | 
+|<%= s.title.gsub("_"," ") %>|<%= s.summary %>|<%= s.sra_description %>|<%= url_s %><%= s.manuscript %><%= url %> | 
 <% end %>
