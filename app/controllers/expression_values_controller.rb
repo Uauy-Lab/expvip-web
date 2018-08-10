@@ -358,6 +358,30 @@ end
       exp_bias["Azhurnaya"] = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9]
       exp_bias["Chinese Spring"] = [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]
       ret["expression_bias"] = {:"Azhurnaya" => [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9], :"Chinese Spring" => [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]}
+      ret["expression_bias_colors"] = {
+        :"Azhurnaya" => [
+          "#377eb8", 
+          "#bdbdbd", 
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd", 
+          "#e41a1c"], 
+        :"Chinese Spring" => [
+          "#377eb8", 
+          "#bdbdbd", 
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd",
+          "#bdbdbd", 
+          "#e41a1c"]
+        }
 
       # Adding the tern (ternkey => gene name)
       terns = Hash.new    
