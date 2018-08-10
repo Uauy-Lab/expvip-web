@@ -41,8 +41,16 @@ Rails.application.routes.draw do
       get 'set_gene_set_session'     
     end
   end
-
-  SequenceServer.init
-  mount SequenceServer, :at => "sequenceserver"
+  begin
+    config_file = Rails.application.config.sequenceserver_config
+    config_ss = {}
+    config_ss[:config_file]  =  config_file if Dir.exist? config_file
+    
+    SequenceServer.init config_ss
+    mount SequenceServer, :at => "sequenceserver"
+  rescue Exception => e
+    Logger.new(STDOUT).info "Unable to start sequenceserver: " + e.to_s
+  end
+  
   
 end

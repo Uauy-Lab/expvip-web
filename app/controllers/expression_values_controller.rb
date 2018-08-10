@@ -71,6 +71,7 @@ class ExpressionValuesController < ApplicationController
    selectedFactors = Hash.new
 
    Study.find_each do |s| 
+    next unless s.active 
     factorOrder["study"]     = Hash.new unless factorOrder["study"]
     longFactorName["study"]  = Hash.new unless longFactorName["study"]
     selectedFactors["study"] = Hash.new unless selectedFactors["study"]  
@@ -78,7 +79,7 @@ class ExpressionValuesController < ApplicationController
     longName = longFactorName["study"]
     selected = selectedFactors["study"] 
 
-    order[s.accession] = s.id
+    order[s.accession] = s.order
     longName[s.accession] = s.title
     longName[s.accession] = s.accession unless s.title
     selected[s.accession] = false
@@ -105,9 +106,10 @@ end
 def getExperimentGroups
   experiments     = Hash.new 
   groups          = Hash.new 
+
   Experiment.find_each do | g |
     group = Hash.new
-   
+    next unless g.study.active
     #Should we use description instead?
     group["name"] = g.accession
     group["description"] = g.accession
@@ -135,11 +137,12 @@ def getValuesForTranscripts(transcripts_in_gene)
       h.each_pair do |exp, val|
         current = values[type][exp]
         current = {:experiment=>exp, :value=>0.0} if current == 0
-        current[:value] += val[:value]
+        current[:value] += val[:value] 
         values[type][exp] = current 
      end
     end
   end
+  #removeInactiveValues values
   values
 end
 
@@ -154,7 +157,16 @@ def getValuesForTranscript(gene)
     obj = client[:experiments].find({ :_id => ev.id })
     obj.first.each_pair {|k, val| values[type_of_value][k.to_s] = {experiment:  k, value: val}  unless k == "_id" }    
   end
+  removeInactiveValues values
   return values
+end
+
+def removeInactiveValues(values)
+  Experiment.joins(:study).where("studies.active = 0").each do |e|
+    values.keys.each do |k|
+      values[k].delete e.id.to_s
+    end
+  end
 end
 
 def getDefaultOrder 
@@ -332,7 +344,9 @@ end
     def add_ret_values(ret, params)
       factorOrder, longFactorName, selectedFactors = getFactorOrder 
       experiments, groups = getExperimentGroups
-      params["studies"].each { |e| selectedFactors["study"][e] = true } if  params["studies"]  and params["studies"].respond_to?('each')
+      params["studies"].each do |e| 
+        selectedFactors["study"][e] = true  
+      end if params["studies"] and params["studies"].respond_to?('each')
 
       ret["factorOrder"]= factorOrder
       ret["longFactorName"]= longFactorName
@@ -354,11 +368,11 @@ end
       ret["tooltip_order"] = ["A", "B", "D"]
 
       # Adding data for expression bias
-      exp_bias = Hash.new
-      exp_bias["Azhurnaya"] = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9]
-      exp_bias["Chinese Spring"] = [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]
-      ret["expression_bias"] = {:"Azhurnaya" => [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9], :"Chinese Spring" => [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]}
-
+      ret["expression_bias"] = {}
+      ExpressionBias.all.each do |eb|
+        ret["expression_bias"][eb.name] = eb.expression_bias_values.map{|e| e.max }.sort
+      end
+      
       # Adding the tern (ternkey => gene name)
       terns = Hash.new    
       triads.each do |triad|
