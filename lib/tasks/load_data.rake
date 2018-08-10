@@ -371,5 +371,20 @@ namespace :load_data do
     end
   end
 
-
+  desc "Load the expression bias"
+  task :expression_bias, [:filename] => :environment do |t,args|
+    ActiveRecord::Base.transaction do
+      CSV.foreach(args[:filename], headers:  true, col_sep: ",") do |row|
+        puts row.inspect
+        eb  = ExpressionBias.find_or_create_by(name: row["dataset"])
+        eb.order = row["order"].to_i
+        puts eb
+        ebv = ExpressionBiasValue.find_or_create_by(expression_bias: eb, decile: row["decile"].to_i)
+        ebv.min = row["min"].to_f
+        ebv.max = row["max"].to_f
+        eb.save!
+        ebv.save!
+      end
+    end
+  end
 end

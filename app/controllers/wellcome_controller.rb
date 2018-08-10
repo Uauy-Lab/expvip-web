@@ -3,7 +3,7 @@ class WellcomeController < ApplicationController
   
 
   def default
-    @studies = Study.all
+    @studies = Study.where("active").order('`order` ASC')
     @gene_example_1 = {}
     @example = {}
     gene_set_id = false 
