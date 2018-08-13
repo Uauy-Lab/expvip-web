@@ -368,11 +368,10 @@ end
       ret["tooltip_order"] = ["A", "B", "D"]
 
       # Adding data for expression bias
-<<<<<<< HEAD
-      exp_bias = Hash.new
-      exp_bias["Azhurnaya"] = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9]
-      exp_bias["Chinese Spring"] = [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]
-      ret["expression_bias"] = {:"Azhurnaya" => [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.9], :"Chinese Spring" => [0.1,0.15,0.20,0.4,0.45,0.50,0.7,0.9]}
+      ret["expression_bias"] = {}
+      ExpressionBias.all.each do |eb|
+        ret["expression_bias"][eb.name] = eb.expression_bias_values.map{|e| e.max }.sort
+      end
       ret["expression_bias_colors"] = {
         :"Azhurnaya" => [
           "#377eb8", 
@@ -397,15 +396,7 @@ end
           "#bdbdbd", 
           "#e41a1c"]
         }
-
-=======
-      ret["expression_bias"] = {}
-      ExpressionBias.all.each do |eb|
-        ret["expression_bias"][eb.name] = eb.expression_bias_values.map{|e| e.max }.sort
-      end
-      
->>>>>>> 00b98f6151cf28ded4ba8e0e3ce4527f3f1ca5a2
-      # Adding the tern (ternkey => gene name)
+# Adding the tern (ternkey => gene name)
       terns = Hash.new    
       triads.each do |triad|
         # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
