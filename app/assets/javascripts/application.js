@@ -236,7 +236,7 @@ ready = (function() {
       // Remove the download links
       setTimeout(function(){
         var dooo = $('#sequenceserver').contents().find('#result').children().children().eq(1).children().hide();        
-      }, 7000);
+      }, 20000);
       
 
       // Adding a new column to the results table (with a time delay to let the content to be generated first and then changed)  
