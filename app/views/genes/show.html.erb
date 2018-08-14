@@ -18,17 +18,31 @@
   // rescaling the bar chart after a 1.5 second delay
   var resizeTimer;
   $(window).on('resize', function(e){      
-    clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
-    resizeTimer = setTimeout(function(){      
-      eb.resizeChart();
+    clearTimeout(resizeTimer);  // Making sure that the reload doesnt happen if the window is resized within 1.5 seconds
+    resizeTimer = setTimeout(function(){     
+
+      var windowHeight = $(window).outerHeight();  
+      var navHeight = $('nav').outerHeight();
+      var footerHeight = 55;
+      var contentHeight = 0;
+            
+      contentHeight = windowHeight - (navHeight + footerHeight) - 90;
+     
+      eb.resizeChart(contentHeight);
     }, 1500);
   });
 
 
+  var windowHeight = $(window).outerHeight();  
+  var navHeight = $('nav').outerHeight();
+  var footerHeight = 55;
+  var contentHeight = 0;
+    
+  contentHeight = windowHeight - (navHeight + footerHeight) - 90;
+
   var container_div="bar_expression_viewer";
   var data_url = "<%= "#{request.base_url}/expression_values/#{@gene.search_by}.json?#{@args}" %>" ;
-  var gene = "<%= @gene.name %>" ;
-  var parentWidth = $("#bar_expression_viewer").parent().width();
+  var gene = "<%= @gene.name %>";
   var eb;
   console.log(data_url);  
   function loadBarChart(){
@@ -36,7 +50,7 @@
       target: container_div,
       highlight: gene, 
       data: data_url,
-      width: parentWidth,
+      height: contentHeight, 
       renderProperty: 'tpm', 
       fontFamily:'Helvetica', 
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   

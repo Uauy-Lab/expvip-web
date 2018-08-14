@@ -23,6 +23,9 @@ Math.log2 = Math.log2 || function(x) {
 var ready;
 ready = (function() {  
 
+  // set the document height
+  setDocumentHeight();
+
   $('a[href="' + this.location.pathname + '"]').parent().addClass('active');
   $("#gene-search-input").autocomplete({
     source: '/genes/autocomplete.json',
@@ -230,6 +233,12 @@ ready = (function() {
       search_left.hide();
       introblurb.hide();             
 
+      // Remove the download links
+      setTimeout(function(){
+        var dooo = $('#sequenceserver').contents().find('#result').children().children().eq(1).children().hide();        
+      }, 20000);
+      
+
       // Adding a new column to the results table (with a time delay to let the content to be generated first and then changed)  
       $(document).ready(function($) {
         setTimeout(function(){
@@ -322,26 +331,47 @@ ready = (function() {
   // **********************************Slide Toggle Studies - END**********************************
 
 
-  // Initialsizing of the logos 
-  var totalWidth = 0;
-  $(".footer img").each(function(){
-    totalWidth =  totalWidth + $(this).width();    
-  });  
-  $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
-  $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
+  // margin between the logos
+  logoMargin();
 
-  // Resizing the logos dynamically 
-  var resizeLogoTimer;
-  $(window).on('resize', function(e){      
-    clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
-    resizeLogoTimer = setTimeout(function(){      
-      $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
-      $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
-    }, 1500);
-  });  
   
-
 });
+
+
+function logoMargin(){
+  setTimeout(function(){
+    var totalWidth = 0;
+    $(".footer img").each(function(){
+      totalWidth =  totalWidth + $(this).width();    
+    }); 
+    $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
+    $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
+  }, 200);  
+}
+
+function setDocumentHeight(){
+
+  var windowHeight = $(window).height();  
+  var navHeight = $('nav').height();
+  var footerHeight = 55;
+  var contentHeight = 0;
+  
+  $('body').height(windowHeight);
+  contentHeight = windowHeight - (navHeight + footerHeight) - 35;   // 35 is the sum of margins and paddings form top and bottom 
+  $('#content').height(contentHeight);
+
+}
+
+// Resizing the logos dynamically 
+var resizeLogoTimer;
+$(window).on('resize', function(e){      
+  clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
+  resizeLogoTimer = setTimeout(function(){      
+    setDocumentHeight();
+    logoMargin();
+  }, 1500);
+});  
+
 
 $(document).ready(ready);
 $(document).on('page:load', ready);

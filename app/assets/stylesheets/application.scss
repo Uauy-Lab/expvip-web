@@ -18,21 +18,22 @@
 @import "bootstrap";
 
 body{
-    background-color: #E6E6E6;
-    height: 100%;
+    background-color: #E6E6E6;    
 }
 
-#content{
-    margin-bottom: 80px;       // footer height + 5
+#content{    
+    margin-bottom: 5px;       // margin between footer 5    
+    overflow-y: scroll;
 }
 
 div.navigation{    
-    width: 100%;            
+    width: 100%;
+    // height: 13%;
 }
 
 div.navigation a{    
     display: inline-block;
-    padding: 10px 0px 10px 0px;
+    padding: 5px 0px 5px 0px;
     margin: 0px 0px 0px -4px;
     width: calc(100%/7);
     text-align: center;
@@ -61,20 +62,17 @@ div.navigation a:hover{
 
 div.footer{
   background-color:  #FFFFFF;
-  border-radius: 25px;  
-  float: center;
-  position: fixed;
+  border-radius: 25px;    
   right: 0;
   bottom: 0;
-  left: 0;
-  max-height: 75px;
+  left: 0;    
+  max-height: 55px;
 }
 
 
 // Styling The Links In About Studies ****************************************
 .dialogs{
     overflow:auto; 
-    max-height:400px; 
     padding: 50px;
 }
 
@@ -109,7 +107,7 @@ div.footer{
 }
 
 img.logo{
-    height: 75px;    
+    height: 55px;    
     padding:10px 0;
     box-sizing: border-box;
 }
