@@ -44,7 +44,7 @@ Rails.application.routes.draw do
   
   begin
     config_ss = {}
-    if Rails.applications.config.respond_to?(:trackable_models)
+    if Rails.application.config.respond_to?(:sequenceserver_config)
       config_file = Rails.application.config.sequenceserver_config 
       config_ss[:config_file]  =  config_file if Dir.exist? config_file
     end
