@@ -4,7 +4,7 @@
 </div> 
 
 <div id="share_popup">
-    <span>X</span>    
+    <button type="button" id="close-button" class="ui-dialog-titlebar-close">x</button>    
     <input type="text">
     <br>
     <br>
@@ -79,7 +79,7 @@
       });
 
       // Close the popup when clicked on the cross
-      $("#share_popup span").click(function (){
+      $("#close-button").click(function (){
         $("#share_popup").hide("fast");
       });
   });
