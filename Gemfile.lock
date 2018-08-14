@@ -99,6 +99,9 @@ GEM
       rails
       rdiscount (>= 1.6.8, < 2.0)
     method_source (0.9.0)
+    mime-types (3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2016.0521)
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
     minitest (5.11.3)
@@ -209,6 +212,7 @@ DEPENDENCIES
   jquery-rails
   jquery-ui-rails
   markdown-rails
+  mime-types
   mongo
   mysql2 (~> 0.3.13)
   rails (~> 5)
