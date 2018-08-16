@@ -40,6 +40,8 @@ gem 'activerecord-session_store'
 
 gem 'mongo'
 
+gem 'mime-types'
+
 # gem 'sinatra', '~> 2.0'
 #gem 'sequenceserver', '~> 1.0.11'
 gem 'sequenceserver', :git => 'https://github.com/homonecloco/sequenceserver.git', :branch => 'update-sinatra'
