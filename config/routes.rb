@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   get 'wellcome/search_gene'
 
   get 'download' => 'download#default'
-
+  get 'cite' =>  'wellcome#cite'
  # resources :expression_values
  # resources :type_of_values
  # resources :meta_experiments

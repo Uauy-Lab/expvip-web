@@ -20,6 +20,10 @@ class WellcomeController < ApplicationController
     end
   end
 
+  def cite
+    
+  end
+  
   def search_gene
   end
 
