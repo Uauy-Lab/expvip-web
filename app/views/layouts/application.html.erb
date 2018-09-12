@@ -38,7 +38,7 @@
 
         <%= form_tag "/genes/forward", method: :post, class: 'navbar-form navbar-right' do %>
           <div class="form-group">
-             <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene], placeholder: "Traes_4AL_F99FCB25F.1" %>
+             <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene] %>
              <%= submit_tag "Search" , name: 'submit', class: "btn btn-default"  %>
 
              <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>

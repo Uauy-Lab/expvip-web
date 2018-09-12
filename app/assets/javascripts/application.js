@@ -26,6 +26,9 @@ ready = (function() {
   // set the document height
   setDocumentHeight();
 
+  // set the input placeholder
+  $('#gene-search-input').attr("placeholder", $('#example1').html());    
+
   $('a[href="' + this.location.pathname + '"]').parent().addClass('active');
   $("#gene-search-input").autocomplete({
     source: '/genes/autocomplete.json',
@@ -52,8 +55,9 @@ ready = (function() {
       data: {        
           gene_set_selector:geneID
       },
-      success: function (response) { 
-        $('#example1').html(response.search.gene);        
+      success: function (response) {         
+        $('#gene-search-input').attr("placeholder", response.search.gene);
+        $('#example1').html(response.search.gene);
         $('#example2').html(response.compare.gene ); 
         $('#example3').html(response.search.name);        
         $('#example4').html(response.compare.name );                     
