@@ -334,24 +334,25 @@ namespace :load_data do
     genes = File.open(args.filename).read
     genes.gsub!(/\r\n?/, "")
     all_genes = []
-    genes.each_line do |line|
-      line.gsub!(/\n/,"")
-      all_genes = line.split(/, */).map{
-        |x|
-        if x =~ /\A\d+\z/ ? true : false
-          x.to_i
-        else
-          x
-        end
-      }
-      gene_id = Gene.find_by(:name => all_genes[1])
-      gene_set_id = GeneSet.find_by(:name => all_genes[0])
-      ActiveRecord::Base.transaction do
-        SampleGene.find_or_create_by(:gene_set_id => gene_set_id.id, :gene_id => gene_id.id, :kind => all_genes[2])
+    ActiveRecord::Base.transaction do
+      SampleGene.delete_all
+      genes.each_line do |line|
+        line.gsub!(/\n/,"")
+        all_genes = line.split(/, */).map{
+          |x|
+          if x =~ /\A\d+\z/ ? true : false
+            x.to_i
+          else
+            x
+          end
+        }
+        gene_id = Gene.find_by(:name => all_genes[1])
+        gene_set_id = GeneSet.find_by(:name => all_genes[0])
+      
+        SampleGene.find_or_create_by(:gene_set_id => gene_set_id.id, :gene_id => gene_id.id, :kind => all_genes[2])      
+        puts "Add #{all_genes}"
       end
-      puts "Add #{all_genes}"
     end
-
   end
 
   desc "Selecting a default gene set"
