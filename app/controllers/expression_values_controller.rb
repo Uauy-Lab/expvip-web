@@ -82,7 +82,7 @@ class ExpressionValuesController < ApplicationController
     order[s.accession] = s.order
     longName[s.accession] = s.title
     longName[s.accession] = s.accession unless s.title
-    selected[s.accession] = false
+    selected[s.accession] = true
 
   end
 
@@ -169,25 +169,17 @@ def removeInactiveValues(values)
   end
 end
 
-def getDefaultOrder 
-    #TODO This should be a table in the DB at some point
-    defOrder = [
-      "study",
-      "High level tissue",
-      "Tissue",
-      "High level age", 
-      "Age", 
-      "High level stress-disease", 
-      "Stress-disease",
-      "High level variety",
-      "Variety",
-      "Intermediate",
-      "Intermediate stress"
-    ]
-    return defOrder
+def getDefaultOrder
+  defOrder = DefaultFactorOrder.all
+  df_hash = {}
+  defOrder.each do |df|
+    df_hash[df.order] = df.name
   end
+  df_hash = df_hash.sort.to_h
+  return df_hash.values
+end
 
-  def getValuesForHomologuesTranscripts(gene)
+def getValuesForHomologuesTranscripts(gene)
     values = Hash.new
     values[gene.name] = getValuesForTranscript(gene)  
     HomologyPair.where("gene_id = :gene", {gene: gene.id}).each do |h|

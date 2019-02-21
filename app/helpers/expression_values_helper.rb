@@ -31,28 +31,27 @@ module ExpressionValuesHelper
 		puts "#{count} genes exported" 
 	end
 
-	def self.add(row, genes, experiments, meta_exp, value_type) 
+	def self.add(row, genes, experiments, meta_exp, value_type, accession) 
 		gene_name = row["target_id"]
-        gene_name = row["transcript"] unless row["target_id"]
-        gene = genes[gene_name]
-        row.delete("target_id")
-        row.delete("transcript")
-        h_row = row.to_hash 
-        to_insert_h = Hash.new
-        missing = Set.new
-        h_row.each_pair do |name, val|
-          exp_id = experiments[name]
-          missing << name unless exp_id
-          to_insert_h[exp_id] = val.to_f if exp_id
-        end
-        
-        exp_val = ExpressionValue.find_or_create_by( 
-          :gene =>  gene, 
-          :meta_experiment => meta_exp ,
-          :type_of_value => value_type )
-        exp_val.save!
-        ExperimentsHelper.saveValues(exp_val, to_insert_h) if to_insert_h.size > 0
-        missing
+		gene_name = row["transcript"] unless row["target_id"]
+		gene = genes[gene_name]
+		h_row = {accession => row["est_counts"]} if value_type.name == 'count'
+		h_row = {accession => row["tpm"]} if value_type.name == 'tpm'
+		to_insert_h = Hash.new
+		missing = Set.new
+		h_row.each_pair do |name, val|
+			exp_id = experiments[name]
+			missing << name unless exp_id
+			to_insert_h[exp_id] = val.to_f if exp_id
+		end
+		
+		exp_val = ExpressionValue.find_or_create_by( 
+			:gene =>  gene, 
+			:meta_experiment => meta_exp ,
+			:type_of_value => value_type )
+		exp_val.save!
+		ExperimentsHelper.saveValues(exp_val, to_insert_h) if to_insert_h.size > 0
+		missing
 	end
 
 end

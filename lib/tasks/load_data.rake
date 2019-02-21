@@ -30,7 +30,8 @@ namespace :load_data do
 		  		study = Study.find_or_create_by(:accession=>row["secondary_study_accession"])
 		  		study.title = 	row["study_title"]
 		  		study.manuscript = row["Manuscript"]
-		  		study.species = species
+          study.species = species
+          study.active = 1
 		  		study.save!
 
 		  		#We need to validate that it doesn't exist. Maybe make the accessions primary keys.
@@ -133,6 +134,7 @@ namespace :load_data do
           g.gene_set = gene_set
           name = arr.shift
           g.name = name
+          g.transcript = name
           g.cdna = name
           #GenesHelper.saveGene(g)
           g.save!
@@ -305,7 +307,7 @@ namespace :load_data do
     end
   end
 
-  desc "Selects default studies"
+  desc "Selects default studies (Provide text file which contains study names/accession in each line)"
   task :default_studies, [:filename] => :environment do |t, args|
     puts "file provided #{args.filename}"
     default_studies = File.open(args.filename).read
@@ -328,7 +330,7 @@ namespace :load_data do
     end
   end
 
-  desc "Adding sample genes"
+  desc "Adding sample genes - Provide a file with each row containing gene_set_name, gene_name, Kind (search/compare/heatmap)"
   task :sample_genes, [:filename] => :environment do |t, args|
     puts "file provided #{args.filename}"
     genes = File.open(args.filename).read
@@ -355,7 +357,7 @@ namespace :load_data do
     end
   end
 
-  desc "Selecting a default gene set"
+  desc "Selecting a default gene set (Provide gene set name)"
   task :default_gene_set, [:gene_set] => :environment do |t, args|
     puts "gene set provided #{args.gene_set}"
     ActiveRecord::Base.transaction do
@@ -388,4 +390,24 @@ namespace :load_data do
       end
     end
   end
+
+  desc "Populate the default factor order table (provide a txt file with each line being [name of the factor] in the order that you want"
+  task :default_factor_order, [:filename] => :environment do |t,args|
+    ActiveRecord::Base.transaction do
+      DefaultFactorOrder.destroy_all
+      factorIndex = 1
+      text = File.open(args[:filename]).read
+      text.gsub!(/\r\n?/, "")
+      text.each_line do |factor|
+        begin
+          puts factor.to_s
+          DefaultFactorOrder.create(name: factor.to_s.gsub(/\n/,""), order: factorIndex)
+          factorIndex += 1
+        rescue => exception
+          puts "Factor: #{factor.gsub(/\n/,"")} could not be found in the database\n#{exception}"
+        end
+      end
+    end
+  end
+
 end
