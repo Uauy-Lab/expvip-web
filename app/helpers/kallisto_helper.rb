@@ -3,11 +3,7 @@ module KallistoHelper
 	def self.runAndLoadFolder(input_dir:, kallistoIndex:, gene_set:, meta_experiment:)
 		meta_exp = MetaExperiment.find_by(:name=>meta_experiment)
 		used_accessions = Set.new
-		experiments = Hash.new
-		Experiment.find_each do |e|
-			experiments[e.accession] = e.id
-		end
-		Experiment.find_each do |e|
+		experiments = Experiment.find_each do |e|
 			next if(used_accessions.include?(e.accession))
 			count = MetaExperimentsHelper.countLoadedValues(meta_experiment: meta_experiment, accession: e.accession)
 			accession_dir = "#{input_dir}/#{e.accession}"
@@ -24,6 +20,12 @@ module KallistoHelper
 	def self.loadFolder(input_dir:, gene_set:, meta_experiment:)
 		meta_exp = MetaExperiment.find_or_create_by(:name=>meta_experiment)
 		used_accessions = Set.new
+
+		experiments = Hash.new
+		Experiment.find_each do |e|
+			experiments[e.accession] = e.id
+		end
+
 		experiments = Experiment.find_each do | e |
 			next if(used_accessions.include?(e.accession))
 			count = MetaExperimentsHelper.countLoadedValues(meta_experiment: meta_experiment, accession: e.accession )
@@ -32,7 +34,7 @@ module KallistoHelper
 			files=Dir["#{accession_dir}/abundance.tsv"]
 			if(count == 0 and files.size == 1 )  #Maybe improve this to make sure the actual kallisto files exist
 				puts "Loading: #{e.accession} (#{gene_set})"
-				self.loadKallistoOutput(input_dir:accession_dir, accession:e.accession, gene_set: gene_set, meta_experiment: meta_experiment )
+				self.loadKallistoOutput(input_dir:accession_dir, accession:e.accession, gene_set: gene_set, meta_experiment: meta_experiment, experiments: experiments )
 			end
 			used_accessions << e.accession
 		end

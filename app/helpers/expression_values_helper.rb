@@ -31,12 +31,16 @@ module ExpressionValuesHelper
 		puts "#{count} genes exported" 
 	end
 
-	def self.add(row, genes, experiments, meta_exp, value_type, accession) 
+	def self.add(row, genes, experiments, meta_exp, value_type) 
 		gene_name = row["target_id"]
 		gene_name = row["transcript"] unless row["target_id"]
 		gene = genes[gene_name]
-		h_row = {accession => row["est_counts"]} if value_type.name == 'count'
-		h_row = {accession => row["tpm"]} if value_type.name == 'tpm'
+		if row.headers.include? "est_counts" and row.headers.include? "tpm"
+			h_row = {accession => row["est_counts"]} if value_type.name == 'count'
+			h_row = {accession => row["tpm"]} if value_type.name == 'tpm'
+		else
+			h_row = row.to_hash
+		end
 		to_insert_h = Hash.new
 		missing = Set.new
 		h_row.each_pair do |name, val|
