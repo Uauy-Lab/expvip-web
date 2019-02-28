@@ -10,11 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180809151038) do
+ActiveRecord::Schema.define(version: 20190228095600) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "ExperimentGroup_id", null: false
     t.integer "Factor_id", null: false
+  end
+
+  create_table "default_factor_orders", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "name"
+    t.integer "order"
   end
 
   create_table "experiment_groups", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -48,14 +53,14 @@ ActiveRecord::Schema.define(version: 20180809151038) do
     t.index ["experiment_id", "factor_id"], name: "index_experiments_factors_on_experiment_id_and_factor_id"
   end
 
-  create_table "expression_bias", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "expression_bias", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
     t.integer "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "expression_bias_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "expression_bias_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "decile"
     t.float "min", limit: 24
     t.float "max", limit: 24
