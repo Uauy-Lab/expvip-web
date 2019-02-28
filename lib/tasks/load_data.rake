@@ -290,7 +290,7 @@ namespace :load_data do
       puts "Loaded #{experiments.size} experiments  in memory"
       count = 0
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-        missing = ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type)
+        missing = ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type, nil)
         count += 1
       end unless extension == ".gz"
 
@@ -298,7 +298,7 @@ namespace :load_data do
         csv = CSV.new(gzip, :headers => true, :col_sep => "\t")
 
         csv.each do |row|
-          missing = ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type)
+          missing = ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type, nil)
           count += 1
         end
       end if extension == ".gz"

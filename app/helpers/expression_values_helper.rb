@@ -31,7 +31,7 @@ module ExpressionValuesHelper
 		puts "#{count} genes exported" 
 	end
 
-	def self.add(row, genes, experiments, meta_exp, value_type) 
+	def self.add(row, genes, experiments, meta_exp, value_type, accession) 
 		gene_name = row["target_id"]
 		gene_name = row["transcript"] unless row["target_id"]
 		gene = genes[gene_name]
