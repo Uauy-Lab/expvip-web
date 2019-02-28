@@ -36,8 +36,12 @@
         <%= check_box_tag "studies[]", study.accession, checked = true,  id: study.accession  %>          
     <% else %>    
         <%= check_box_tag "studies[]", study.accession, checked = false, id: study.accession  %>
-    <% end %>    
-    <%= label_tag(study.accession, study.summary, class: 'study_title' , for: study.accession) %> 
+    <% end %>
+    <% if study.summary %>
+      <%= label_tag(study.accession, study.summary, class: 'study_title' , for: study.accession) %> 
+    <% else %>
+      <%= label_tag(study.accession, study.accession, class: 'study_title' , for: study.accession) %> 
+    <% end %>
     </div>         
   <% end %>  
 <% end %>
