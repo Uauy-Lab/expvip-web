@@ -3,7 +3,6 @@
 <%= render :partial => "genes/share" %>
 
 <strong><%= @gene.search_by%>:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
-<%= link_to "Ensembl", "http://plants.ensembl.org/Multi/Search/Results?q=#{@gene.gene}" %>
  
 <% if @compare %>
  <strong>Compare:</strong>
