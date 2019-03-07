@@ -30,7 +30,8 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <h3>Wheat Expression Browser   <span style="font-size:50%">powered by expVIP</span></h3>
+        <a href="/"><%= image_tag("berry.png", class: "main-logo" ) %></a>
+        <h3>BacHBerryEXP Gene Expression Browser   <span style="font-size:50%">powered by expVIP</span></h3>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -49,12 +50,11 @@
 
         <div class="navigation left">
           <%= link_to "Home", root_path %>
-          <%= link_to "Studies", "#", :id => 'studies_button'%>
+          <%= link_to "Overview", "cite", :id => 'cite_button'%>
           <%= link_to "Download", "/download" %>
-          <%= link_to "Add your data", "https://github.com/homonecloco/expvip-web/wiki/LoadingVM"%>
           <%= link_to "Tutorials",  "https://github.com/homonecloco/expvip-web/wiki" %>
           <%= link_to "Videos",  "https://github.com/homonecloco/expvip-web/wiki/List-of-tutorial-videos" %>
-          <%= link_to "Cite", "cite", :id => 'cite_button'%>
+          <%= link_to "Add your data", "https://github.com/homonecloco/expvip-web/wiki/LoadingVM"%>
         </div>
 
       </div><!-- /.navbar-collapse -->
@@ -84,9 +84,8 @@
 
   <div class="footer">
     <%= image_tag("jic.png", class: "logo" ) %>
-    <%= image_tag("EI.png", class: "logo" ) %>
     <%= image_tag("bbsrc.png", class: "logo" ) %>
-    <%= image_tag("iwyp.png", class: "logo" ) %>
+    <%= image_tag("eu.jpg", class: "logo" ) %>
     <%= image_tag("DFW.jpg", class: "logo" ) %>
   </div>
 </body>
