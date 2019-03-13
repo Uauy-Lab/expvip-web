@@ -3,12 +3,15 @@
 <%= render :partial => "genes/share" %>
 
 <strong><%= @gene.search_by%>:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
-<%= link_to "Ensembl", @gene.url %>
+<%= link_to "Ensembl", @gene.ensembl %>
+<%= link_to "KnetMiner", @gene.knetminer %>
+
  
 <% if @compare %>
  <strong>Compare:</strong>
  <span id="compare_gene_name"><%= @compare.name %></span>   
- <%= link_to "Ensembl", @compare.url %>
+ <%= link_to "Ensembl", @compare.ensembl %>
+ <%= link_to "KnetMiner", @compare.knetminer %>
 <% end %>
 
 <div id="bar_expression_viewer"> </div>

@@ -419,7 +419,8 @@ namespace :load_data do
         data.each_line do |url|
           raise "URL: #{url} doesn't include a placeholder (<gene>)" unless url.include?('<gene>')
           puts url.to_s
-          Link.create(URL: url.to_s)
+          site = url.gsub(/\s+/, "").split(',')
+          Link.create(url: site[0].to_s, site_name: site[1].to_s)
         end
       rescue => exception
         puts "There was an issue processing the file.\nMake sure each URL is in a seperate line and contains a placeholder (<gene>)"

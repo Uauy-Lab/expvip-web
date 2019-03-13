@@ -135,36 +135,39 @@ class GenesController < ApplicationController
     studies = session[:studies]    
     compare = ""
     alert = ""
-    
+
     #search_by = params[:search_by]
     #search_by.capitalize! if search_by
     gene = {
       name: params[:name],
       gene: params[:name], 
       search_by:  params[:search_by],
-      gene_set: params[:gene_set],
-      url: nil
+      gene_set: params[:gene_set]
     }
     if params[:compare]
       compare = {
-        name: params[:compare],
-        url: nil
+        name: params[:compare]
       }
     end
     
-    
-    # If parameters passed contain settings (it's a shared link)
+    # If parameters passed contain settings (Gene.find_by(:transcript=>params[:name]).geneit's a shared link)
     studies = set_shared_settings if params[:settings]
     
     @link = Link.all
+    site_name = nil
     @link.each do |url_element|
-     gene[:url] = url_element.url.gsub("<gene>", gene[:gene])
-     compare[:url] = url_element.url.gsub("<gene>", compare[:name]) unless compare == ""
+      site_name = url_element.site_name
+      if site_name == "knetminer" and params[:search_by] == "transcript"
+        gene[site_name] = url_element.url.gsub("<gene>", Gene.find_by(:transcript=>params[:name]).gene)
+        compare[site_name] = url_element.url.gsub("<gene>", Gene.find_by(:transcript=>params[:compare]).gene) unless compare == ""
+      else
+        gene[site_name] = url_element.url.gsub("<gene>", gene[:gene])
+        compare[site_name] = url_element.url.gsub("<gene>", compare[:name]) unless compare == ""
+      end
     end
-    
+
     @gene = OpenStruct.new(gene)
     @compare = OpenStruct.new(compare) unless compare == ""
-
 
     @args = {studies: studies,name: @gene.name ,compare: @compare, gene_set: params[:gene_set]  }.to_query  
 

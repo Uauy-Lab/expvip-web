@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190313145633) do
+ActiveRecord::Schema.define(version: 20190313160721) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -142,6 +142,7 @@ ActiveRecord::Schema.define(version: 20190313145633) do
 
   create_table "links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "url"
+    t.string "site_name"
   end
 
   create_table "meta_experiments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
