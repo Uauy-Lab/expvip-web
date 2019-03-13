@@ -142,16 +142,29 @@ class GenesController < ApplicationController
       name: params[:name],
       gene: params[:name], 
       search_by:  params[:search_by],
-      gene_set: params[:gene_set]
+      gene_set: params[:gene_set],
+      url: nil
     }
-    @compare = params[:compare] if params[:compare]
+    if params[:compare]
+      compare = {
+        name: params[:compare],
+        url: nil
+      }
+    end
     
     
     # If parameters passed contain settings (it's a shared link)
     studies = set_shared_settings if params[:settings]
-     
     
-    @gene = OpenStruct.new(gene)    
+    @link = Link.all
+    @link.each do |url_element|
+     gene[:url] = url_element.url.gsub("<gene>", gene[:gene])
+     compare[:url] = url_element.url.gsub("<gene>", compare[:name]) unless compare == ""
+    end
+    
+    @gene = OpenStruct.new(gene)
+    @compare = OpenStruct.new(compare) unless compare == ""
+
 
     @args = {studies: studies,name: @gene.name ,compare: @compare, gene_set: params[:gene_set]  }.to_query  
 

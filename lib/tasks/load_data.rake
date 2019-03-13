@@ -410,4 +410,22 @@ namespace :load_data do
     end
   end
 
+  desc "Populate the links table with URL that contain placeholdersi(<gene>) for genes (Provide a file with URLs in each line)"
+  task :links, [:filename] => :environment do |t, args|
+    ActiveRecord::Base.transaction do
+      begin
+        data = File.open(args[:filename]).read
+        data.gsub!(/\r\n?/, "")
+        data.each_line do |url|
+          raise "URL: #{url} doesn't include a placeholder (<gene>)" unless url.include?('<gene>')
+          puts url.to_s
+          Link.create(URL: url.to_s)
+        end
+      rescue => exception
+        puts "There was an issue processing the file.\nMake sure each URL is in a seperate line and contains a placeholder (<gene>)"
+      end
+    end
+  end
+
+
 end
