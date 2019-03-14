@@ -33,7 +33,7 @@ class GenesController < ApplicationController
     genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
     raise "Please select less than 500 genes" if genes.size > 500
     ids = getGeneIds(genes)
-    raise "Plese select some genes for the heatmap" if ids.size == 0
+    raise "Please select some genes for the heatmap" if ids.size == 0
     session[:genes] = ids.join(',')    
     redirect_to action: "heatmap"
   end
@@ -122,7 +122,25 @@ class GenesController < ApplicationController
     # If parameters passed contain settings (it's a shared link)
     studies = set_shared_settings if params[:settings]
 
-    @args = {studies: studies }.to_query
+    genes_arr = genes.split(',')
+
+    gene = {
+      name: genes_arr
+    }
+
+    # Generate links to other websites (limit of 70 genes to generate a link to KnetMiner)
+    if genes_arr.length <= 70
+      @link = Link.all
+      site_name = nil
+      @link.each do |url_element|
+        site_name = url_element.site_name
+        gene[site_name] = url_element.url.gsub("<gene>", genes) if site_name == "knetminer"
+      end
+    end
+
+    @gene = OpenStruct.new(gene)
+
+    @args = {studies: studies,  }.to_query
     respond_to do |format|
       format.html { render :heatmap }
     end
@@ -132,10 +150,11 @@ class GenesController < ApplicationController
   # GET /genes/1.json
   def show 
     #Use TRIAE_CS42_2BL_TGACv1_130848_AA0418720 as it has multiple transcripts
+    studies = []
     studies = session[:studies]    
     compare = ""
     alert = ""
-    
+
     #search_by = params[:search_by]
     #search_by.capitalize! if search_by
     gene = {
@@ -144,16 +163,44 @@ class GenesController < ApplicationController
       search_by:  params[:search_by],
       gene_set: params[:gene_set]
     }
-    @compare = params[:compare] if params[:compare]
+    if params[:compare]
+      compare = {
+        name: params[:compare]
+      }
+    else
+      compare = {
+        name: ""
+      }
+    end
     
-    
-    # If parameters passed contain settings (it's a shared link)
+    # If parameters passed contain settings (Gene.find_by(:transcript=>params[:name]).geneit's a shared link)
     studies = set_shared_settings if params[:settings]
-     
     
-    @gene = OpenStruct.new(gene)    
+    # Select all studies if not studies are in session
+    if studies.empty?
+      Study.where("active").order('`order` ASC').each do |study|
+        studies.push(study.accession)
+      end
+    end
 
-    @args = {studies: studies,name: @gene.name ,compare: @compare, gene_set: params[:gene_set]  }.to_query  
+    # Generate links to other websites
+    @link = Link.all
+    site_name = nil
+    @link.each do |url_element|
+      site_name = url_element.site_name
+      if site_name == "knetminer" and params[:search_by] == "transcript"
+        gene[site_name] = url_element.url.gsub("<gene>", Gene.find_by(:transcript=>params[:name]).gene)
+        compare[site_name] = url_element.url.gsub("<gene>", Gene.find_by(:transcript=>params[:compare]).gene) unless compare[:name] == ""
+      else
+        gene[site_name] = url_element.url.gsub("<gene>", gene[:gene])
+        compare[site_name] = url_element.url.gsub("<gene>", compare[:name]) unless compare[:name] == ""
+      end
+    end
+
+    @gene = OpenStruct.new(gene)
+    @compare = OpenStruct.new(compare)
+
+    @args = {studies: studies,name: @gene.name ,compare: @compare.name, gene_set: params[:gene_set]  }.to_query  
 
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  
