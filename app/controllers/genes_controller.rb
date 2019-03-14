@@ -153,6 +153,14 @@ class GenesController < ApplicationController
     # If parameters passed contain settings (Gene.find_by(:transcript=>params[:name]).geneit's a shared link)
     studies = set_shared_settings if params[:settings]
     
+    # Select all studies if not studies are in session
+    if studies.empty?
+      Study.where("active").order('`order` ASC').each do |study|
+        studies.push(study.accession)
+      end
+    end
+
+    # Generate links to other websites
     @link = Link.all
     site_name = nil
     @link.each do |url_element|
