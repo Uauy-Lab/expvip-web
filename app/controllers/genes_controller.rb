@@ -195,7 +195,7 @@ class GenesController < ApplicationController
     @gene = OpenStruct.new(gene)
     @compare = OpenStruct.new(compare) unless compare == ""
 
-    @args = {studies: studies,name: @gene.name ,compare: @compare, gene_set: params[:gene_set]  }.to_query  
+    @args = {studies: studies,name: @gene.name ,compare: @compare.name, gene_set: params[:gene_set]  }.to_query  
 
     #studies.each { |e|  @studies += "studies[]=#{e}\&" }`
   end  
