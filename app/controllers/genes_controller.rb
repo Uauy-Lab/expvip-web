@@ -122,7 +122,25 @@ class GenesController < ApplicationController
     # If parameters passed contain settings (it's a shared link)
     studies = set_shared_settings if params[:settings]
 
-    @args = {studies: studies }.to_query
+    genes_arr = genes.split(',')
+
+    gene = {
+      name: genes_arr
+    }
+
+    # Generate links to other websites (limit of 70 genes to generate a link to KnetMiner)
+    if genes_arr.length <= 70
+      @link = Link.all
+      site_name = nil
+      @link.each do |url_element|
+        site_name = url_element.site_name
+        gene[site_name] = url_element.url.gsub("<gene>", genes) if site_name == "knetminer"
+      end
+    end
+
+    @gene = OpenStruct.new(gene)
+
+    @args = {studies: studies,  }.to_query
     respond_to do |format|
       format.html { render :heatmap }
     end
