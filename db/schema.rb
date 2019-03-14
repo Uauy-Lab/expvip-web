@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 20190313160721) do
     t.integer "Factor_id", null: false
   end
 
-  create_table "default_factor_orders", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "default_factor_orders", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.integer "order"
   end
@@ -53,14 +53,14 @@ ActiveRecord::Schema.define(version: 20190313160721) do
     t.index ["experiment_id", "factor_id"], name: "index_experiments_factors_on_experiment_id_and_factor_id"
   end
 
-  create_table "expression_bias", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "expression_bias", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.integer "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "expression_bias_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "expression_bias_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "decile"
     t.float "min", limit: 24
     t.float "max", limit: 24
@@ -140,7 +140,7 @@ ActiveRecord::Schema.define(version: 20190313160721) do
     t.index ["homology"], name: "index_homology_pairs_on_homology"
   end
 
-  create_table "links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "links", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "url"
     t.string "site_name"
   end

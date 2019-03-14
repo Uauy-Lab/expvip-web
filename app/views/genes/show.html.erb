@@ -4,6 +4,12 @@
 
 <strong><%= @gene.search_by%>:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
 
+<% if @compare.name != "" %>
+ <strong>Compare:</strong>
+ <span id="compare_gene_name"><%= @compare.name %></span>
+<% end %>
+
+
 <div id="bar_expression_viewer"> </div>
 
 <script type="text/javascript">
