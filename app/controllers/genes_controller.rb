@@ -33,7 +33,7 @@ class GenesController < ApplicationController
     genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
     raise "Please select less than 500 genes" if genes.size > 500
     ids = getGeneIds(genes)
-    raise "Plese select some genes for the heatmap" if ids.size == 0
+    raise "Please select some genes for the heatmap" if ids.size == 0
     session[:genes] = ids.join(',')    
     redirect_to action: "heatmap"
   end
