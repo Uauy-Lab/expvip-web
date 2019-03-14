@@ -7,7 +7,7 @@
 <%= link_to "KnetMiner", @gene.knetminer %>
 
  
-<% if @compare %>
+<% if @compare.name != "" %>
  <strong>Compare:</strong>
  <span id="compare_gene_name"><%= @compare.name %></span>   
  <%= link_to "Ensembl", @compare.ensembl %>

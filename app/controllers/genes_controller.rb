@@ -150,6 +150,7 @@ class GenesController < ApplicationController
   # GET /genes/1.json
   def show 
     #Use TRIAE_CS42_2BL_TGACv1_130848_AA0418720 as it has multiple transcripts
+    studies = []
     studies = session[:studies]    
     compare = ""
     alert = ""
@@ -165,6 +166,10 @@ class GenesController < ApplicationController
     if params[:compare]
       compare = {
         name: params[:compare]
+      }
+    else
+      compare = {
+        name: ""
       }
     end
     
@@ -185,15 +190,15 @@ class GenesController < ApplicationController
       site_name = url_element.site_name
       if site_name == "knetminer" and params[:search_by] == "transcript"
         gene[site_name] = url_element.url.gsub("<gene>", Gene.find_by(:transcript=>params[:name]).gene)
-        compare[site_name] = url_element.url.gsub("<gene>", Gene.find_by(:transcript=>params[:compare]).gene) unless compare == ""
+        compare[site_name] = url_element.url.gsub("<gene>", Gene.find_by(:transcript=>params[:compare]).gene) unless compare[:name] == ""
       else
         gene[site_name] = url_element.url.gsub("<gene>", gene[:gene])
-        compare[site_name] = url_element.url.gsub("<gene>", compare[:name]) unless compare == ""
+        compare[site_name] = url_element.url.gsub("<gene>", compare[:name]) unless compare[:name] == ""
       end
     end
 
     @gene = OpenStruct.new(gene)
-    @compare = OpenStruct.new(compare) unless compare == ""
+    @compare = OpenStruct.new(compare)
 
     @args = {studies: studies,name: @gene.name ,compare: @compare.name, gene_set: params[:gene_set]  }.to_query  
 
