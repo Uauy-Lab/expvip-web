@@ -150,8 +150,7 @@ class GenesController < ApplicationController
   # GET /genes/1.json
   def show 
     #Use TRIAE_CS42_2BL_TGACv1_130848_AA0418720 as it has multiple transcripts
-    studies = []
-    studies = session[:studies]    
+    studies = session[:studies] if session[:studies]
     compare = ""
     alert = ""
 
@@ -176,6 +175,8 @@ class GenesController < ApplicationController
     # If parameters passed contain settings (Gene.find_by(:transcript=>params[:name]).geneit's a shared link)
     studies = set_shared_settings if params[:settings]
     
+    studies = [] if studies == nil
+
     # Select all studies if not studies are in session
     if studies.empty?
       Study.where("active").order('`order` ASC').each do |study|
@@ -264,7 +265,6 @@ class GenesController < ApplicationController
     		response = "#{request.base_url}/#{params[:controller]}/heatmap?#{{settings: hashed_settings}.to_query}"
 
     	else
-
     		response = "#{request.base_url}/#{params[:controller]}/#{@gene.id}?#{{gene_set: gene_set_name}.to_query}&#{{name: session[:name]}.to_query}&#{{search_by: @search_by}.to_query}&#{{settings: hashed_settings}.to_query}"
     		response += "&" +{compare: params[:compare]}.to_query if params[:compare]
 
