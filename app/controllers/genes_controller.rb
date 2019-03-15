@@ -111,7 +111,7 @@ class GenesController < ApplicationController
   end
 
   def heatmap    
-    genes = []
+    genes = ""
     genes = session[:genes] if  session[:genes] 
     genes = params[:genes]  if  params[:genes]
     session[:studies] = params[:studies] if  params[:studies] 
@@ -121,6 +121,8 @@ class GenesController < ApplicationController
 
     # If parameters passed contain settings (it's a shared link)
     studies = set_shared_settings if params[:settings]
+    # Since session is set for genes if it's a shared link the following line needs to be called
+    genes = session[:genes] if  session[:genes]
 
     genes_arr = genes.split(',')
 
@@ -172,7 +174,7 @@ class GenesController < ApplicationController
       }
     end
     
-    # If parameters passed contain settings (Gene.find_by(:transcript=>params[:name]).geneit's a shared link)
+    # If parameters passed contain settings (it's a shared link)
     studies = set_shared_settings if params[:settings]
     
     studies = [] if studies == nil
@@ -209,7 +211,12 @@ class GenesController < ApplicationController
   def share 
     # Hash the settings sent by the clinet's request
     sha1 = Digest::SHA1.new
-    sha1 << params[:settings]
+    if session[:heatmap]
+      hash_salt = params[:settings] + session[:genes]
+    else
+      hash_salt = params[:settings]
+    end
+    sha1 << hash_salt
     hashed_settings = sha1.hexdigest
 
     # Get the gene set & gene
