@@ -19,8 +19,6 @@ If you use expVIP please cite the following papers:
 doi:10.1104/pp.15.01667 </a></td>
 </table>
 
+## Developers
 
- 
-
-
-
+PolyMarker and the PolyMarker server was developed by [Ricardo H. Ramirez-Gonzalez](https://www.jic.ac.uk/people/dr-ricardo-h-ramirez-gonzalez/)([github](https://github.com/homonecloco)) and [Bijan Ghasemi Afshar](https://www.jic.ac.uk/people/bijan-ghasemi-afshar/) ([github](https://github.com/Bijan-Ghasemi-Afshar)) as part of the [Designing Future Wheat Institute Strategic Program](https://www.jic.ac.uk/research-impact/designing-future-wheat/) within the [Uauy lab](https://www.jic.ac.uk/people/cristobal-uauy/).
