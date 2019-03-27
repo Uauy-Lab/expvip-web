@@ -400,8 +400,9 @@ namespace :load_data do
       text.gsub!(/\r\n?/, "")
       text.each_line do |factor|
         begin
-          puts factor.to_s
-          DefaultFactorOrder.create(name: factor.to_s.gsub(/\n/,""), order: factorIndex)
+          line_content = factor.split(",")
+          puts line_content[0].to_s
+          DefaultFactorOrder.create(name: line_content[0].to_s.gsub(/\n/,""), order: factorIndex, selected: line_content[1])
           factorIndex += 1
         rescue => exception
           puts "Factor: #{factor.gsub(/\n/,"")} could not be found in the database\n#{exception}"

@@ -315,20 +315,17 @@ def gene
   end
 
   def getDefaultSelection
-    #TODO: This should be also dynamic. 
-    defSelection = {
-    "Age"=> false,
-    "High level stress-disease"=> true,
-    "High level age"=> true,
-    "High level tissue"=>true,
-    "High level variety"=>true,
-    "Stress-disease"=>false,
-    "study"=>false,
-    "Tissue" => false,
-    "Intermediate" => false,
-    "Intermediate stress" => false
-  }
-  return defSelection
+    defSelection = {}
+    default_factor_order = DefaultFactorOrder.all
+    default_factor_order.each do |factor|
+      if factor.selected
+        defSelection[factor.name] = false if factor.selected.zero?
+        defSelection[factor.name] = true unless factor.selected.zero?
+      else
+        defSelection[factor.name] = true
+      end
+    end
+    return defSelection
 end
 
   private
