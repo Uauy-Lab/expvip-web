@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190313160721) do
+ActiveRecord::Schema.define(version: 20190327114926) do
 
   create_table "ExperimentGroups_Factors", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20190313160721) do
   create_table "default_factor_orders", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
     t.integer "order"
+    t.integer "selected"
   end
 
   create_table "experiment_groups", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
