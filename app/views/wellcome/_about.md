@@ -32,8 +32,7 @@
     </tr>
 </table>
 
-
- 
+## Developers
 
 <h3 class="text-info">Contact</h3>
 <h5><u>Please contact the following regarding questions or requests</u></h5>
