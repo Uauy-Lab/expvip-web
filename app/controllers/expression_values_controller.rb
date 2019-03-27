@@ -318,7 +318,8 @@ class ExpressionValuesController < ApplicationController
       end
     end
     return defSelection
-  end
+
+end
 
   private
 
