@@ -67,7 +67,7 @@ class GenesController < ApplicationController
 
   def forwardHeatmap
     @gene_set = getGeneset
-    genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
+    genes = params[:genes_heatmap].split(/[,|\s]+/).map { |e| e.strip }
     raise "Please select less than 500 genes" if genes.size > 500
     ids = getGeneIds(genes)
     raise "Please select some genes for the heatmap" if ids.size == 0
