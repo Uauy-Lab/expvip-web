@@ -45,6 +45,7 @@ class GenesController < ApplicationController
 
   def manageNumOfGenes(gene_set, genes)
     managed_genes = []
+    removed_genes = []
     genes_arr = genes.split(",")
     genes_query = {}
 
@@ -53,12 +54,15 @@ class GenesController < ApplicationController
     allowed_arg_length = WEBrick::HTTPRequest::MAX_URI_LENGTH - uri_base.length
 
     genes_arr.each do |gene|
-      managed_genes.push(gene)
       genes_query = {genes: managed_genes}.to_query
-      break if (genes_query.length + gene.length) > allowed_arg_length
+      if (genes_query.length + gene.length) > allowed_arg_length
+        removed_genes.push(gene)
+      else
+        managed_genes.push(gene)
+      end
     end
 
-    return managed_genes.join(',')
+    return managed_genes.join(','), removed_genes.length
   end
 
   def forwardHeatmap
@@ -69,7 +73,9 @@ class GenesController < ApplicationController
     raise "Please select some genes for the heatmap" if ids.size == 0
     genes = ids.join(',')
 
-    genes = manageNumOfGenes(@gene_set.name, genes) unless validateURILength(@gene_set.name, genes)
+    genes,removed_genes  = manageNumOfGenes(@gene_set.name, genes) unless validateURILength(@gene_set.name, genes)
+
+    flash.notice = "Removed last #{removed_genes} genes due to limited URL length" if removed_genes
 
     redirect_to action: "heatmap",
                 genes: genes,
