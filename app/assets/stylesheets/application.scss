@@ -151,12 +151,11 @@ img.logo{
     background: #FFE7E7 url('../assets/exclamation.png') right no-repeat;   
 }
 
-
-.info{
-    background: #E7F3FF;
+.info, .notice{
+    background: #efc82b;
 }
-.info p{
-    background: #E7F3FF url('../assets/information.png') right no-repeat;
+.info p, .notice p{
+    background: #efc82b url('../assets/information.png') right no-repeat;
 }
 
 
