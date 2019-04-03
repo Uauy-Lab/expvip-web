@@ -19,24 +19,27 @@ Math.log2 = Math.log2 || function(x) {
   return Math.log(x) / Math.LN2;
 };
 
+function setNavbarInputPlaceholder() {
+  
+  $('#gene-search-input').attr("placeholder", $('#example1').html());
 
-var ready;
-ready = (function() {  
+}
 
-  // set the document height
-  setDocumentHeight();
-
-  // set the input placeholder
-  $('#gene-search-input').attr("placeholder", $('#example1').html());    
-
+function activateCurrentLink() {
+  
   $('a[href="' + this.location.pathname + '"]').parent().addClass('active');
+
+}
+
+function autocompleteGene() {
+  
+
   $("#gene-search-input").autocomplete({
     source: '/genes/autocomplete.json',
   });
-   $("#gene-search-compare").autocomplete({
+  $("#gene-search-compare").autocomplete({
     source: '/genes/autocomplete.json',
   });
-
   $("#gene").autocomplete({
     source: '/genes/autocomplete.json',
   });
@@ -44,7 +47,10 @@ ready = (function() {
     source: '/genes/autocomplete.json',
   });
 
-  // Gene set selector
+}
+
+function updateExample() {
+  
   $("select[name*='gene_set_selector']").on("change", function(event){    
     var geneID = $(this).val();    
 
@@ -69,25 +75,47 @@ ready = (function() {
     });    
   });  
 
+}
+
+function hideAlert() {
+  
   $(".alert").on("click", function(event) { 
     $(this).hide();
   });
-  
+
+}
+
+function openStudies(){
+
   $( "#about_studies" ).dialog({
-      autoOpen: false,
-      minWidth: 1000,
-      maxHeight: 500,
-      resizable: false,
-      position: { at: "center top" },
-      show: {
-        effect: "fade",
-        duration: 500
-      },
-      hide: {
-        effect: "fade",
-        duration: 500
-      }
-    });
+    autoOpen: false,
+    minWidth: 1000,
+    maxHeight: 500,
+    resizable: false,
+    position: { at: "center top" },
+    show: {
+      effect: "fade",
+      duration: 500
+    },
+    hide: {
+      effect: "fade",
+      duration: 500
+    }
+  });
+
+  $( "#studies_button" ).click(function() {
+      $( "#about_studies" ).dialog( "open" );
+  });
+
+}
+
+function addCrossToCloseButton(){
+
+  $(".ui-dialog-titlebar-close").html('X');
+
+}
+
+function openCitation(){
 
   $( "#about" ).dialog({
       autoOpen: false,
@@ -105,17 +133,14 @@ ready = (function() {
       }
     });
 
-  $( "#studies_button" ).click(function() {
-      $( "#about_studies" ).dialog( "open" );
+  $( "#cite_button" ).click(function() {
+    $( "#about" ).dialog( "open" );
   });
 
-  $(".ui-dialog-titlebar-close").html('X');
+}
 
-   $( "#cite_button" ).click(function() {
-      $( "#about" ).dialog( "open" );
-  });
-     
-   // Select all studies
+function selectAllStudies(){
+
   $('.select_all').click(function(event) {
 
     event.preventDefault();
@@ -124,7 +149,10 @@ ready = (function() {
     });
   });
 
-  // Deselect all studies
+}
+
+function deselectAllStudies(){
+
   $('.deselect_all').click(function(event) {
 
     event.preventDefault();
@@ -133,7 +161,10 @@ ready = (function() {
     });
   });
 
-  // Heatmap populate example
+}
+
+function populateHeatmapExamples(){
+
   $(`.heatmap_example`).click(function(event) {
     event.preventDefault();
     var heatmapGeneExamples = '';
@@ -160,7 +191,10 @@ ready = (function() {
     
   });
 
-  //*************************************SEQUENCESERVER - START*************************************
+}
+
+function sequenceserverModification(){
+
   var search_right = $('#search_right');
   var search_left = $('#search_left');
   var introblurb = $('#introblurb');
@@ -273,9 +307,11 @@ ready = (function() {
 
     });
   });
-  //*************************************SEQUENCESERVER - END*************************************  
-  
-  //*************************************SELECTED STUDIES SESSION STORAGE - START*************************************  
+
+}
+
+function selectedStudiesSession(){
+
   if(sessionStorage.bar_expression_viewer_selectedFactors){    // If bar_expression_viewer_selectedFactors exists        
     var expBarSelectedStudies = sessionStorage.bar_expression_viewer_selectedFactors;
     var expBarSelectedStudiesObj = JSON.parse(expBarSelectedStudies);
@@ -322,25 +358,17 @@ ready = (function() {
     });    
 
   }
-  //*************************************SELECTED STUDIES SESSION STORAGE - END*************************************
 
+}
 
-  // **********************************Slide Toggle Studies - START**********************************
+function toggleStudies(){
   $("#select_studies").click(function(){
-      $(".glyphicon").toggleClass("glyphicon-chevron-up");
-      $(".glyphicon").toggleClass("glyphicon-chevron-down");
-      $(".study_title").slideToggle("slow");
-      $("input[name='studies[]']").slideToggle("slow");
+    $(".glyphicon").toggleClass("glyphicon-chevron-up");
+    $(".glyphicon").toggleClass("glyphicon-chevron-down");
+    $(".study_title").slideToggle("slow");
+    $("input[name='studies[]']").slideToggle("slow");
   });
-  // **********************************Slide Toggle Studies - END**********************************
-
-
-  // margin between the logos
-  logoMargin();
-
-  
-});
-
+}
 
 function logoMargin(){
   setTimeout(function(){
@@ -366,16 +394,37 @@ function setDocumentHeight(){
 
 }
 
-// Resizing the logos dynamically 
-var resizeLogoTimer;
-$(window).on('resize', function(e){      
-  clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
-  resizeLogoTimer = setTimeout(function(){      
-    setDocumentHeight();
-    logoMargin();
-  }, 1500);
-});  
+function spaceLogosOnResize(){
+  // Resizing the logos dynamically 
+  var resizeLogoTimer;
+  $(window).on('resize', function(e){      
+    clearTimeout(resizeLogoTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
+    resizeLogoTimer = setTimeout(function(){      
+      setDocumentHeight();
+      logoMargin();
+    }, 1500);
+  });
+}
 
+
+var ready;
+ready = (function() {  
+  setDocumentHeight();
+  autocompleteGene();
+  updateExample();
+  hideAlert();
+  openStudies();    
+  openCitation();
+  addCrossToCloseButton();
+  selectAllStudies();
+  deselectAllStudies();  
+  populateHeatmapExamples();
+  sequenceserverModification();
+  selectedStudiesSession();
+  toggleStudies();
+  logoMargin();
+  spaceLogosOnResize()
+});
 
 $(document).ready(ready);
 $(document).on('page:load', ready);

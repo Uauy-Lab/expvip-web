@@ -1,254 +1,110 @@
 # README #
 
-##Requirements ##
-expVIP requires to have installed ```ruby 2.1``` or later. 
+## Requirements
 
-* ```ruby 2.2``` or newer
-* ```MySQL 5.5``` or newer. May work with other Databases, but it hasn't been tested
-* ```Kallisto 0.42.3``` Optional. You need to get it from [here](http://pachterlab.github.io/kallisto/) and set it up in your ```$PATH```.  **Kallisto is free for non commercial use. Refer to the license in it's website**
-*  ```MongoDB 3.4``` To store the expression values in a non-relational database. 
+### Environment
+Expvip runs on **Unix-Like** environments (Linux distribution or mac).<br>
+**_The project doesn’t run on Windows OS_**
+<br>
 
-
-## Getting expVIP ##
-
-
-To load the required gems, run ```bundle install```
-
-##Setting up the database ##
-
-If you are using the provided VM, you can skip this step, as it is already setup. 
-
-expVIP is developed on ```MySQL 5.7```. However, other databases may work as most of the queries are generated using ```ActiveRecord```. To set your database, you need to modify the file ```config/database.yml``` with the relevant information.
-
-```yml
-default: &default
-  adapter: mysql2
-  encoding: utf8
-  database: "expvip"
-  username: expvipUSR
-  password: expvipPWD
-  host: 127.0.0.1
-  port: 3306
+### Programs
+The following must be installed on your environment (minimum requirements):
 ```
+Git
+Ruby 2.2
+Rails 4.2.1
+Nodejs 6.0.0
+NPM 3.8.6 || Yarn 1.7.0
+MySQL 5.5 (along with its development files - libmysqlclient-dev)
+MongoDB 3.4
+Kallisto 0.42.3 (optional)
+```
+Get Kallisto from [here](http://pachterlab.github.io/kallisto/)
 
-You need to create the database in ```MySQL```. However, the tables can be created directly with the following ```rake``` task: 
 
+### Data
+Data required for setting up expvip can be downloaded form [here](http://www.wheat-expression.com/download)
+
+## Setting up expVIP ##
+Follow these steps:
+
+### Software code
+1. **Clone** the project using **Git** to the default repository. `git clone {SSH/URL}`
+2.  Run `npm/yarn install` using the terminal to install the JavaScript dependencies and then run `npm/yarn bundle`.
+3.  Run `bundle install` using the terminal to install the gem dependencies.
+
+### Database set up
+
+
+1.  **Mysql Database**: Set your mysql database with  user and password according to your **Config/Database.yml** file
+```yaml
+database: expvip
+username: expvipUSR
+password: expvipPWD
+```
+2.  Run the following rake tasks to create the database and tables.
 ```sh
+rake db:setup
 rake db:migrate
 ```
+3.  Run `sequenceserver` to install **NCBI Blast+** binaries if not installed and to create the database.<br>
+Give the path to the **.fasta** file (e.g. ```Triticum_aestivum.IWGSC2.26.cdna.all.fa``` or ```IWGSC_v1.1_ALL_20170706_transcripts.fasta```) where you have downloaded it to your machine for creating the database.
+4.  Run the following rake task to load the factors from the file **FactorOrder.tsv** using ```rake load_data:factor[{path-to-FactorOrder.tsv}]```
+5.  Run the following rake task to load the metadata from the file **default_metadata.txt** using `rake load_data:metadata[{path-to-default_metadata.txt}]`
+6.  Run the following rake task to load the gene set from the file (e.g. ```Triticum_aestivum.IWGSC2.26.cdna.all.fa```) using `rake load_data:ensembl_genes[{gene-set-name},{path-to-The-file-containing-gene-set-data}]`
+7.  Run the following rake task to load the homology data from the file (_compara_homolgy.txt_) using `rake load_data:homology_pairs[{gene-set-name},{path-to-the-file-containing-homology-data}]`.  Note that the gene names are not the same as the transcript names, they correspond to the gene name. The file can be genrated with ensembl compara, using the following query:
+	```sql
+	SELECT 
+		homology_member.homology_id, cigar_line, perc_cov, perc_id, perc_pos, 
+		gene_member.stable_id as genes, 
+		gene_member.genome_db_id
+	
+	FROM 
+	    homology_member 
+	INNER JOIN homology USING (homology_id) 
+	INNER JOIN method_link_species_set USING (method_link_species_set_id) 
+	INNER JOIN gene_member USING (gene_member_id)
+	WHERE method_link_species_set.name="T.aes homoeologues";
+	```
+8.  Start **MongoDB** service in order to populate the table with data.
+`sudo service mongod start`
+9.  Run the following rake task to load the value data into **MongoDB** from the file containing the value data (_final_output_tmp.txt_)<br> using `rake load_data:values_mongo[First Run,{gene-set-name},{tmp/counts},}{path-to-the-file-containing-tmp-or-counts-value-data}]`.
 
+## Run expVIP
+After you have followed all the mentioned steps. Run the following command `npm/yarn start` and navigate to `localhost:3000` in your browser.
 
-##Loading data ##
+## Important Note
+ If any step was wrong or missed or needed to be modified please create an issue on expvip repository on GitHub and explain your proposed changes to the documentation.
 
-To laod data in the database, a set of rake tasks is provded. 
+ ## Contributing
+Please submit all issues and pull requests to the [homonecloco/expvip-web](https://github.com/homonecloco/expvip-web) repository!
 
+## Support
+If you have any problem or suggestion please open an issue [here](https://github.com/homonecloco/expvip-web/issues).
 
-###Available factors and their order. 
+## License
 
-The first thing to do is to setup the available factors. Each file looks like:
+The MIT License
 
-```
-factor	order	name	short
-Age	1	7 days	7d
-Age	2	seedling stage	see
-Age	3	14 days	14d
-Age	4	three leaf stage	3_lea
-Age	5	24 days	24d
-Age	6	tillering stage	till
-Age	7	fifth leaf stage	5_lea
-Age	8	1 cm spike	1_sp
-Age	9	two nodes detectable	2_no
-Age	10	flag leaf stage	f_lea
-Age	11	anthesis	anth
-Age	12	2 dpa	2dpa
-Age	13	4 dpa	4dpa
-Age	14	6 dpa	6dpa
-Age	15	8 dpa	8dpa
-Age	16	9 dpa	9dpa
-Age	17	10 dpa	10dpa
-Age	18	11 dpa	11dpa
-Age	19	12 dpa	12dpa
-Age	20	4-12 dpa	4+dpa
-Age	21	14 dpa	14dpa
-Age	22	15 dpa	15dpa
-Age	23	20 dpa	20dpa
-Age	24	25 dpa	25dpa
-Age	25	30 dpa	30dpa
-Age	26	35 dpa	35dpa
-```
+Copyright (c) 2015, Ricardo H. Ramirez-Gonzalez
 
-Alternatively, a single file with all the factors on the same columns can be used to populate the table. The order of the columns is not important, as long as the headers are: ```factor```	```order```	```name``` ```short```.  
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
 
-To load several files of factors do the following:
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-```bash
-for f in ./test/default_setup/FactorOrders/*.tsv; do 
-	rake load_data:factor[$f]; 
-done
-
-```
-###Experiment Metadata ###
-
-The second step is to load the experiment meta data. Currently, a tab separated file is the input and it **must** contain the following columns with the header named exactly as stated:
-
-* **secondary\_study\_accession**
-* **run\_accession**
-* **scientific\_name**
-* **experiment\_title**
-* **study\_title**
-* **Variety**
-* **Tissue**
-* **Age**
-* **Stress/disease**
-* **Manuscript**
-* **Group\_for\_averaging**
-* **Group\_number\_for\_averaging**
-* **Total reads**	(optional)
-* **Mapped reads**  (optional)
-* **High level variety**
-* **High level tissue**
-* **High level age**
-* **High level stress/disease**
-
-
-The rake task is :
-
-```bash
-rake load_data:metadata[./test/default_setup/metadata.txt]
-```
-
-If ```Mapped reads``` and ```Total reads``` are missing, you need to run the ```Kallisto``` mapping from the ```rake``` task. 
-
-### Loading the gene sets (ensembl notation)###
-Before loading the actual expression, it is necesary to load the gene models. Currently, only the fasta file with the cdna from ensembl is supported. The fasta header should contain the following fields, besides the gene name (first string in the header).
-
-* **cdna**
-* **chromosome** or **scaffold** are converted to possition
-* **gene** 
-* **transcript** 
-* **description** a free text, in quotes. Any other field with quotes may fail in the load. 
-
-```bash
-rake load_data:ensembl_genes[IWGSC2.26,Triticum_aestivum.IWGSC2.26.cdna.all.fa]
-```
-
-The fasta file looks like:
-
-```
->Traes_5BL_3FC5BA305.1 cdna:novel scaffold:IWGSC2:IWGSC_CSS_5BL_scaff_1082268:5:199:-1 gene:Traes_5BL_3FC5BA305 transcript:Traes_5BL_3FC5BA305.1
-TGCTGCTGCTAGGCTTGAAGAGGTTGCTGGCAAGCTCCAGTCTGCTCGGCAGCTCATTCA
-GAGGGGCTGTGAGGAGTGCCCCAAGAACGAGGATGTTTGGTTCGAGGCATGCCGGTTGGC
-TAGCCCAGATGAGTCAAAGGCAGTAATTGCCAGGGGTGTGAAGGCAATTCCCAACTCTGT
-GAAGCTGTGGCTGCA
->Traes_6BL_9BB648D51.1 cdna:novel scaffold:IWGSC2:IWGSC_CSS_6BL_scaff_430516:302:1741:-1 gene:Traes_6BL_9BB648D51 transcript:Traes_6BL_9BB648D51.1
-TCCCTATCTGTTTCCTTGGCAGCTCCCTGATCCAATCGATCCATCAGGGCTCGACTAACT
-TCTTCCAGCGCCTCTTCAGCGCGGGAGATCTACCAGCGTCGGCGGAGGGGCGTAGGTGCA
-GGCGTGCAGCCCAAGTCCGCACCCGGCTCTAGGTTTCTGCTAATCTTCTTCCACCTGTGA
-TACGCGCTCCGGGGCTAGGAGCACTCGTTGCCGGCTGCCTCGTGCTCGGAATGGCGGATG
-```
-
-### Loading gene sets (from gff produced fasta)
-
-
-Another supported type of header with fields separatd by spaces, each key-value pair is separated by ```=```. The supported keys are:
-
-* **gene**
-* **biotype** 
-
-```bash
-rake  gff_produced_genes[TGACv1,Triticum_aestivum_CS42_TGACv1_scaffold.annotation.gff3.cdna.fa]
-```
-
-The fasta file looks like: 
-
-```
->TRIAE_CS42_1AL_TGACv1_000001_AA0000010.1   gene=TRIAE_CS42_1AL_TGACv1_000001_AA0000010	biotype=protein_coding
-GAGCGCCGCCCGTACGCTGCACCCGCAGCCACGCACTCGAGGCCGAGCTCCCGAGCGTGCCGCCGCCTCG
-ACCTCGCGACCCGCCGGCGACCGGATCCTCGCCGGAGATGAGTGCCGCCGTGCCCTGCTCCCTCCTCTCT
-```
-
-### Loading genes only by the fasta ID
-
-expVIP can be used for *de novo* assemblies, where you only have the name of the contigs/transcripts and not a relationship of the gene. 
-
-```bash
-rake de_novo_genes(MyAssembly,transcripts.fa]
-```
-
-This can be used to use an arbitrary list of genes
-
-
-###Loading the homologies
-
-
-In order to show the homoeologues, a file with the homoeologies must bue loaded. The file is tab separated with the following format:
-
-```
-Gene	A	B	D	Group	Genome
-Traes_5BS_0AFC3F795		Traes_5BS_0AFC3F795	Traes_5DS_C204EBAA9	5	B
-Traes_5DS_C204EBAA9		Traes_5BS_0AFC3F795	Traes_5DS_C204EBAA9	5	D
-Traes_7DL_82360D4EE1			Traes_7DL_82360D4EE1	7	D
-Traes_2AL_1368BE0AD	Traes_2AL_1368BE0AD	Traes_2BL_CD459994C1		2	A
-```
-
-Note that the gene names are not the same as the transcript names, they correspond to the gene name. The file can be genrated with ensembl compara, using the following query:
-
-```sql
-SELECT 
-	homology_member.homology_id, cigar_line, perc_cov, perc_id, perc_pos, 
-	gene_member.stable_id as genes, 
-	gene_member.genome_db_id
-
-FROM 
-    homology_member 
-INNER JOIN homology USING (homology_id) 
-INNER JOIN method_link_species_set USING (method_link_species_set_id) 
-INNER JOIN gene_member USING (gene_member_id)
-WHERE method_link_species_set.name="T.aes homoeologues";
-```
-
-Then, to fomrat the result of the query (saved as ```compara_homology.txt```), you can use the probided script
-
-```sh
-ruby bin/homologyTable.rb compara_homolgy.txt homology.txt homology_counts.txt
-```
-You can get your homologies elsewhere, as long as you keep the file format. 
-
-```sh
-rake load_data:homology[IWGSC2.26,/homology.txt]
-```
-
-
-###Loading values 
-
-
-#### Single big table 
-The values are stored in a single long table. This allows to get new values, should we want to.  In order to load the data, the task ```load_data:values``` is provided. The table must contain a column ```target_id``` that has the gene name, as the first field in the fasta file used for the mapping. The rest of the columns most contain a header with the accession of the experiment. Each row represents a value. All the values in the table must be from the same time. For exaple, to load the TPMs, the following command is used. 
-
-```sh
-rake "load_data:values[First run,IWGSC2.26,tpm,edited_final_output_tpm.txt]"
-```
-
-
-#### Running Kallisto ####
-
-You can load the data directly to the database provided that you generated the ```Kallisto``` index on your reference:
-
-
-```
-kallisto index --index=Triticum_aestivum.IWGSC2.26.cdna.all.fa.kallisto.k31 Triticum_aestivum.IWGSC2.26.cdna.all.fa
-```
-
-You can modify the index options as you find it suitable for your experiment.
-
-To run Kallisto on single sample, the following task is available:
-
-```
-rake kallisto:runAndStorePaired[Index,folder/with/samples/ACCESSION,experiment_title,IWGSC2.26]
-```
-
-The task requires that the reads are in a folder named exactly as the ```secondary\_study\_accession*``` column in the metadata file. If the accession doesn't exist, the task will fail. ```experiment_title``` is a name to group alignments (Currently not in use, but will be used as we grow the database). 
-
-
-
-
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

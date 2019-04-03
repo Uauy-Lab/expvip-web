@@ -1,5 +1,15 @@
 <%= render :partial => "genes/share" %>
 
+<strong>Genes:</strong> 
+<span id="heatmap_gene_name">
+<% @gene.name.each do |gene| %>
+<%= gene %> |
+<% end %>
+</span>
+<% if @gene.knetminer %>
+  <%= link_to "KnetMiner", @gene.knetminer %>
+<% end %>
+
 <div id="bar_expression_viewer"> </div>
 
 <script type="text/javascript">  
@@ -39,6 +49,7 @@
       target: container_div,
       data: data_url,
       renderProperty: 'tpm', 
+      defaultLog2State: true,
       fontFamily: 'Helvetica', 
       height: contentHeight,
       groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],             
