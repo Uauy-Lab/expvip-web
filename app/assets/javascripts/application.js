@@ -410,37 +410,21 @@ function spaceLogosOnResize(){
 
 var ready;
 ready = (function() {  
-  
   setDocumentHeight();
-  
   autocompleteGene();
-  
   updateExample();
-  
   hideAlert();
-  
   openStudies();    
-  
   openCitation();
-
   addCrossToCloseButton();
-
   selectAllStudies();
- 
   deselectAllStudies();  
-
   populateHeatmapExamples();
-
   sequenceserverModification();
-
   selectedStudiesSession();
-
   toggleStudies();
-  
   logoMargin();
-
   spaceLogosOnResize()
-  
 });
 
 $(document).ready(ready);
