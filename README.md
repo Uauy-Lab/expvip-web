@@ -34,31 +34,49 @@ Follow these steps:
 3.  Run `bundle install` using the terminal to install the gem dependencies.
 
 ### Database set up
-1.  **Mysql Database**: Set your mysql database with  user and password according to your **Config/Database.yml** file<br>
-`database: expvip` <br>
-`username: expvipUSR` <br>
-`password: expvipPWD` <br><br>
-2.  Run the following rake tasks to create the database and tables.<br>
-`rake db:setup`<br>
-`rake db:migrate`<br><br>
+
+
+1.  **Mysql Database**: Set your mysql database with  user and password according to your **Config/Database.yml** file
+```yaml
+database: expvip
+username: expvipUSR
+password: expvipPWD
+```
+2.  Run the following rake tasks to create the database and tables.
+```sh
+rake db:setup
+rake db:migrate
+```
 3.  Run `sequenceserver` to install **NCBI Blast+** binaries if not installed and to create the database.<br>
-Give the path to the **.fasta** file (e.g. _Triticum_aestivum.IWGSC2.26.cdna.all.fa_ or _IWGSC_v1.1_ALL_20170706_transcripts.fasta_) where you have downloaded it to your machine for creating the database.<br><br>
-4.  Run the following rake task to load the factors from the file **FactorOrder.tsv** using `rake load_data:factor[{path-to-FactorOrder.tsv}]`<br><br>
-5.  Run the following rake task to load the metadata from the file **default_metadata.txt** using `rake load_data:metadata[{path-to-default_metadata.txt}]`<br><br>
-6.  Run the following rake task to load the gene set from the file (e.g. _Triticum_aestivum.IWGSC2.26.cdna.all.fa_) using `rake load_data:ensembl_genes[{gene-set-name},{path-to-The-file-containing-gene-set-data}]`<br><br>
-7.  Run the following rake task to load the homology data from the file (_compara_homolgy.txt_) using `rake load_data:homology_pairs[{gene-set-name},{path-to-the-file-containing-homology-data}]`.<br><br>
-8.  Start **MongoDB** service in order to populate the table with data.<br>
-`sudo service mongod start`<br><br>
-9.  Run the following rake task to load the value data into **MongoDB** from the file containing the value data (_final_output_tmp.txt_)<br> using `rake load_data:values_mongo[First Run,{gene-set-name},{tmp/counts},}{path-to-the-file-containing-tmp-or-counts-value-data}]`.<br><br>
+Give the path to the **.fasta** file (e.g. ```Triticum_aestivum.IWGSC2.26.cdna.all.fa``` or ```IWGSC_v1.1_ALL_20170706_transcripts.fasta```) where you have downloaded it to your machine for creating the database.
+4.  Run the following rake task to load the factors from the file **FactorOrder.tsv** using ```rake load_data:factor[{path-to-FactorOrder.tsv}]```
+5.  Run the following rake task to load the metadata from the file **default_metadata.txt** using `rake load_data:metadata[{path-to-default_metadata.txt}]`
+6.  Run the following rake task to load the gene set from the file (e.g. ```Triticum_aestivum.IWGSC2.26.cdna.all.fa```) using `rake load_data:ensembl_genes[{gene-set-name},{path-to-The-file-containing-gene-set-data}]`
+7.  Run the following rake task to load the homology data from the file (_compara_homolgy.txt_) using `rake load_data:homology_pairs[{gene-set-name},{path-to-the-file-containing-homology-data}]`.  Note that the gene names are not the same as the transcript names, they correspond to the gene name. The file can be genrated with ensembl compara, using the following query:
+	```sql
+	SELECT 
+		homology_member.homology_id, cigar_line, perc_cov, perc_id, perc_pos, 
+		gene_member.stable_id as genes, 
+		gene_member.genome_db_id
+	
+	FROM 
+	    homology_member 
+	INNER JOIN homology USING (homology_id) 
+	INNER JOIN method_link_species_set USING (method_link_species_set_id) 
+	INNER JOIN gene_member USING (gene_member_id)
+	WHERE method_link_species_set.name="T.aes homoeologues";
+	```
+8.  Start **MongoDB** service in order to populate the table with data.
+`sudo service mongod start`
+9.  Run the following rake task to load the value data into **MongoDB** from the file containing the value data (_final_output_tmp.txt_)<br> using `rake load_data:values_mongo[First Run,{gene-set-name},{tmp/counts},}{path-to-the-file-containing-tmp-or-counts-value-data}]`.
 
 ## Run expVIP
 After you have followed all the mentioned steps. Run the following command `npm/yarn start` and navigate to `localhost:3000` in your browser.
 
 ## Important Note
- If any step was wrong or missed or needed to be modified please create an issue on expvip repository on GitHub and explain your proposed changes to the documentation.<br>
+ If any step was wrong or missed or needed to be modified please create an issue on expvip repository on GitHub and explain your proposed changes to the documentation.
 
  ## Contributing
-
 Please submit all issues and pull requests to the [homonecloco/expvip-web](https://github.com/homonecloco/expvip-web) repository!
 
 ## Support
