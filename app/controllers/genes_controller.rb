@@ -29,13 +29,57 @@ class GenesController < ApplicationController
     return gs.to_a
   end
 
+  def getGeneset
+    @gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
+    @gene_set = GeneSet.find(params[:gene_set_selector_main]) if params[:gene_set_selector_main]
+    @gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
+    return @gene_set
+  end
+
+  def validateURILength(gene_set, genes)
+    arguments = {gene_set: gene_set, genes: genes}.to_query
+    uri = "#{request.base_url}/genes/heatmap/#{arguments}"
+    return false if WEBrick::HTTPRequest::MAX_URI_LENGTH < uri.length
+    return true
+  end
+
+  def manageNumOfGenes(gene_set, genes)
+    managed_genes = []
+    removed_genes = []
+    genes_arr = genes.split(",")
+    genes_query = {}
+
+    arguments = {gene_set: gene_set, genes: genes}.to_query
+    uri_base = "#{request.base_url}/genes/heatmap/"
+    allowed_arg_length = WEBrick::HTTPRequest::MAX_URI_LENGTH - uri_base.length
+
+    genes_arr.each do |gene|
+      genes_query = {genes: managed_genes}.to_query
+      if (genes_query.length + gene.length) > allowed_arg_length
+        removed_genes.push(gene)
+      else
+        managed_genes.push(gene)
+      end
+    end
+
+    return managed_genes.join(','), removed_genes.length
+  end
+
   def forwardHeatmap
-    genes = params[:genes_heatmap].split(/[,\s]+/).map { |e| e.strip }
+    @gene_set = getGeneset
+    genes = params[:genes_heatmap].split(/[,|\s]+/).map { |e| e.strip }
     raise "Please select less than 500 genes" if genes.size > 500
     ids = getGeneIds(genes)
     raise "Please select some genes for the heatmap" if ids.size == 0
-    session[:genes] = ids.join(',')    
-    redirect_to action: "heatmap"
+    genes = ids.join(',')
+
+    genes,removed_genes  = manageNumOfGenes(@gene_set.name, genes) unless validateURILength(@gene_set.name, genes)
+
+    flash.notice = "Removed last #{removed_genes} genes due to limited URL length" if removed_genes
+
+    redirect_to action: "heatmap",
+                genes: genes,
+                gene_set: @gene_set.name
   end
 
   def forwardCommon
@@ -43,9 +87,7 @@ class GenesController < ApplicationController
     gene_name = params[:gene]
     gene_name = params[:query] if params[:query]
     gene_name.gsub!(/\s+/, '')
-    @gene_set = GeneSet.find(params[:gene_set_selector]) if params[:gene_set_selector]
-    @gene_set = GeneSet.find(params[:gene_set_selector_main]) if params[:gene_set_selector_main]
-    @gene_set = GeneSet.find_by(:name => params[:gene_set]) if params[:gene_set]    
+    @gene_set = getGeneset
     session[:heatmap] = false
     @gene, @search_by = GenesHelper.findGeneName gene_name, @gene_set 
     @search_by = params[:search_by] if ["gene", "transcript"].include? params[:search_by]
@@ -118,6 +160,7 @@ class GenesController < ApplicationController
     studies = session[:studies]
     session[:genes] = params[:genes] if params[:genes]
     session[:heatmap] = true
+    session[:gene_set_id] = getGeneset.id if params[:gene_set]
 
     # If parameters passed contain settings (it's a shared link)
     studies = set_shared_settings if params[:settings]
