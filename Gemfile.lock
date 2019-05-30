@@ -67,9 +67,9 @@ GEM
     bio (1.5.1)
     bio-kallisto (0.1.0)
       systemu (>= 2.5.2)
-    bootstrap-sass (3.3.7)
+    bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
-      sass (>= 3.3.4)
+      sassc (>= 2.0.0)
     bson (4.3.0)
     builder (3.2.3)
     byebug (10.0.2)
@@ -168,6 +168,9 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
+    sassc (2.0.1)
+      ffi (~> 1.9)
+      rake
     sdoc (0.4.2)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
@@ -214,7 +217,7 @@ DEPENDENCIES
   activerecord-session_store
   bio (~> 1.5)
   bio-kallisto (~> 0.1.0)
-  bootstrap-sass (~> 3.3.7)
+  bootstrap-sass (~> 3.4)
   byebug
   jbuilder (~> 2.0)
   jquery-rails
