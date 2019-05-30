@@ -117,7 +117,7 @@ FileUtils.mkdir_p options[:out] + "/ByTranscript"
 FileUtils.mkdir_p options[:out] + "/ByGene"
 
 
-File.open(options[:out] + "/#{options[:study_title]}_summary.tsv", "w") do |file|  
+File.open(options[:out] + "/#{study}_summary.tsv", "w") do |file|  
 	file.puts ["Sample", "Mapped_count", "Total_read", "Percentage"].join "\t"
 	all_samples_count_sum.each { |e|  file.puts e.join "\t" }
 end
