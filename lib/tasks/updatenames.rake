@@ -44,4 +44,20 @@ namespace :updatenames do
 			end
 		end
 	end
+
+	desc "Move the gene to the description and infer the name from the gene"
+	task :rename_gene_names,[:gene_set,:prefix] => :environment do |t, args|
+		puts "Updating gene names for #{args[:gene_set]}"
+		i = 0
+		ActiveRecord::Base.transaction do
+			gene_set = GeneSet.find_or_create_by(:name => args[:gene_set])
+			Gene.find_by_sql("SELECT * FROM genes where gene not like '#{args[:prefix]}%' AND  gene_set_id='#{gene_set.id}'").each do |g|
+				g.description = g.gene
+				g.gene =  g.transcript.split(".")[0]
+				i += 1
+				g.save!
+			end
+		end
+		puts "Modified #{i} transcripts"
+	end
 end
