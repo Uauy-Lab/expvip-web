@@ -121,7 +121,7 @@ GEM
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
     ox (2.9.0)
-    rack (2.0.7)
+    rack (2.0.8)
     rack-protection (2.0.5)
       rack
     rack-test (1.1.0)
