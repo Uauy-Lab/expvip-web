@@ -30,7 +30,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <h3>Wheat Expression Browser   <span style="font-size:50%">powered by expVIP</span></h3>
+        <h3>Rust Expression Browser   <span style="font-size:50%">powered by expVIP</span></h3>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -42,7 +42,7 @@
              <%= submit_tag "Search" , name: 'submit', class: "btn btn-default"  %>
 
              <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>
-             <%= submit_tag "Compare", name: 'submit', class: "btn btn-default"  %>              
+             <%= submit_tag "Compare", name: 'submit', class: "btn btn-default"  %>
               Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
           </div>
         <% end %>
@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  
+
 
   <div class='container-fluid' id="content">
 
@@ -84,10 +84,9 @@
 
   <div class="footer">
     <%= image_tag("jic.png", class: "logo" ) %>
-    <%= image_tag("EI.png", class: "logo" ) %>
     <%= image_tag("bbsrc.png", class: "logo" ) %>
-    <%= image_tag("iwyp.png", class: "logo" ) %>
-    <%= image_tag("DFW.jpg", class: "logo" ) %>
+    <%= image_tag("Rustwatch.png", class: "logo" ) %>
+    <%= image_tag("ERC.png", class: "logo" ) %>
   </div>
 </body>
 </html>
