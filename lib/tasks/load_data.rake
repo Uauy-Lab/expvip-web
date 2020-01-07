@@ -133,6 +133,7 @@ namespace :load_data do
           g.gene_set = gene_set
           name = arr.shift
           g.name = name
+          g.gene = name
           g.transcript = name
           g.cdna = name
           #GenesHelper.saveGene(g)
@@ -198,7 +199,7 @@ namespace :load_data do
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
         h = HomologyPair.new
         h.homology = row["homology_id"].to_i
-        h.gene = genes[row["genes"]]
+        h.gene_id = genes[row["genes"]]
         h.cigar = row["cigar_line"]
         h.cigar = nil if row["cigar_line"] != nil and row["cigar_line"].length > 254
         h.perc_cov = row["perc_cov"].to_f
