@@ -16,7 +16,7 @@ module Bio
 			extra += " --seed=#{seed}" if seed != 42
 			command = "kallisto quant --index=#{index} --output-dir=#{output_dir} #{extra} #{fastq.join(' ')}"
 		end
-	
+
 
 		def self.getCommadPairedEnd(index:, output_dir:, left:, right:, keep_bam:false)
 			l=left.split(":")
@@ -24,7 +24,7 @@ module Bio
 			raise "Reads should have at least one path for each pair #{left}" if l.size == 0 or r.size == 0
 			raise "left and right reads must be paired: \n#{left}\n#{right}" unless l.size == r.size
 			reads=[]
-			l.each_with_index do |e, i| 
+			l.each_with_index do |e, i|
 				reads << e
 				reads << r[i]
 			end
@@ -72,7 +72,7 @@ OptionParser.new do |opts|
 
 end.parse!
 
-options[:ref_name] = options[:index].split("/")[-1] unless options[:ref_name] 
+options[:ref_name] = options[:index].split("/")[-1] unless options[:ref_name]
 
 cmd_str=""
 mkdir_str=""
@@ -84,24 +84,24 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	i += 1
 	l = row["left"]
 	r = row["right"]
-	id = row["Sample.IDs"] 
+	id = row["Sample.IDs"]
 	id = row["Sample IDs"] unless id
 	study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 	id 	  	= id.gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 	out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{study}/#{id}"
-	mkdir_str += "\"#{out_d}\"\n" 
+	mkdir_str += "\"#{out_d}\"\n"
 	output_prefix = "#{out_d}/#{id}"
 	#output_sam = "#{out_d}/#{id}.sam"
-	
+
 	if l and r and l.length > 1 and r.length > 1
-		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d, keep_bam: options[:keep_bam])}" + "\"\n"  
+		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d, keep_bam: options[:keep_bam])}" + "\"\n"
 	else
 		single = row['single']
 		fl = row['fragment_size'].to_i
 		sd = row['sd'].to_f
 		cmd_str += "\"#{Bio::Kallisto.getCommadSingleEnd(index: options[:index], single:single,fragment_length:fl, sd:sd, output_dir:out_d, keep_bam:options[:keep_bam])}" + "\"\n"
 	end
-	sam_str += "\"#{output_prefix}\"\n" 
+	sam_str += "\"#{output_prefix}\"\n"
 end
 
 def get_bam_extra_string
@@ -111,7 +111,7 @@ def get_bam_extra_string
 	extra << "srun samtools index $prefix.sorted.bam \n\t"
 	extra << "srun rm $prefix.sam \n\t"
 	extra << "srun rm $prefix.bam \n\t"
-	extra 
+	extra
 end
 
 File.open(options[:out],"w") do |f|
@@ -120,7 +120,7 @@ File.open(options[:out],"w") do |f|
 	extra =  get_bam_extra_string if options[:keep_bam]
 	f.puts "#!/bin/bash"
 	f.puts "#SBATCH --mem=25Gb"
-	f.puts "#SBATCH -p nbi-medium,RG-Cristobal-Uauy"
+	f.puts "#SBATCH -p jic-medium,nbi-medium,RG-Diane-Saunders"
 	f.puts "#SBATCH -J kallisto_#{options[:ref_name]}"
 	f.puts "#SBATCH -n 1"
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
@@ -145,4 +145,3 @@ File.open(options[:out],"w") do |f|
 	f.puts "if [ -s $out_dir/abundance.tsv ]\nthen\n\techo \"File $out_dir/abundance.tsv exists\""
 	f.puts "else\n\tsrun $cmd #{extra} \nfi"
 end
-
