@@ -38,7 +38,7 @@ OptionParser.new do |opts|
 	end
 
 end.parse!
-options[:ref_name] = options[:index].split("/")[-1] unless options[:ref_name] 
+options[:ref_name] = options[:index].split("/")[-1] unless options[:ref_name]
 
 
 cmd_str=""
@@ -52,7 +52,7 @@ headers << "transcript"
 
 CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
-	id 	  	= row["Sample IDs"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
+	id 	  	= row["run_accession"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 	out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{study}/#{id}"
 	k+=1
 	if options[:chunk_size] != 0
@@ -65,14 +65,14 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	end
 	i += 1
 	j = 0
-	headers << id 
-	
+	headers << id
+
 	CSV.foreach(abundace_f, col_sep: "\t", headers:true) do |row2|
 		if i == 1
 			all_samples_tpm[j]  = []
 			all_samples_count[j] = []
-			all_samples_tpm[j]   << row2["target_id"] 
-			all_samples_count[j] << row2["target_id"] 
+			all_samples_tpm[j]   << row2["target_id"]
+			all_samples_count[j] << row2["target_id"]
 		end
 		all_samples_tpm[j]   << row2["tpm"]
 		all_samples_count[j] << row2["est_counts"]
@@ -80,13 +80,13 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	end
 end
 
-File.open(options[:out] + "_tpm_#{options[:chunk]}.tsv", "w") do |file|  
+File.open(options[:out] + "_tpm_#{options[:chunk]}.tsv", "w") do |file|
 	file.puts headers.join "\t"
 	all_samples_tpm.each { |e|  file.puts e.join "\t" }
 end
 
 
-File.open(options[:out] + "_count_#{options[:chunk]}.tsv", "w") do |file|  
+File.open(options[:out] + "_count_#{options[:chunk]}.tsv", "w") do |file|
 	file.puts headers.join "\t"
 	all_samples_count.each { |e|  file.puts e.join "\t" }
 end
