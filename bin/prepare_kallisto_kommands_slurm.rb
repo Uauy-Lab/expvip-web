@@ -10,7 +10,6 @@ module Bio
 			extra += " --bias" if bias
 			extra += " --sd=#{sd}" if sd > 0
 			extra += " --fragment-length=#{fragment_length}" if fragment_length > 0
-			extra += " --pseudobam" if keep_bam
 			extra += " --bootstrap-samples=#{bootstrap-samples}" if bootstrap_samples > 0
 			extra += " --threads=#{threads}" if threads > 1
 			extra += " --seed=#{seed}" if seed != 42
