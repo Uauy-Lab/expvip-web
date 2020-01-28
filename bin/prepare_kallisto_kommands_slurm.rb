@@ -3,14 +3,14 @@ require 'optparse'
 
 module Bio
 	class Kallisto
-		def self.getCommand(index:, fastq:, output_dir:,sd:0, single:false, bias:false, fragment_length:0, pseudobam:false, bootstrap_samples:0, threads:1, seed:42, keep_bam:false)
+		def self.getCommand(index:, fastq:, output_dir:,sd:0, single:false, bias:false, fragment_length:0, pseudobam:false, bootstrap_samples:100, threads:1, seed:42, keep_bam:false)
 
 			extra = ""
 			extra += " --single" if single
 			extra += " --bias" if bias
 			extra += " --sd=#{sd}" if sd > 0
 			extra += " --fragment-length=#{fragment_length}" if fragment_length > 0
-			extra += " --bootstrap-samples=#{bootstrap-samples}" if bootstrap_samples > 0
+			extra += " --bootstrap-samples=#{bootstrap_samples}" if bootstrap_samples > 0
 			extra += " --threads=#{threads}" if threads > 1
 			extra += " --seed=#{seed}" if seed != 42
 			command = "kallisto quant --index=#{index} --output-dir=#{output_dir} #{extra} #{fastq.join(' ')}"
