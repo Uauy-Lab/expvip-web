@@ -103,16 +103,6 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	sam_str += "\"#{output_prefix}\"\n"
 end
 
-def get_bam_extra_string
-	extra = " > $prefix.sam \n\t"
-	extra << "srun samtools view -bS $prefix.sam > $prefix.bam \n\t"
-	extra << "srun samtools sort -m 5G  -o $prefix.sorted.bam $prefix.bam \n\t"
-	extra << "srun samtools index $prefix.sorted.bam \n\t"
-	extra << "srun rm $prefix.sam \n\t"
-	extra << "srun rm $prefix.bam \n\t"
-	extra
-end
-
 File.open(options[:out],"w") do |f|
 
 	extra = ""
