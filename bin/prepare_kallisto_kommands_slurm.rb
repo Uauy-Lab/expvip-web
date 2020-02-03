@@ -3,7 +3,7 @@ require 'optparse'
 
 module Bio
 	class Kallisto
-		def self.getCommand(index:, fastq:, output_dir:,sd:0, single:false, bias:false, fragment_length:0, pseudobam:false, bootstrap_samples:100, threads:3, seed:42, keep_bam:false)
+		def self.getCommand(index:, fastq:, output_dir:,sd:0, single:false, bias:false, fragment_length:0, pseudobam:false, bootstrap_samples:100, threads:1, seed:42, keep_bam:false)
 
 			extra = ""
 			extra += " --single" if single
@@ -108,12 +108,12 @@ File.open(options[:out],"w") do |f|
 	extra = ""
 	f.puts "#!/bin/bash"
 	f.puts "#SBATCH --mem=25Gb"
-	f.puts "#SBATCH -p jic-long,nbi-long,RG-Diane-Saunders"
+	f.puts "#SBATCH -p jic-medium,nbi-medium,RG-Diane-Saunders"
 	f.puts "#SBATCH -J kallisto_#{options[:ref_name]}"
-	f.puts "#SBATCH -n 3"
+	f.puts "#SBATCH -n 1"
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
 	f.puts "#SBATCH --array=0-#{i}"
-	f.puts "#SBATCH --time=6-00:00:00"
+	f.puts "#SBATCH --time=12:00:00"
 	f.puts "source kallisto-0.42.3"
 	f.puts "source  samtools-1.4.1"
 	f.puts "i=$SLURM_ARRAY_TASK_ID"
