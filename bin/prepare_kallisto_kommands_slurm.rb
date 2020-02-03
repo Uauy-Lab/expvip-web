@@ -113,7 +113,7 @@ File.open(options[:out],"w") do |f|
 	f.puts "#SBATCH -n 3"
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
 	f.puts "#SBATCH --array=0-#{i}"
-	f.puts "#SBATCH --time=12:00:00"
+	f.puts "#SBATCH --time=6-00:00:00"
 	f.puts "source kallisto-0.42.3"
 	f.puts "source  samtools-1.4.1"
 	f.puts "i=$SLURM_ARRAY_TASK_ID"
