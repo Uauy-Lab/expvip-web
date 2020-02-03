@@ -3,7 +3,7 @@ require 'optparse'
 
 module Bio
 	class Kallisto
-		def self.getCommand(index:, fastq:, output_dir:,sd:0, single:false, bias:false, fragment_length:0, pseudobam:false, bootstrap_samples:100, threads:1, seed:42, keep_bam:false)
+		def self.getCommand(index:, fastq:, output_dir:,sd:0, single:false, bias:false, fragment_length:0, pseudobam:false, bootstrap_samples:100, threads:3, seed:42, keep_bam:false)
 
 			extra = ""
 			extra += " --single" if single
