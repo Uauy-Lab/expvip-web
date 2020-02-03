@@ -108,7 +108,7 @@ File.open(options[:out],"w") do |f|
 	extra = ""
 	f.puts "#!/bin/bash"
 	f.puts "#SBATCH --mem=25Gb"
-	f.puts "#SBATCH -p jic-medium,nbi-medium,RG-Diane-Saunders"
+	f.puts "#SBATCH -p jic-long,nbi-long,RG-Diane-Saunders"
 	f.puts "#SBATCH -J kallisto_#{options[:ref_name]}"
 	f.puts "#SBATCH -n 3"
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
