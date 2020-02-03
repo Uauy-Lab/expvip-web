@@ -110,7 +110,7 @@ File.open(options[:out],"w") do |f|
 	f.puts "#SBATCH --mem=25Gb"
 	f.puts "#SBATCH -p jic-medium,nbi-medium,RG-Diane-Saunders"
 	f.puts "#SBATCH -J kallisto_#{options[:ref_name]}"
-	f.puts "#SBATCH -n 1"
+	f.puts "#SBATCH -n 3"
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
 	f.puts "#SBATCH --array=0-#{i}"
 	f.puts "#SBATCH --time=12:00:00"
