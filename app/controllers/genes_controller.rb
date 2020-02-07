@@ -230,6 +230,7 @@ class GenesController < ApplicationController
     end
 
     # Generate links to other websites
+    # This needs to be dynamic! 
     @link = Link.all
     site_name = nil
     @link.each do |url_element|
