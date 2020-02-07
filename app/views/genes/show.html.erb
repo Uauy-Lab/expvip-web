@@ -3,16 +3,12 @@
 <%= render :partial => "genes/share" %>
 
 <strong><%= @gene.search_by%>:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
-<%= link_to "Ensembl", @gene.ensembl %>
-<%= link_to "KnetMiner", @gene.knetminer %>
 
- 
 <% if @compare.name != "" %>
  <strong>Compare:</strong>
- <span id="compare_gene_name"><%= @compare.name %></span>   
- <%= link_to "Ensembl", @compare.ensembl %>
- <%= link_to "KnetMiner", @compare.knetminer %>
+ <span id="compare_gene_name"><%= @compare.name %></span>
 <% end %>
+
 
 <div id="bar_expression_viewer"> </div>
 
@@ -56,7 +52,7 @@
       height: contentHeight, 
       renderProperty: 'tpm', 
       fontFamily:'Helvetica', 
-      groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   
+      groupBy: ["Fruit ripening stage"],                   
     });
 
   }

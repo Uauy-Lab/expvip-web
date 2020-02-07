@@ -21,6 +21,11 @@ body{
     background-color: #E6E6E6;    
 }
 
+.main-logo{
+    width: 10%;
+    float: left
+}
+
 #content{    
     margin-bottom: 5px;       // margin between footer 5    
     overflow-y: scroll;
@@ -35,7 +40,7 @@ div.navigation a{
     display: inline-block;
     padding: 5px 0px 5px 0px;
     margin: 0px 0px 0px -4px;
-    width: calc(100%/7);
+    width: calc(100%/6);
     text-align: center;
     font-size: larger;
     border-radius: 10px;
@@ -213,4 +218,16 @@ input[type="checkbox"]{
     h1{
         margin: 0 30px;        
     }
+}
+
+// Overview Page Styling
+.cite-tbl img{
+    width: 5%;
+    text-align: top !important;
+}
+
+.cite-icon{
+    margin-right: 2%;
+    float: left;
+    display: inline-block;
 }

@@ -63,10 +63,11 @@ function updateExample() {
       },
       success: function (response) {         
         $('#gene-search-input').attr("placeholder", response.search.gene);
-        $('#example1').html(response.search.gene);
-        $('#example2').html(response.compare.gene ); 
-        $('#example3').html(response.search.name);        
-        $('#example4').html(response.compare.name );                     
+        $('#example1').html(response.search_1.gene);
+        $('#example2').html(response.compare_1.gene );
+        $('#example3').html(response.search_2.gene);
+        $('#example4').html(response.compare_2.gene );
+        $('#example5').html(response.search_3.gene );                     
         $("select[name*='gene_set_selector']").val(geneID)
       },
       error: function(){
@@ -376,8 +377,8 @@ function logoMargin(){
     $(".footer img").each(function(){
       totalWidth =  totalWidth + $(this).width();    
     }); 
-    $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/10)-10 );
-    $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/10)-10 );
+    $(".logo").css("margin-left", ((window.innerWidth - totalWidth)/8)-10 );
+    $(".logo").css("margin-right", ((window.innerWidth - totalWidth)/8)-10 );
   }, 200);  
 }
 
