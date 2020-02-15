@@ -18,7 +18,7 @@
         <td>
             <img src="./images/berry.png" class="cite-icon">
             <p class="cite-des">
-            Vera Thole, Jean-Etienne Bassard, Martin Trick, Ricardo Ramírez-González, Bijan Afshar, Nicola Love, Dario Breitel, Lionel Hill, Alexandre Foito, Louise Shepherd, Cláudia Nunes dos Santos, Regina Menezes, Pilar Bañados, Barbara Avila, Michael Naesby, Liangsheng Wang, Wei Wei, Artem Sorokin, Tatiana Shelenga, Derek Stewart, Philippe Vain and Cathie Martin (2019) <b>RNA-seq, de novo transcriptome assembly and flavonoid gene analysis in 13 wild and cultivated berry fruit species with high content of phenolics.</b> (manuscript in preparation).
+                Vera Thole, Jean-Etienne Bassard, Ricardo Ramírez-González, Martin Trick, Bijan Ghasemi Afshar, Dario Breitel, Lionel Hill, Alexandre Foito, Louise Shepherd, Sabine Freitag, Cláudia Nunes dos Santos, Regina Menezes, Pilar Bañados, Michael Naesby, Liangsheng Wang, Artem Sorokin, Olga Tikhonova, Tatiana Shelenga, Derek Stewart, Philippe Vain and Cathie Martin (2019) <b>RNA-seq, <i>de novo</i> transcriptome assembly and flavonoid gene analysis in 13 wild and cultivated berry fruit species with high content of phenolics.</b> <i>BMC Genomics</i> 20: 995. <a href="https://doi.org/10.1186/s12864-019-6183-2">10.1186/s12864-019-6183-2</a>
             </p>
          </td>
     </tr>
