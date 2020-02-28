@@ -63,9 +63,9 @@ function updateExample() {
       },
       success: function (response) {         
         $('#gene-search-input').attr("placeholder", response.search.gene);
-        $('#example1').html(response.search.gene);
+        $('#example1').html(response.search.gene); //for genes
         $('#example2').html(response.compare.gene ); 
-        $('#example3').html(response.search.name);        
+        $('#example3').html(response.search.name);        // for transcripts
         $('#example4').html(response.compare.name );                     
         $("select[name*='gene_set_selector']").val(geneID)
       },
