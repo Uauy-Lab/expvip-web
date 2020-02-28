@@ -3,8 +3,8 @@ module GenesHelper
 	def self.get_random_genes(gene_set, count: 50)
 		random_genes = Gene.where(gene_set_id: gene_set.id).order("RAND()").limit(count)
 		example = {}
-		example[:search]  = random_genes.first(3)
-		example[:compare] = random_genes.last(2)
+		example[:search]  = random_genes.first
+		example[:compare] = random_genes.last
 		example[:heatmap] = random_genes.map { |e| e.gene }
 		example
 	end
@@ -17,11 +17,9 @@ module GenesHelper
 		if example[:search].size == 0
 			return get_random_genes(gene_set)  
 		end
-		example[:search_1]  = Gene.where(id: example[:search][0].gene_id).first
-		example[:search_2]  = Gene.where(id: example[:search][1].gene_id).first
-		example[:search_3]  = Gene.where(id: example[:search][2].gene_id).first
-		example[:compare_1] = Gene.where(id: example[:compare][0].gene_id).first
-		example[:compare_2] = Gene.where(id: example[:compare][1].gene_id).first
+		#This only allows one gene for each.
+		example[:search]  = Gene.where(id: example[:search] .gene_id).first
+		example[:compare] = Gene.where(id: example[:compare].gene_id).first
 		example[:heatmap] = example[:heatmap].map { |e| e.gene.gene  }
 		example
 	end
