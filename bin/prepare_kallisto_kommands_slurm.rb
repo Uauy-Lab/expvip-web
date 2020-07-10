@@ -66,7 +66,7 @@ OptionParser.new do |opts|
 	end
 
 	opts.on("-k", "--keep_bam", " pseudo Keep BAM file") do
-		options[:keep_bam] = true
+		options[:keep_bam] = false
 	end
 
 end.parse!
