@@ -89,7 +89,7 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	id 	  	= id.gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 	out_d ="#{options[:output_dir]}/#{id}"
 	mkdir_str += "\"#{out_d}\"\n"
-	output_prefix = "#{out_d}/#{id}"
+	output_prefix = "#{out_d}"
 	#output_sam = "#{out_d}/#{id}.sam"
 
 	if l and r and l.length > 1 and r.length > 1
