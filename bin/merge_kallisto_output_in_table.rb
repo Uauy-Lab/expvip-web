@@ -53,7 +53,7 @@ headers << "transcript"
 CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	study 	= row["study_title"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 	id 	  	= row["run_accession"].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
-	out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{study}/#{id}"
+	out_d ="#{options[:output_dir]}/#{options[:ref_name]}/#{id}"
 	k+=1
 	if options[:chunk_size] != 0
 		next unless (k-1) / options[:chunk_size] == options[:chunk]
