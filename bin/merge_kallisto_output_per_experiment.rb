@@ -7,7 +7,7 @@ options = {}
 options[:output_dir]="/nbi/group-data/ifs/NBI/Cristobal-Uauy/expression_browser/collaborators/kallisto/"
 options[:index]="/usr/users/ga002/ramirezr/Cristobal-Uauy/WGAv1.0/annotation/IWGSCv1.0_UTR_ALL.cdnas.fasta.gz.k31"
 options[:study_title] = nil
-options[:out] = options[:output_dir]
+options[:out] = false
 OptionParser.new do |opts|
 	opts.banner = "Usage: prepare_kallisto_kommands_slurm.rb [options]"
 
@@ -38,7 +38,7 @@ OptionParser.new do |opts|
 
 end.parse!
 options[:ref_name] = options[:index].split("/")[-1] unless options[:ref_name] 
-
+options[:out] = "#{options[:output_dir]}/#{options[:ref_name]}" unless options[:out] 
 
 cmd_str=""
 mkdir_str=""
