@@ -1,18 +1,7 @@
 # Citation
-If you use expVIP please cite the following papers:
+If you use expVIP please cite the following paper:
 
 <table>
-        <tr><td><img src="./images/0817Cover.png" width="250px"></td>
-        <td>Ricardo Ramirez-Gonzalez, Philippa Borrill et al. <i>The transcriptional landscape of hexaploid wheat across tissues and cultivars</i> Science 2018: Vol. 361, Issue 6403, eaar6089. <a href="http://dx.doi.org/10.1126/science.aar6089"> doi:10.1126/science.aar6089</a>
-            <br><br>
-            <b>Free access</b>
-            <ul>
-                <li><a href="http://science.sciencemag.org/cgi/content/abstract/361/6403/eaar6089?ijkey=IAVYItYDZkSiI&keytype=ref&siteid=sci"> Abstract</a> </li>
-                <li><a href="http://science.sciencemag.org/cgi/rapidpdf/361/6403/eaar6089?ijkey=IAVYItYDZkSiI&keytype=ref&siteid=sci"> Reprint</a> </li>
-                <li><a href="http://science.sciencemag.org/cgi/content/full/361/6403/eaar6089?ijkey=IAVYItYDZkSiI&keytype=ref&siteid=sci">Full text </a> </li>
-            </ul>
-         </td>
-     </tr>
      <tr>
         <td><img src="./images/0416PPCover.png" width="250px"></td>
         <td>Philippa Borrill, Ricardo Ramirez-Gonzalez, and Cristobal Uauy <i>expVIP: a customisable RNA-seq data analysis and visualisation platform</i> Plant Physiology 2016 : pp.15.01667v1-pp.01667.2015. <a href="http://dx.doi.org/10.1104/pp.15.01667">
@@ -22,3 +11,4 @@ doi:10.1104/pp.15.01667 </a></td>
 ## Developers
 
 expVIP was developed by [Ricardo H. Ramirez-Gonzalez](https://www.jic.ac.uk/people/dr-ricardo-h-ramirez-gonzalez/)([github](https://github.com/homonecloco)) and [Bijan Ghasemi Afshar](https://www.jic.ac.uk/people/bijan-ghasemi-afshar/) ([github](https://github.com/Bijan-Ghasemi-Afshar)) as part of the [Designing Future Wheat Institute Strategic Program](https://www.jic.ac.uk/research-impact/designing-future-wheat/) within the [Uauy lab](https://www.jic.ac.uk/people/cristobal-uauy/).
+Modifications for the creation of the Rust expression browser were made by [Thomas Adams](https://www.jic.ac.uk/people/thomas-adams/)([github](https://github.com/TMAdams)) and [Tjelvar Olsson](https://www.jic.ac.uk/people/dr-tjelvar-olsson/)([github](https://github.com/tjelvar-olsson)) within the [Saunder's lab](https://www.jic.ac.uk/people/diane-saunders/).

@@ -2,14 +2,14 @@
 
 <%= render :partial => "genes/share" %>
 
-<strong><%= @gene.search_by%>:</strong> <span id="search_gene_name"><%= @gene.name %></span> 
+<strong><%= @gene.search_by%>:</strong> <span id="search_gene_name"><%= @gene.name %></span>
 <%= link_to "Ensembl", @gene.ensembl %>
 <%= link_to "KnetMiner", @gene.knetminer %>
 
- 
+
 <% if @compare.name != "" %>
  <strong>Compare:</strong>
- <span id="compare_gene_name"><%= @compare.name %></span>   
+ <span id="compare_gene_name"><%= @compare.name %></span>
  <%= link_to "Ensembl", @compare.ensembl %>
  <%= link_to "KnetMiner", @compare.knetminer %>
 <% end %>
@@ -20,46 +20,46 @@
 
   // rescaling the bar chart after a 1.5 second delay
   var resizeTimer;
-  $(window).on('resize', function(e){      
+  $(window).on('resize', function(e){
     clearTimeout(resizeTimer);  // Making sure that the reload doesnt happen if the window is resized within 1.5 seconds
-    resizeTimer = setTimeout(function(){     
+    resizeTimer = setTimeout(function(){
 
-      var windowHeight = $(window).outerHeight();  
+      var windowHeight = $(window).outerHeight();
       var navHeight = $('nav').outerHeight();
       var footerHeight = 55;
       var contentHeight = 0;
-            
+
       contentHeight = windowHeight - (navHeight + footerHeight) - 90;
-     
+
       eb.resizeChart(contentHeight);
     }, 1500);
   });
 
 
-  var windowHeight = $(window).outerHeight();  
+  var windowHeight = $(window).outerHeight();
   var navHeight = $('nav').outerHeight();
   var footerHeight = 55;
   var contentHeight = 0;
-    
+
   contentHeight = windowHeight - (navHeight + footerHeight) - 90;
 
   var container_div="bar_expression_viewer";
   var data_url = "<%= "#{request.base_url}/expression_values/#{@gene.search_by}.json?#{@args}" %>" ;
   var gene = "<%= @gene.name %>";
   var eb;
-  console.log(data_url);  
+  console.log(data_url);
   function loadBarChart(){
     eb =  new biovisexpressionbar.ExpressionBar({
       target: container_div,
-      highlight: gene, 
+      highlight: gene,
       data: data_url,
-      height: contentHeight, 
-      renderProperty: 'tpm', 
-      fontFamily:'Helvetica', 
-      groupBy: ["High level stress-disease", "High level age","High level tissue","High level variety"],                   
+      height: contentHeight,
+      renderProperty: 'tpm',
+      fontFamily:'Helvetica',
+      groupBy: ["High level stress-disease", "High level age", "High level tissue", "High level variety", "Date Isolated", "Sample IDs", "location", "country"],
     });
 
   }
-  loadBarChart();       
-  //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen    
+  loadBarChart();
+  //$("#bar_expression_viewer_sort_div").disableSelection(); //We need to move this to the js componen
 </script>

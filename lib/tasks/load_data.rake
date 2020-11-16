@@ -133,6 +133,7 @@ namespace :load_data do
           g.gene_set = gene_set
           name = arr.shift
           g.name = name
+          g.gene = name
           g.transcript = name
           g.cdna = name
           #GenesHelper.saveGene(g)
