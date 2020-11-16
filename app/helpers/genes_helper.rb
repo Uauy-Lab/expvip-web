@@ -17,6 +17,7 @@ module GenesHelper
 		if example[:search].size == 0
 			return get_random_genes(gene_set)  
 		end
+		#This only allows one gene for each.
 		example[:search]  = Gene.where(id: example[:search] .first.gene_id).first
 		example[:compare] = Gene.where(id: example[:compare].first.gene_id).first
 		example[:heatmap] = example[:heatmap].map { |e| e.gene.gene  }
