@@ -123,7 +123,7 @@ GEM
       racc (~> 1.4)
     ox (2.9.0)
     racc (1.5.2)
-    rack (2.2.2)
+    rack (2.2.3)
     rack-protection (2.0.5)
       rack
     rack-test (1.1.0)
