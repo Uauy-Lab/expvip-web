@@ -73,6 +73,7 @@ GEM
     bson (4.3.0)
     builder (3.2.3)
     byebug (10.0.2)
+    choice (0.2.0)
     concurrent-ruby (1.1.5)
     crass (1.0.6)
     debug_inspector (0.0.3)
@@ -144,6 +145,11 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
+    rails-erd (1.6.1)
+      activerecord (>= 4.2)
+      activesupport (>= 4.2)
+      choice (~> 0.2.0)
+      ruby-graphviz (~> 1.2)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
     railties (5.2.3)
@@ -159,6 +165,9 @@ GEM
     rdiscount (1.6.8)
     rdoc (4.3.0)
     redcarpet (3.5.1)
+    rexml (3.2.5)
+    ruby-graphviz (1.2.5)
+      rexml
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -229,6 +238,7 @@ DEPENDENCIES
   mongo
   mysql2 (~> 0.5)
   rails (~> 5.2)
+  rails-erd (~> 1.6.1)
   redcarpet
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
@@ -240,4 +250,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.17.1
+   1.17.3

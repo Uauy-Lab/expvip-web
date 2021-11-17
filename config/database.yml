@@ -10,14 +10,14 @@ default: &default
   adapter: mysql2
   encoding: utf8
   database: "expvip"
-  username: expvipUSR
-  password: expvipPWD
+  username: root
+  password: 
   host: localhost
   port: 3306
 
 development:
   <<: *default
-  database: "wheat_expression_dev_3"
+  database: "wheat_expression_prd"
 #  database: "expvip_berries"
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -26,7 +26,7 @@ test:
   <<: *default
   database: "wheat_expression_test"
 
-#production:
+production:
 #  <<: *default
 #  database: "wheat_expression_prd"
 
