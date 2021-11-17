@@ -38,7 +38,7 @@ OptionParser.new do |opts|
 
 end.parse!
 options[:ref_name] = options[:index].split("/")[-1] unless options[:ref_name] 
-
+puts "Saving to: #{options[:out]}"
 
 cmd_str=""
 mkdir_str=""
@@ -116,7 +116,7 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 end
 study 	= options[:study_title].gsub(/\s+/,"_").gsub(",",".").gsub(":",".")
 
-
+puts "Saving to: #{options[:out]}"
 FileUtils.mkdir_p options[:out] + "/ByTranscript"
 FileUtils.mkdir_p options[:out] + "/ByGene"
 
