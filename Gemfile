@@ -68,3 +68,5 @@ group :test do
   #gem 'spring'
 end
 
+
+gem "webrick", "~> 1.7"
