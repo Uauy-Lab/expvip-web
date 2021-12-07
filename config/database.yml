@@ -27,8 +27,8 @@ test:
   database: "wheat_expression_test"
 
 production:
-#  <<: *default
-#  database: "wheat_expression_prd"
+  <<: *default
+  database: "wheat_expression_prd"
 
 #production:
 #  <<: *default

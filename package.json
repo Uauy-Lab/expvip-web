@@ -7,9 +7,11 @@
   },
   "devDependencies": {
     "browserify": "^14.5.0",
-    "watchify": "^3.2.2"
+    "watchify": "^3.2.2",
+    "webpack-dev-server": "^4.6.0"
   },
   "dependencies": {
-    "bio-vis-expression-bar": "0.8.5-2"
+    "@rails/webpacker": "5.2.1",
+    "bio-vis-expression-bar": "0.9.1"
   }
 }
