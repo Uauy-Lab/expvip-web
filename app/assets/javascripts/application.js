@@ -10,10 +10,7 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery
-//= require jquery-ui
-//= require bootstrap-sprockets
-//= require bundle
+
 
 Math.log2 = Math.log2 || function(x) {
   return Math.log(x) / Math.LN2;

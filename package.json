@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@rails/webpacker": "5.2.1",
+    "jquery": "3.6.0",
     "bio-vis-expression-bar": "0.9.1"
   }
 }
