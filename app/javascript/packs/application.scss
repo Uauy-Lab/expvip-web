@@ -13,8 +13,8 @@
  *= require jquery-ui
  */
 
-@import "*";
-@import "bootstrap-sprockets";
+// @import "*";
+// @import "bootstrap-sprockets";
 @import "bootstrap";
 
 body{
@@ -22,7 +22,7 @@ body{
 }
 
 #content{    
-    margin-bottom: 5px;       // margin between footer 5    
+    margin-bottom: 6px;       // margin between footer 5    
     overflow-y: scroll;
 }
 
