@@ -1,14 +1,12 @@
 {
   "name": "bioruby-rna-explorer",
-  "scripts": {
-    "bundle": "browserify app/assets/javascripts/index.js -o app/assets/javascripts/bundle.js",
-    "watch-js": "watchify app/assets/javascripts/index.js -o app/assets/javascripts/bundle.js",
-    "start": "npm run watch-js & rails s"
-  },
+  "scripts": {},
   "devDependencies": {
+    "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.6.0"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.0",
     "@rails/webpacker": "5.2.1",
     "bio-vis-expression-bar": "0.9.1",
     "bootstrap": "^5.1.3",
