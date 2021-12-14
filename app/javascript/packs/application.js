@@ -33,9 +33,10 @@ import 'bootstrap/js/src/tab'
 // import 'bootstrap/js/src/toast'  
 import 'bootstrap/js/src/tooltip'
 
-//import 'bio-vis-expression-bar'
+import * as be from  'bio-vis-expression-bar'
 console.log("SSSSSS");
-console.log(ExpressionBar);
+console.log(be);
+// console.log(ExpressionBar);
 
 Math.log2 = Math.log2 || function(x) {
     return Math.log(x) / Math.LN2;
@@ -452,4 +453,5 @@ Math.log2 = Math.log2 || function(x) {
   $(document).on('page:load', ready);
 
   window.$ = window.jQuery = $;
+  window.biovisexpressionbar = be;
   
