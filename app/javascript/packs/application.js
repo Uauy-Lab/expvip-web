@@ -20,6 +20,8 @@ console.log('Hello World from Webpacker')
 import  * as d3 from 'd3'
 import $ from "jquery";
 import jquery from "jquery";
+require("jquery-ui")
+import { ExpressionBar } from './expressionbar/expressionBar';
 
 // import 'bootstrap/js/src/alert'  
 // import 'bootstrap/js/src/button'  
@@ -33,10 +35,10 @@ import 'bootstrap/js/src/tab'
 // import 'bootstrap/js/src/toast'  
 import 'bootstrap/js/src/tooltip'
 
-import * as be from  'bio-vis-expression-bar'
+// import * as be from  'bio-vis-expression-bar'
 console.log("SSSSSS");
-console.log(be);
-// console.log(ExpressionBar);
+// console.log(be);
+ console.log(ExpressionBar);
 
 Math.log2 = Math.log2 || function(x) {
     return Math.log(x) / Math.LN2;
@@ -453,5 +455,5 @@ Math.log2 = Math.log2 || function(x) {
   $(document).on('page:load', ready);
 
   window.$ = window.jQuery = $;
-  window.biovisexpressionbar = be;
+
   
