@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_06_120700) do
+ActiveRecord::Schema.define(version: 2021_12_17_181226) do
 
   create_table "ExperimentGroups_Factors", id: false, charset: "utf8mb3", force: :cascade do |t|
     t.integer "ExperimentGroup_id", null: false
     t.integer "Factor_id", null: false
   end
 
-  create_table "active_storage_attachments", charset: "utf8mb3", force: :cascade do |t|
+  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
     t.bigint "record_id", null: false
@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 2021_12_06_120700) do
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", charset: "utf8mb3", force: :cascade do |t|
+  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "key", null: false
     t.string "filename", null: false
     t.string "content_type"
@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 2021_12_06_120700) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "active_storage_variant_records", charset: "utf8mb3", force: :cascade do |t|
+  create_table "active_storage_variant_records", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
@@ -116,8 +116,8 @@ ActiveRecord::Schema.define(version: 2021_12_06_120700) do
     t.integer "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "factor"
-    t.index ["factor"], name: "index_factors_on_factor"
+    t.bigint "default_factor_order_id"
+    t.index ["default_factor_order_id"], name: "index_factors_on_default_factor_order_id"
   end
 
   create_table "gene_sets", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -227,27 +227,12 @@ ActiveRecord::Schema.define(version: 2021_12_06_120700) do
     t.index ["title"], name: "index_studies_on_title"
   end
 
-  create_table "tissues", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "type_of_values", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_type_of_values_on_name"
-  end
-
-  create_table "varieties", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.string "url"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -257,6 +242,7 @@ ActiveRecord::Schema.define(version: 2021_12_06_120700) do
   add_foreign_key "expression_values", "genes"
   add_foreign_key "expression_values", "meta_experiments"
   add_foreign_key "expression_values", "type_of_values"
+  add_foreign_key "factors", "default_factor_orders"
   add_foreign_key "genes", "gene_sets"
   add_foreign_key "homologies", "genes"
   add_foreign_key "meta_experiments", "gene_sets"

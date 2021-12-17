@@ -49,7 +49,7 @@ class GenesController < ApplicationController
     genes_arr = genes.split(",")
     genes_query = {}
 
-    arguments = {gene_set: gene_set, genes: genes}.to_query
+   # arguments = {gene_set: gene_set, genes: genes}.to_query
     uri_base = "#{request.base_url}/genes/heatmap/"
     allowed_arg_length = WEBrick::HTTPRequest::MAX_URI_LENGTH - uri_base.length
 
@@ -135,8 +135,7 @@ class GenesController < ApplicationController
       flash[:error] = e.to_s
       #puts "ERROR: #{e.inspect}"
       #puts e.backtrace
-      redirect_back fallback_location: request.base_url.to_s
-      return 
+      redirect_back fallback_location: request.base_url.to_s 
     end
 	end
 
