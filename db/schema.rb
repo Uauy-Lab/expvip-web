@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_17_181226) do
+ActiveRecord::Schema.define(version: 2021_12_18_191612) do
 
   create_table "ExperimentGroups_Factors", id: false, charset: "utf8mb3", force: :cascade do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -144,18 +144,6 @@ ActiveRecord::Schema.define(version: 2021_12_17_181226) do
     t.index ["transcript"], name: "index_genes_on_transcript"
   end
 
-  create_table "homologies", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.integer "gene_id"
-    t.integer "group"
-    t.string "genome"
-    t.integer "A_id"
-    t.integer "B_id"
-    t.integer "D_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["gene_id"], name: "index_homologies_on_gene_id"
-  end
-
   create_table "homology_pairs", charset: "utf8mb3", force: :cascade do |t|
     t.integer "homology"
     t.string "cigar"
@@ -244,7 +232,6 @@ ActiveRecord::Schema.define(version: 2021_12_17_181226) do
   add_foreign_key "expression_values", "type_of_values"
   add_foreign_key "factors", "default_factor_orders"
   add_foreign_key "genes", "gene_sets"
-  add_foreign_key "homologies", "genes"
   add_foreign_key "meta_experiments", "gene_sets"
   add_foreign_key "studies", "species"
 end
