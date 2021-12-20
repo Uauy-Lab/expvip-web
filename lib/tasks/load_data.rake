@@ -142,45 +142,38 @@ namespace :load_data do
     end
   end
 
+  desc "Load the genes, from the wheat pangenome project. The gene is parsed from the transcript name. "
+  task :pangenome_cdna, [:gene_set, :filename] => :environment do |t, args|
+    puts "Loading genes"
+    ActiveRecord::Base.transaction do
+      gene_set = GeneSet.find_or_create_by(:name => args[:gene_set])
+      stream = Zlib::GzipReader.open(args[:filename]) 
+      i=0
+      Bio::FlatFile.open(Bio::FastaFormat, stream) do |ff|
+        ff.each do |entry|
+          name = entry.entry_id
+          arr = entry.entry_id.split(".")
+          g = Gene.new
+          g.gene_set = gene_set
+          g.name = name
+          g.transcript = name
+          g.cdna = name
+          g.gene = arr[0]
+          g.save!
+          i += 1
+          puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
+          #puts g.inspect
+          #raise "Testing"
+        end
+      end
+    end
+  end
+
   #def get_experiment(name)
   #	@experiments[name] = Experiment.find_by(:accession=>name) unless @experiments[name]
   #	return @experiments[name]
   #end
 
-  desc "Load the homology values. The headers of the table must be: Gene  A B D Group Genome. The gene corresponds to the gene name, not the specific transcript"
-  task :homology_deprecated, [:gene_set, :filename] => :environment do |t, args|
-    puts args
-    ActiveRecord::Base::transaction do
-      conn = ActiveRecord::Base.connection
-      gene_set = GeneSet.find_by(:name => args[:gene_set])
-      genes = Hash.new
-      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}' ORDER BY gene").each do |g|
-        genes[g.gene] = g unless genes[g.gene]
-      end
-      puts "Loaded #{genes.size} genes  in memory"
-      count = 0
-
-      CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-        h = Homology.new
-        #Gene A B D Group Genome
-        #puts row["Gene"].inspect
-        #puts  genes[row["Gene"]].inspect
-        #puts h.inspect
-        h.Gene = genes[row["Gene"]]
-        h.A = genes[row["A"]]
-        h.B = genes[row["B"]]
-        h.D = genes[row["D"]]
-        h.genome = row["Genome"]
-        h.group = row["Group"]
-        h.save!
-        count += 1
-        if count % 10000 == 0
-          puts "Loaded #{count} Homologies (#{row["Gene"]})"
-        end
-      end
-      puts "Loaded #{count} Homologies"
-    end
-  end
 
   desc "Load homology in a pairwaise manner"
   task :homology_pairs, [:gene_set, :filename] => :environment do |t, args|
@@ -211,57 +204,6 @@ namespace :load_data do
         end
       end
       puts "Loaded #{count} Homologies"
-    end
-  end
-
-  desc "Load the values from a csv file"
-  task :values, [:meta_experiment, :gene_set, :value_type, :filename] => :environment do |t, args|
-    puts args
-    ActiveRecord::Base::transaction do
-      conn = ActiveRecord::Base.connection
-      meta_exp = MetaExperiment.find_or_create_by(:name => args[:meta_experiment])
-      gene_set = GeneSet.find_by(:name => args[:gene_set])
-      value_type = TypeOfValue.find_or_create_by(:name => args[:value_type])
-      experiments = Hash.new
-      meta_exp.gene_set = gene_set
-      #TODO: add validation if any of the find_by is null
-
-      genes = Hash.new
-      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|
-        genes[g.name] = g.id
-      end
-      puts "Loaded #{genes.size} genes  in memory"
-
-      Experiment.find_each do |e|
-        experiments[e.accession] = e.id
-      end
-      puts "Loaded #{experiments.size} experiments  in memory"
-      count = 0
-      inserts = Array.new
-      CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-        gene_name = row["target_id"]
-        gene_name = row["transcript"] unless row["target_id"]
-        gene = genes[gene_name]
-        row.delete("target_id")
-        row.delete("transcript")
-        row.to_hash.each_pair do |name, val|
-          val = val.to_f
-          raise "Experiment #{name} not found " unless experiments[name]
-          raise "Gene #{gene_name} not found in gene set #{args[:gene_set]} " unless gene
-          str = "(#{experiments[name]},#{gene},#{meta_exp.id},#{value_type.id},#{val},NOW(),NOW())"
-          inserts.push str
-        end
-        count += 1
-        if count % 10 == 0
-          puts "Loaded #{count} ExpressionValue (#{gene_name})"
-          sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
-          conn.execute sql
-          inserts = Array.new
-        end
-      end
-      puts "Loaded #{count} ExpressionValue "
-      sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
-      conn.execute sql
     end
   end
 

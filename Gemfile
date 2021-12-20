@@ -26,7 +26,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'mysql2', '~>  0.5' 
 
-gem 'bio', '~> 1.5'
+gem 'bio', '~> 2.0'
 
 gem 'bio-kallisto', '~> 0.1.0'
 

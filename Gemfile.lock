@@ -79,7 +79,7 @@ GEM
       zeitwerk (~> 2.3)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
-    bio (1.5.2)
+    bio (2.0.3)
     bio-kallisto (0.1.0)
       systemu (>= 2.5.2)
     bson (4.12.1)
@@ -224,7 +224,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-session_store
-  bio (~> 1.5)
+  bio (~> 2.0)
   bio-kallisto (~> 0.1.0)
   byebug
   jbuilder (~> 2.0)
