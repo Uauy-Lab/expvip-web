@@ -102,7 +102,6 @@ class ExpressionValuesController < ApplicationController
   def getExperimentGroups
     experiments = Hash.new
     groups = Hash.new
-
     Experiment.find_each do |g|
       group = Hash.new
       next unless g.study.active
@@ -149,7 +148,8 @@ class ExpressionValuesController < ApplicationController
       type_of_value = ev.type_of_value.name
       values[type_of_value] = Hash.new unless values[type_of_value]
       tvh = values[type_of_value]
-      obj = client[:experiments].find({ :_id => ev.id })
+      exps = client[:experiments]
+      obj = exps.find({ :_id => ev.id })
       obj.first.each_pair { |k, val| values[type_of_value][k.to_s] = { experiment: k, value: val } unless k == "_id" }
     end
     removeInactiveValues values

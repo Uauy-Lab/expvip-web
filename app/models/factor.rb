@@ -3,6 +3,8 @@ class Factor < ActiveRecord::Base
 	belongs_to :default_factor_order, class_name: "DefaultFactorOrder", foreign_key: "default_factor_order_id"
 	
 	def factor
-		default_factor_order.name
+		@@factor_names ||= Hash.new 
+		@@factor_names[self.id] ||=  self.default_factor_order.name
+		return @@factor_names[self.id]  
 	end
 end
