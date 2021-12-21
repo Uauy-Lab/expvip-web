@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_18_191612) do
+ActiveRecord::Schema.define(version: 2021_12_21_094947) do
 
   create_table "ExperimentGroups_Factors", id: false, charset: "utf8mb3", force: :cascade do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(version: 2021_12_18_191612) do
     t.integer "type_of_value_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "values"
     t.index ["gene_id"], name: "index_expression_values_on_gene_id"
     t.index ["meta_experiment_id"], name: "index_expression_values_on_meta_experiment_id"
     t.index ["type_of_value_id"], name: "index_expression_values_on_type_of_value_id"

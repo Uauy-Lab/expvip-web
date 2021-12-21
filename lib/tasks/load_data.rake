@@ -179,7 +179,6 @@ namespace :load_data do
   task :homology_pairs, [:gene_set, :filename] => :environment do |t, args|
     puts args
     ActiveRecord::Base::transaction do
-      conn = ActiveRecord::Base.connection
       gene_set = GeneSet.find_by(:name => args[:gene_set])
       genes = Hash.new
       Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}' ORDER BY gene").each do |g|
@@ -211,7 +210,6 @@ namespace :load_data do
   task :values_mongo, [:meta_experiment, :gene_set, :value_type, :filename] => :environment do |t, args|
     puts args
     ActiveRecord::Base::transaction do
-      conn = ActiveRecord::Base.connection
       gene_set = GeneSet.find_by(:name => args[:gene_set])
       meta_exp = MetaExperiment.find_or_create_by(:name => args[:meta_experiment], :gene_set => gene_set)
       value_type = TypeOfValue.find_or_create_by(:name => args[:value_type])
