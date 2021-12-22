@@ -3,6 +3,7 @@ class Gene < ActiveRecord::Base
 	has_many :expression_values;
 	has_many :type_of_value , through: :expression_values
 	has_many :meta_experiment , through: :expression_values
+	has_and_belongs_to_many :ortholog_groups
 	def add_field(text)
 		arr = text.split(":", 2)
 		#puts arr.inspect

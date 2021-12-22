@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_21_094947) do
+ActiveRecord::Schema.define(version: 2021_12_22_120033) do
 
   create_table "ExperimentGroups_Factors", id: false, charset: "utf8mb3", force: :cascade do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -145,6 +145,11 @@ ActiveRecord::Schema.define(version: 2021_12_21_094947) do
     t.index ["transcript"], name: "index_genes_on_transcript"
   end
 
+  create_table "genes_ortholog_groups", id: false, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "ortholog_group_id", null: false
+    t.bigint "gene_id", null: false
+  end
+
   create_table "homology_pairs", charset: "utf8mb3", force: :cascade do |t|
     t.integer "homology"
     t.string "cigar"
@@ -171,6 +176,18 @@ ActiveRecord::Schema.define(version: 2021_12_21_094947) do
     t.datetime "updated_at", null: false
     t.index ["gene_set_id"], name: "index_meta_experiments_on_gene_set_id"
     t.index ["name"], name: "index_meta_experiments_on_name"
+  end
+
+  create_table "ortholog_groups", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "ortholog_set_id", null: false
+    t.index ["ortholog_set_id"], name: "index_ortholog_groups_on_ortholog_set_id"
+  end
+
+  create_table "ortholog_sets", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "sample_genes", charset: "utf8mb3", force: :cascade do |t|
@@ -234,5 +251,6 @@ ActiveRecord::Schema.define(version: 2021_12_21_094947) do
   add_foreign_key "factors", "default_factor_orders"
   add_foreign_key "genes", "gene_sets"
   add_foreign_key "meta_experiments", "gene_sets"
+  add_foreign_key "ortholog_groups", "ortholog_sets"
   add_foreign_key "studies", "species"
 end
