@@ -70,6 +70,8 @@ module ExpressionValuesHelper
 				i += 1
 				ev.save!
 				puts "migrated #{i} values " if i  % 10000 == 0
+			#	puts ev.inspect
+				break if i  % 10 == 0
 			end
 			puts "DONE migrated #{i} values "
 		end
