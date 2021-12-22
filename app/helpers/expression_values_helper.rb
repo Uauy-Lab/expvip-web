@@ -19,7 +19,7 @@ module ExpressionValuesHelper
 					yield headers if count == 0
 					yield values
 					values = Array.new
-					puts "#{count} genes done" if(count %1000 == 0)
+					puts "#{count} genes done" if count % 1000 == 0
 
 					count += 1
 				end
@@ -58,4 +58,20 @@ module ExpressionValuesHelper
 		missing
 	end
 
+	def self.migrate_from_mongodb
+		client = MongodbHelper.getConnection
+		exps = client[:experiments]
+		i = 0
+		ActiveRecord::Base.transaction do
+			ExpressionValue.find_each do |ev|
+				obj = exps.find({ :_id => ev.id }).first
+				obj.delete("_id")
+				ev.values = obj
+				i += 1
+				ev.save!
+				puts "migrated #{i} values " if i  % 10000 == 0
+			end
+			puts "DONE migrated #{i} values "
+		end
+  	end
 end
