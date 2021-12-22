@@ -1,0 +1,2 @@
+class OrthologSet < ApplicationRecord
+end

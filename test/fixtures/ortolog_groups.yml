@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  rm: MyString
+  db/migrate/20211222114524_create_ortolog_sets.rb: MyString
+  app/models/ortolog_set.rb: MyString
+  test/models/ortolog_set_test.rb: MyString
+  test/fixtures/ortolog_sets.yml: MyString
+
+two:
+  rm: MyString
+  db/migrate/20211222114524_create_ortolog_sets.rb: MyString
+  app/models/ortolog_set.rb: MyString
+  test/models/ortolog_set_test.rb: MyString
+  test/fixtures/ortolog_sets.yml: MyString
