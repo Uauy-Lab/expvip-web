@@ -109,7 +109,7 @@ class ExpressionValuesController < ApplicationController
       group["name"] = g.accession
       group["description"] = g.accession
       factors = Hash.new
-      g.factors.each { |f| factors[f.factor] = f.name }
+      g.factors.each { |f| factors[f.factor] = f.name } #TODO: This may be cached
 
       experiments[g.id] = Hash.new
       exp = experiments[g.id]
@@ -143,14 +143,14 @@ class ExpressionValuesController < ApplicationController
   def getValuesForTranscript(gene)
     #TODO: Add code to validate for different experiments.
     values = Hash.new
-    client = MongodbHelper.getConnection
+    # client = MongodbHelper.getConnection
     ExpressionValue.where("gene_id = :gene", { gene: gene.id }).each do |ev|
       type_of_value = ev.type_of_value.name
       values[type_of_value] = Hash.new unless values[type_of_value]
-      tvh = values[type_of_value]
-      exps = client[:experiments]
-      obj = exps.find({ :_id => ev.id })
-      obj.first.each_pair { |k, val| values[type_of_value][k.to_s] = { experiment: k, value: val } unless k == "_id" }
+      #tvh = values[type_of_value]
+      #exps = client[:experiments]
+      obj = ev.values
+      obj.each_pair { |k, val| values[type_of_value][k.to_s] = { experiment: k, value: val } unless k == "_id" }
     end
     removeInactiveValues values
     return values
