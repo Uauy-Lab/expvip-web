@@ -4,9 +4,15 @@ namespace :load_data do
   desc "Loads the values for a factor. The file must have 4 columns, separated by tabs: facor, order, name and short."
   task :factor, [:filename] => :environment do |t, args|
     ActiveRecord::Base.transaction do
+      dfos = Hash.new 
+      DefaultFactorOrder.all.each do |single|
+        dfos[single.name] = single
+      end
+     # puts dfos.inspect
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
+        #puts row["factor"]
         factor = Factor.find_or_create_by(
-          :factor => row["factor"],
+          :default_factor_order => dfos[row["factor"]],
           :description => row["name"],
         )
         factor.name = row["short"]
@@ -21,7 +27,11 @@ namespace :load_data do
     puts "Loading metadata"
 
     ActiveRecord::Base.transaction do
-      factors = Factor.distinct.pluck(:factor)
+      dfos = Hash.new 
+      DefaultFactorOrder.all.each do |single|
+        dfos[single.name] = single
+      end
+      # factors = Factor.distinct.pluck(:factor)
       CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
         #	puts row.inspect
         species = Species.find_or_create_by(:scientific_name => row["scientific_name"])
@@ -41,9 +51,11 @@ namespace :load_data do
         experiment.mapped_reads = row["Mapped reads"].to_i if row["Mapped reads"]
         experiment.study = study
 
-        factors.each do |f|
+        dfos.each_pair do |f, dfo|
+          next if f == "study" #TODO: this is a patch on a patch! Need to make sure that study is the first on the plot
           v = row[f]
-          factor = Factor.find_by factor: f, description: v
+          #puts row.inspect
+          factor = Factor.find_by default_factor_order: dfo, description: v
           raise "'#{f}:#{v}' not found!. Make sure '#{v}' was loaded in the factors\n" unless factor
 
           experiment.factors << factor

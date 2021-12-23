@@ -1,11 +1,11 @@
 require 'set'
 module KallistoHelper
 	def self.runAndLoadFolder(input_dir:, kallistoIndex:, gene_set:, meta_experiment:)
-		meta_exp = MetaExperiment.find_by(:name=>meta_experiment)
+		# meta_exp = MetaExperiment.find_by(:name=>meta_experiment)
 		used_accessions = Set.new
 		experiments = Experiment.find_each do |e|
 			next if(used_accessions.include?(e.accession))
-			count = MetaExperimentsHelper.countLoadedValues(meta_experiment: meta_experiment, accession: e.accession)
+			# count = MetaExperimentsHelper.countLoadedValues(meta_experiment: meta_experiment, accession: e.accession)
 			accession_dir = "#{input_dir}/#{e.accession}"
 			files = Dir["#{accession_dir}/abundance.tsv"]
 			next unless files.any?
@@ -18,7 +18,7 @@ module KallistoHelper
 	end
 	
 	def self.loadFolder(input_dir:, gene_set:, meta_experiment:)
-		meta_exp = MetaExperiment.find_or_create_by(:name=>meta_experiment)
+		MetaExperiment.find_or_create_by(:name=>meta_experiment)
 		used_accessions = Set.new
 
 		experiments = Hash.new
@@ -44,14 +44,14 @@ module KallistoHelper
 	def self.loadKallistoOutput(input_dir:, gene_set:, meta_experiment:, experiments:, accession: e.accession )
 		
 		ActiveRecord::Base.transaction do
-			conn 		= ActiveRecord::Base.connection
+			# conn 		= ActiveRecord::Base.connection
 			gene_set 	= GeneSet.find_by(:name=>gene_set)
 			meta_exp 	= MetaExperiment.find_or_create_by(:name=>meta_experiment)
 
 			Kernel::abort("Gene set #{gene_set} was not loaded in the metadata!") unless gene_set
 
-			tpm 		= TypeOfValue.find_or_create_by(:name=>"tpm")
-			count_type 	= TypeOfValue.find_or_create_by(:name=>"count")
+			TypeOfValue.find_or_create_by(:name=>"tpm")
+			TypeOfValue.find_or_create_by(:name=>"count")
 
 			puts "Loading gene names(#{gene_set.name})..."
 
@@ -61,22 +61,23 @@ module KallistoHelper
 			puts "Loading values in db"
 
 			count 		= 0
-			inserts 	= Array.new
-			json_stats 	= "#{input_dir}/run_info.json"
+			# inserts 	= Array.new
+			# json_stats 	= "#{input_dir}/run_info.json"
 			abundance 	= "#{input_dir}/abundance.tsv"
-			file 		= File.read(json_stats)
-			data_hash 	= JSON.parse(file)
+			# file 		= File.read(json_stats)
+			# data_hash 	= JSON.parse(file)
 
 			CSV.foreach(abundance, :headers=>true, :col_sep=>"\t") do |row|
 
 				value_type 	= TypeOfValue.find_or_create_by(:name => "count")
-				missing 	= ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type, accession)
+				ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type, accession)
 				value_type 	= TypeOfValue.find_or_create_by(:name => "tpm")
-				missing 	= ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type, accession)
+				ExpressionValuesHelper.add(row, genes, experiments, meta_exp, value_type, accession)
 				count += 1
 				
 			end
 			puts "Loaded #{count} ExpressionValue "
+			# puts "Missing: #{}"
 		end
 	end
 
@@ -115,10 +116,10 @@ module KallistoHelper
 			count = 0
 			inserts = Array.new
 
-			json_stats = "#{tmp_output}/run_info.json"
+			# json_stats = "#{tmp_output}/run_info.json"
 			abundance = "#{tmp_output}/abundance.tsv"
-			file = File.read(json_stats)
-			data_hash = JSON.parse(file)
+			# file = File.read(json_stats)
+			# data_hash = JSON.parse(file)
 
 			CSV.foreach(abundance, :headers=>true, :col_sep=>"\t") do |row|
 				gene = genes[row["target_id"]]
@@ -132,16 +133,16 @@ module KallistoHelper
 				if count % 1000 == 0
 					puts "Loaded #{count} ExpressionValues (#{row["target_id"]})" 
 					sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
-          			#puts sql
-          			conn.execute sql
-          			inserts = Array.new
-          		end
-          	end
-          	
-          	puts "Loaded #{count} ExpressionValue " 
-          	sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
-      		#puts sql
-      		conn.execute sql
+					#puts sql
+					conn.execute sql
+					inserts = Array.new
+				end
+			end
+			
+			puts "Loaded #{count} ExpressionValue " 
+			sql = "INSERT INTO expression_values (`experiment_id`,`gene_id`, `meta_experiment_id`, `type_of_value_id`, `value`,`created_at`, `updated_at`) VALUES #{inserts.join(", ")}"
+			#puts sql
+			conn.execute sql
 		end
 		
 	end

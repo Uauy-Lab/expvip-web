@@ -1,5 +1,5 @@
 module GenesHelper
-
+	
 	def self.get_random_genes(gene_set, count: 50)
 		random_genes = Gene.where(gene_set_id: gene_set.id).order("RAND()").limit(count)
 		example = {}
@@ -8,7 +8,7 @@ module GenesHelper
 		example[:heatmap] = random_genes.map { |e| e.gene }
 		example
 	end
-
+	
 	def self.get_example_genes(gene_set)
 		example = {}
 		example[:search]  = SampleGene.where(gene_set_id: gene_set.id, kind:'search')
@@ -23,13 +23,15 @@ module GenesHelper
 		example[:heatmap] = example[:heatmap].map { |e| e.gene.gene  }
 		example
 	end
-
+	
 	def self.find(gene)
+		raise "Mongo is deprecated"
 		@client = MongodbHelper.getConnection unless @client 
 		gene_mongo = @client[:genes].find({:_id => gene.id}).first
 		gene_mongo
 	end
 	def self.saveGene(gene)
+		raise "Mongo is deprecated"
 		@client = MongodbHelper.getConnection unless @client 
 		gene.save!
 		doc = { :name => gene.name } 
@@ -37,43 +39,45 @@ module GenesHelper
 			{ :_id => gene.id }, 
 			{ '$set' => doc}, 
 			upsert:true
-			)
+		)
 		
 	end
-
+	
 	def self.findTranscripts(gene_name, gene_set)
 		transcripts = Array.new
 		Gene.where("gene = :gene_name AND gene_set_id = :gene_set", 
 			{
 				gene_name: gene_name, 
 				gene_set: gene_set.id
-			}).each do |t|
+			}
+		).each do |t|
 			transcripts << t
 		end
 		transcripts
 	end
-
-
+	
+	
 	def self.saveValues(gene, type, values)		
 		@client = MongodbHelper.getConnection unless @client 
 		@client[:genes].update({ 
 			:_id => gene.id }, 
 			'$set' => { type => values 
-		})
+			}
+		)
 	end
-
+	
 	def self.load_gene_hash(gene_set)
-	  genes = Hash.new
-      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
-        genes[g.name] = g
-      end
-      genes
+		genes = Hash.new
+		Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}'").each do |g|  
+			genes[g.name] = g
+		end
+		genes
 	end
-
+	
 	def self.findGeneName(gene_name, gene_set)
-    gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)      
-    gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene     
-    raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene
-    return [gene,  gene_name == gene.gene ? "gene": "transcript" ]  
-  end
+		gene = Gene.find_by(:name=>gene_name, :gene_set_id=>gene_set.id)      
+		gene = Gene.find_by(:gene=>gene_name, :gene_set_id=>gene_set.id) unless  gene     
+		raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene
+		return [gene,  gene_name == gene.gene ? "gene": "transcript" ]  
+	end
 end
