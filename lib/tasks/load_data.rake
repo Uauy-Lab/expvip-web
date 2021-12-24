@@ -84,108 +84,24 @@ namespace :load_data do
   desc "Load the genes, from the ENSEMBL fasta file."
   task :ensembl_genes, [:gene_set, :filename] => :environment do |t, args|
     puts "Loading Ensembl genes"
-    ActiveRecord::Base.transaction do
-      gene_set = GeneSet.find_or_create_by(:name => args[:gene_set])
-      #puts gene_set.inspect
-      Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
-        ff.each do |entry|
-          arr = entry.definition.split(/ description:"(.*?)" *| /)
-          g = Gene.new
-          g.gene_set = gene_set
-          g.name = arr.shift
-          arr.each { |e| g.add_field(e) }
-          g.save!
-          #GenesHelper.saveGene(g)
-        end
-      end
-    end
+    GenesHelper.load_ensembl_genes(args[:gene_set], args[:filename])
   end
 
   desc "Load the genes, from a fasta file.  '=' is used on each field "
   task :gff_produced_genes, [:gene_set, :filename] => :environment do |t, args|
-    puts "Loading gff produced genes"
-    i = 0
-    ActiveRecord::Base.transaction do
-      gene_set = GeneSet.find_or_create_by(:name => args[:gene_set])
-      puts gene_set.inspect
-      Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
-        ff.each do |entry|
-          arr = entry.definition.split(/\s|\t/)
-          g = Gene.new
-          g.gene_set = gene_set
-          g.name = arr.shift
-          fields = Hash.new
-          arr.each do |e|
-            f = e.split("=")
-            fields[f[0]] = f[1]
-          end
-          g.transcript = g.name
-          g.gene = fields["gene"]
-          g.cdna = fields["biotype"]
-          g.save!
-          #GenesHelper.saveGene(g)
-          i += 1
-          puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
-        end
-      end
-    end
-    puts "Loaded #{i} genes"
+    GenesHelper.load_gff_produced_gens(args[:gene_set], args[:filename])
   end
 
   desc "Load the genes, from a de novo assembly. "
   task :de_novo_genes, [:gene_set, :filename] => :environment do |t, args|
-    puts "Loading genes"
-    ActiveRecord::Base.transaction do
-      gene_set = GeneSet.find_or_create_by(:name => args[:gene_set])
-
-      Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
-        ff.each do |entry|
-          arr = entry.definition.split(/ description:"(.*?)" *| /)
-          g = Gene.new
-          g.gene_set = gene_set
-          name = arr.shift
-          g.name = name
-          g.transcript = name
-          g.cdna = name
-          #GenesHelper.saveGene(g)
-          g.save!
-        end
-      end
-    end
+    GenesHelper.load_de_novo_genes(args[:gene_set], args[:filename])
   end
 
   desc "Load the genes, from the wheat pangenome project. The gene is parsed from the transcript name. "
   task :pangenome_cdna, [:gene_set, :filename] => :environment do |t, args|
     puts "Loading genes"
-    ActiveRecord::Base.transaction do
-      gene_set = GeneSet.find_or_create_by(:name => args[:gene_set])
-      stream = Zlib::GzipReader.open(args[:filename]) 
-      i=0
-      Bio::FlatFile.open(Bio::FastaFormat, stream) do |ff|
-        ff.each do |entry|
-          name = entry.entry_id
-          arr = entry.entry_id.split(".")
-          g = Gene.new
-          g.gene_set = gene_set
-          g.name = name
-          g.transcript = name
-          g.cdna = name
-          g.gene = arr[0]
-          g.save!
-          i += 1
-          puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
-          #puts g.inspect
-          #raise "Testing"
-        end
-      end
-    end
+    GenesHelper.load_pangenome_cdna(args[:gene_set], args[:filename])
   end
-
-  #def get_experiment(name)
-  #	@experiments[name] = Experiment.find_by(:accession=>name) unless @experiments[name]
-  #	return @experiments[name]
-  #end
-
 
   desc "Load homology in a pairwaise manner"
   task :homology_pairs, [:gene_set, :filename] => :environment do |t, args|

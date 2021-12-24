@@ -80,4 +80,94 @@ module GenesHelper
 		raise "\n\n\nGene not found: #{gene_name} for #{gene_set.name}\n\n\n" unless gene
 		return [gene,  gene_name == gene.gene ? "gene": "transcript" ]  
 	end
+
+	def self.load_ensembl_genes(gene_set, filename)
+		ActiveRecord::Base.transaction do
+			gene_set = GeneSet.find_or_create_by(:name => gene_set)
+			#puts gene_set.inspect
+			Bio::FlatFile.open(Bio::FastaFormat, filename) do |ff|
+			  ff.each do |entry|
+				arr = entry.definition.split(/ description:"(.*?)" *| /)
+				g = Gene.new
+				g.gene_set = gene_set
+				g.name = arr.shift
+				arr.each { |e| g.add_field(e) }
+				g.save!
+				#GenesHelper.saveGene(g)
+			  end
+			end
+		  end
+	end
+
+	def self.load_pangenome_cdna(gene_set, filename)
+		ActiveRecord::Base.transaction do
+			gene_set = GeneSet.find_or_create_by(:name => :gene_set)
+			stream = Zlib::GzipReader.open(:filename) 
+			i=0
+			Bio::FlatFile.open(Bio::FastaFormat, stream) do |ff|
+				ff.each do |entry|
+					name = entry.entry_id
+					arr = entry.entry_id.split(".")
+					g = Gene.new
+					g.gene_set = gene_set
+					g.name = name
+					g.transcript = name
+					g.cdna = name
+					g.gene = arr[0]
+					g.save!
+					i += 1
+					puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
+				end
+			end
+		end
+	end
+
+	def load_de_novo_genes(gene_set, filename)
+		puts "Loading genes"
+		ActiveRecord::Base.transaction do
+		gene_set = GeneSet.find_or_create_by(:name => :gene_set)
+
+		Bio::FlatFile.open(Bio::FastaFormat, :filename) do |ff|
+			ff.each do |entry|
+				arr = entry.definition.split(/ description:"(.*?)" *| /)
+				g = Gene.new
+				g.gene_set = gene_set
+				name = arr.shift
+				g.name = name
+				g.transcript = name
+				g.cdna = name
+				g.save!
+				end
+			end
+		end
+	end
+
+	def load_gff_produced_gens(gene_sets, filename)
+		puts "Loading gff produced genes"
+		i = 0
+		ActiveRecord::Base.transaction do
+		gene_set = GeneSet.find_or_create_by(:name => args[:gene_set])
+		puts gene_set.inspect
+		Bio::FlatFile.open(Bio::FastaFormat, args[:filename]) do |ff|
+			ff.each do |entry|
+				arr = entry.definition.split(/\s|\t/)
+				g = Gene.new
+				g.gene_set = gene_set
+				g.name = arr.shift
+				fields = Hash.new
+				arr.each do |e|
+					f = e.split("=")
+					fields[f[0]] = f[1]
+				end
+				g.transcript = g.name
+				g.gene = fields["gene"]
+				g.cdna = fields["biotype"]
+				g.save!
+				i += 1
+				puts "Loaded #{i} genes (#{g.transcript})" if i % 1000 == 0
+				end
+			end
+		end
+		puts "Loaded #{i} genes"
+	end
 end
