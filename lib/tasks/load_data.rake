@@ -105,33 +105,7 @@ namespace :load_data do
 
   desc "Load homology in a pairwaise manner"
   task :homology_pairs, [:gene_set, :filename] => :environment do |t, args|
-    puts args
-    ActiveRecord::Base::transaction do
-      gene_set = GeneSet.find_by(:name => args[:gene_set])
-      genes = Hash.new
-      Gene.find_by_sql("SELECT * FROM genes where gene_set_id='#{gene_set.id}' ORDER BY gene").each do |g|
-        genes[g.gene] = g unless genes[g.gene]
-      end
-      puts "Loaded #{genes.size} genes  in memory"
-      count = 0
-
-      CSV.foreach(args[:filename], :headers => true, :col_sep => "\t") do |row|
-        h = HomologyPair.new
-        h.homology = row["homology_id"].to_i
-        h.gene = genes[row["genes"]]
-        h.cigar = row["cigar_line"]
-        h.cigar = nil if row["cigar_line"] != nil and row["cigar_line"].length > 254
-        h.perc_cov = row["perc_cov"].to_f
-        h.perc_id = row["perc_id"].to_f
-        h.perc_pos = row["perc_pos"].to_f
-        h.save!
-        count += 1
-        if count % 10000 == 0
-          puts "Loaded #{count} Homologies (#{row["homology_id"]})"
-        end
-      end
-      puts "Loaded #{count} Homologies"
-    end
+    OrthologyHelper.load_homology_pairs(args[:gene_set], args[:filename])
   end
 
   desc "Load the values from a tsv file"

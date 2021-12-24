@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_22_120033) do
+ActiveRecord::Schema.define(version: 2021_12_24_150004) do
 
   create_table "ExperimentGroups_Factors", id: false, charset: "utf8mb3", force: :cascade do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -180,6 +180,7 @@ ActiveRecord::Schema.define(version: 2021_12_22_120033) do
 
   create_table "ortholog_groups", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "ortholog_set_id", null: false
+    t.string "name"
     t.index ["ortholog_set_id"], name: "index_ortholog_groups_on_ortholog_set_id"
   end
 
