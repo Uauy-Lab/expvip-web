@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_24_150004) do
+ActiveRecord::Schema.define(version: 2021_12_25_111141) do
 
   create_table "ExperimentGroups_Factors", id: false, charset: "utf8mb3", force: :cascade do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -135,8 +135,6 @@ ActiveRecord::Schema.define(version: 2021_12_24_150004) do
     t.string "possition"
     t.string "gene"
     t.string "transcript"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "gene_set_id"
     t.text "description"
     t.index ["gene"], name: "index_genes_on_gene"
@@ -157,8 +155,6 @@ ActiveRecord::Schema.define(version: 2021_12_24_150004) do
     t.decimal "perc_id", precision: 7, scale: 4
     t.decimal "perc_pos", precision: 7, scale: 4
     t.bigint "gene_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["gene_id"], name: "index_homology_pairs_on_gene_id"
     t.index ["homology"], name: "index_homology_pairs_on_homology"
   end
