@@ -124,45 +124,13 @@ class ExpressionValuesController < ApplicationController
   end
 
   def getValuesForTranscripts(transcripts_in_gene)
-    values = Hash.new { |hash, key| hash[key] = Hash.new { |h, k| h[k] = 0 } }
-    transcripts_in_gene.each do |t|
-      v_t = getValuesForTranscript(t)
-      v_t.each_pair do |type, h|
-        h.each_pair do |exp, val|
-          current = values[type][exp]
-          current = { :experiment => exp, :value => 0.0 } if current == 0
-          current[:value] += val[:value]
-          values[type][exp] = current
-        end
-      end
-    end
-    #removeInactiveValues values
-    values
+    ExpressionValuesHelper.getValuesForTranscripts(transcripts_in_gene)
   end
 
   def getValuesForTranscript(gene)
-    #TODO: Add code to validate for different experiments.
-    values = Hash.new
-    # client = MongodbHelper.getConnection
-    ExpressionValue.where("gene_id = :gene", { gene: gene.id }).each do |ev|
-      type_of_value = ev.type_of_value.name
-      values[type_of_value] = Hash.new unless values[type_of_value]
-      #tvh = values[type_of_value]
-      #exps = client[:experiments]
-      obj = ev.values
-      obj.each_pair { |k, val| values[type_of_value][k.to_s] = { experiment: k, value: val } unless k == "_id" }
-    end
-    removeInactiveValues values
-    return values
+    ExpressionValuesHelper.getValuesForTranscript(gene)
   end
 
-  def removeInactiveValues(values)
-    Experiment.joins(:study).where("studies.active = 0").each do |e|
-      values.keys.each do |k|
-        values[k].delete e.id.to_s
-      end
-    end
-  end
 
   def getDefaultOrder
     defOrder = DefaultFactorOrder.all
@@ -284,14 +252,11 @@ class ExpressionValuesController < ApplicationController
     ret = Hash.new
     values = Hash.new
     genes = []
-    useIDs = false
-
     genes = session[:genes]
     genes = genes.split(",")
     gene_set = GeneSet.find(session[:gene_set_id])
     genes.each do |g|
       gene, search_by = GenesHelper.findGeneName(g, gene_set)
-      #puts ""
       values[g] = search_by == "transcript" ?
         getValuesForTranscript(gene) :
         getValuesForTranscripts(GenesHelper.findTranscripts(g, gene_set))
