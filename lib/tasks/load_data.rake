@@ -105,7 +105,16 @@ namespace :load_data do
 
   desc "Load homology in a pairwaise manner"
   task :homology_pairs, [:gene_set, :filename] => :environment do |t, args|
+    puts args
     OrthologyHelper.load_homology_pairs(args[:gene_set], args[:filename])
+  end
+
+  desc "Load orthologs"
+  task :orthologs, [:orth_set, :filename] => :environment do |t, args|
+    puts args
+    Zlib::GzipReader.open(args[:filename]) do | stream|
+      OrthologyHelper.load_orthologs(args[:orth_set], stream)
+    end
   end
 
   desc "Load the values from a tsv file"
