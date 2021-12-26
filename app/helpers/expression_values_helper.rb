@@ -117,4 +117,19 @@ module ExpressionValuesHelper
 		end
 	end
 
+	def self.getValuesForHomologuesTranscripts(gene)
+		#TODO: This can go away, we should send the homologies from the client. 
+		values = Hash.new
+		values[gene.name] = getValuesForTranscript(gene)
+		HomologyPair.where("gene_id = :gene", { gene: gene.id }).each do |h|
+			hom = h.homology
+			HomologyPair.where("homology = :hom", { hom: hom }).each do |h2|
+				if h2.gene.gene_set_id == gene.gene_set_id
+				values[h2.gene.name] = getValuesForTranscript(h2.gene) unless h2.gene == gene
+				end
+			end
+		end
+		return values
+	end
+
 end

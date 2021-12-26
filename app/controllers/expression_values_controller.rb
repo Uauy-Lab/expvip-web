@@ -3,65 +3,6 @@ require "json"
 class ExpressionValuesController < ApplicationController
   before_action :set_expression_value, only: [:show, :edit, :update, :destroy]
 
-  # GET /expression_values
-  # GET /expression_values.json
-  def index
-    @expression_values = ExpressionValue.all
-  end
-
-  # GET /expression_values/1
-  # GET /expression_values/1.json
-  def show
-  end
-
-  # GET /expression_values/new
-  def new
-    @expression_value = ExpressionValue.new
-  end
-
-  # GET /expression_values/1/edit
-  def edit
-  end
-
-  # POST /expression_values
-  # POST /expression_values.json
-  def create
-    @expression_value = ExpressionValue.new(expression_value_params)
-
-    respond_to do |format|
-      if @expression_value.save
-        format.html { redirect_to @expression_value, notice: "Expression value was successfully created." }
-        format.json { render :show, status: :created, location: @expression_value }
-      else
-        format.html { render :new }
-        format.json { render json: @expression_value.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /expression_values/1
-  # PATCH/PUT /expression_values/1.json
-  def update
-    respond_to do |format|
-      if @expression_value.update(expression_value_params)
-        format.html { redirect_to @expression_value, notice: "Expression value was successfully updated." }
-        format.json { render :show, status: :ok, location: @expression_value }
-      else
-        format.html { render :edit }
-        format.json { render json: @expression_value.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /expression_values/1
-  # DELETE /expression_values/1.json
-  def destroy
-    @expression_value.destroy
-    respond_to do |format|
-      format.html { redirect_to expression_values_url, notice: "Expression value was successfully destroyed." }
-      format.json { head :no_content }
-    end
-  end
 
   def getFactorOrder
     factorOrder = Hash.new
@@ -99,30 +40,6 @@ class ExpressionValuesController < ApplicationController
     return [factorOrder, longFactorName, selectedFactors]
   end
 
-  def getExperimentGroups
-    experiments = Hash.new
-    groups = Hash.new
-    Experiment.find_each do |g|
-      group = Hash.new
-      next unless g.study.active
-      #Should we use description instead?
-      group["name"] = g.accession
-      group["description"] = g.accession
-      factors = Hash.new
-      g.factors.each { |f| factors[f.factor] = f.name } #TODO: This may be cached
-
-      experiments[g.id] = Hash.new
-      exp = experiments[g.id]
-      exp["name"] = g.accession
-      exp["group"] = g.id.to_s
-      factors["study"] = g.study.accession
-
-      group["factors"] = factors
-      groups[g.id] = group
-    end
-    return [experiments, groups]
-  end
-
   def getValuesForTranscripts(transcripts_in_gene)
     ExpressionValuesHelper.getValuesForTranscripts(transcripts_in_gene)
   end
@@ -142,19 +59,7 @@ class ExpressionValuesController < ApplicationController
     return df_hash.values
   end
 
-  def getValuesForHomologuesTranscripts(gene)
-    values = Hash.new
-    values[gene.name] = getValuesForTranscript(gene)
-    HomologyPair.where("gene_id = :gene", { gene: gene.id }).each do |h|
-      hom = h.homology
-      HomologyPair.where("homology = :hom", { hom: hom }).each do |h2|
-        if h2.gene.gene_set_id == gene.gene_set_id
-          values[h2.gene.name] = getValuesForTranscript(h2.gene) unless h2.gene == gene
-        end
-      end
-    end
-    return values
-  end
+  
 
   def getHomologueGenesForGene(transcripts_in_gene)
     ret = Set.new
@@ -233,7 +138,7 @@ class ExpressionValuesController < ApplicationController
       values = getValuesToCompareTranscipts(gene, compare)
       ret["compare"] = params["compare"]
     else
-      values = getValuesForHomologuesTranscripts(gene)
+      values = ExpressionValuesHelper.getValuesForHomologuesTranscripts(gene)
       gene_set_name = GeneSet.find(gene.gene_set_id).name
       add_triads(ret, gene_set_name, values.keys)
     end
@@ -283,14 +188,13 @@ class ExpressionValuesController < ApplicationController
       end
     end
     return defSelection
-
-end
+  end
 
   private
 
   def add_ret_values(ret, params)
     factorOrder, longFactorName, selectedFactors = getFactorOrder
-    experiments, groups = getExperimentGroups
+    experiments, groups =  ExperimentsHelper.getExperimentGroups
     params["studies"].each do |e|
       selectedFactors["study"][e] = true
     end if params["studies"] and params["studies"].respond_to?("each")
@@ -366,10 +270,10 @@ end
   # Allocating triads to their corresponding tern (and compare perc_cov with already existing triad allocated to its tern) which prepares data for ternary plot display
   def allocate_triad_to_tern(tern_key, terns, triad)
     if terns[tern_key].nil?
-      puts "\n#{tern_key} doesn't have any value\n"
+      # puts "\n#{tern_key} doesn't have any value\n"
       terns[tern_key] = triad
     else
-      puts "\n#{tern_key} already HAS a value\n"
+      # puts "\n#{tern_key} already HAS a value\n"
       first_triad = Gene.find_by name: terns[tern_key]
       first_homology_pair = HomologyPair.find_by gene_id: first_triad.id
       first_perc_cov = first_homology_pair.perc_cov
@@ -377,26 +281,17 @@ end
       second_homology_pair = HomologyPair.find_by gene_id: second_triad.id
       second_perc_cov = second_homology_pair.perc_cov
       if first_perc_cov < second_perc_cov
-        puts "\n\n\nsecond perc_cov:#{second_perc_cov} > first perc_cov:#{first_perc_cov}\n\n\n"
+        #puts "\n\n\nsecond perc_cov:#{second_perc_cov} > first perc_cov:#{first_perc_cov}\n\n\n"
         terns[tern_key] = triad
-      else
-        puts "\n\n\nsecond perc_cov:#{second_perc_cov} < first perc_cov:#{first_perc_cov}\n\n\n"
+      #else
+        #puts "\n\n\nsecond perc_cov:#{second_perc_cov} < first perc_cov:#{first_perc_cov}\n\n\n"
       end
     end
   end
-
-  # Use callbacks to share common setup or constraints between actions.
-  def set_expression_value
-    @expression_value = ExpressionValue.find(params[:id])
-  end
-
+  
   # Never trust parameters from the scary internet, only allow the white list through.
   def expression_value_params
-    params.require(:expression_value).permit(:compare,
-                                             :experiment_id,
-                                             :gene_id,
-                                             :meta_experiment_id,
-                                             :type_of_value_id,
-                                             :value)
+    params.require(:expression_value).permit(:compare, :experiment_id, :gene_id, 
+      :meta_experiment_id, :type_of_value_id, :value)
   end
 end
