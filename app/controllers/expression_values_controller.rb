@@ -5,39 +5,7 @@ class ExpressionValuesController < ApplicationController
 
 
   def getFactorOrder
-    factorOrder = Hash.new
-    longFactorName = Hash.new
-    selectedFactors = Hash.new
-
-    Study.find_each do |s|
-      next unless s.active
-      factorOrder["study"] = Hash.new unless factorOrder["study"]
-      longFactorName["study"] = Hash.new unless longFactorName["study"]
-      selectedFactors["study"] = Hash.new unless selectedFactors["study"]
-      order = factorOrder["study"]
-      longName = longFactorName["study"]
-      selected = selectedFactors["study"]
-
-      order[s.accession] = s.order
-      longName[s.accession] = s.title
-      longName[s.accession] = s.accession unless s.title
-      selected[s.accession] = true
-    end
-
-    Factor.find_each do |f|
-      factorOrder[f.factor] = Hash.new unless factorOrder[f.factor]
-      longFactorName[f.factor] = Hash.new unless longFactorName[f.factor]
-      selectedFactors[f.factor] = Hash.new unless selectedFactors[f.factor]
-
-      order = factorOrder[f.factor]
-      longName = longFactorName[f.factor]
-      selected = selectedFactors[f.factor]
-
-      order[f.name] = f.order
-      longName[f.name] = f.description
-      selected[f.name] = true
-    end
-    return [factorOrder, longFactorName, selectedFactors]
+    ExperimentsHelper.getFactorOrder
   end
 
   def getValuesForTranscripts(transcripts_in_gene)
@@ -50,16 +18,8 @@ class ExpressionValuesController < ApplicationController
 
 
   def getDefaultOrder
-    defOrder = DefaultFactorOrder.all
-    df_hash = {}
-    defOrder.each do |df|
-      df_hash[df.order] = df.name
-    end
-    df_hash = df_hash.sort.to_h
-    return df_hash.values
+    ExperimentsHelper.getDefaultOrder
   end
-
-  
 
   def getHomologueGenesForGene(transcripts_in_gene)
     ret = Set.new
@@ -150,10 +110,6 @@ class ExpressionValuesController < ApplicationController
   end
 
   def genes
-    old_logger = ActiveRecord::Base.logger
-    ActiveRecord::Base.logger.level = 1
-    Rails.logger.info "genes"
-    Rails.logger.info session[:genes]
     ret = Hash.new
     values = Hash.new
     genes = []
@@ -166,11 +122,8 @@ class ExpressionValuesController < ApplicationController
         getValuesForTranscript(gene) :
         getValuesForTranscripts(GenesHelper.findTranscripts(g, gene_set))
     end
-
     ret["values"] = values
     add_ret_values(ret, params)
-
-    ActiveRecord::Base.logger = old_logger
     respond_to do |format|
       format.json { render json: ret }
     end
@@ -224,28 +177,10 @@ class ExpressionValuesController < ApplicationController
     end
     ret["expression_bias_colors"] = {
       :"Azhurnaya" => [
-        "#377eb8",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#e41a1c",
+        "#377eb8", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#e41a1c"
       ],
       :"Chinese Spring" => [
-        "#377eb8",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#bdbdbd",
-        "#e41a1c",
+        "#377eb8", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#bdbdbd", "#e41a1c"
       ],
     }
     # Adding the tern (ternkey => gene name)
@@ -253,6 +188,7 @@ class ExpressionValuesController < ApplicationController
     triads.each do |triad|
       # Extracting the tern key from the gene name (for IWGSC2.26 & RefSeq tern key is always the letter after the 1st number and for TGACv1 it is the letter aftr the 3rd number)
       # Returns an array of all digits in the gene name
+      #TODO: Make this from the database. Use the position column in the gene. 
       first_number = triad.scan(/[[:digit:]]/)
       # Getting the index of the tern key
       if gene_set == "TGACv1"
@@ -288,7 +224,7 @@ class ExpressionValuesController < ApplicationController
       end
     end
   end
-  
+
   # Never trust parameters from the scary internet, only allow the white list through.
   def expression_value_params
     params.require(:expression_value).permit(:compare, :experiment_id, :gene_id, 

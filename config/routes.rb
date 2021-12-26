@@ -25,6 +25,8 @@ Rails.application.routes.draw do
   get 'expression_values/transcript' => 'expression_values#transcript'
   get 'expression_values/genes' => 'expression_values#genes'
 
+  get 'expression/:gene_set/gene/:name' => 'expression_values#gene_values'
+  get 'expression/:gene_set/transcript/:name' => 'expression_values#transcript_values'
   
 
   resources :gene_sets  do
