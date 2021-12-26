@@ -3,61 +3,17 @@ require "json"
 class ExpressionValuesController < ApplicationController
   before_action :set_expression_value, only: [:show, :edit, :update, :destroy]
 
-
-  def getFactorOrder
-    ExperimentsHelper.getFactorOrder
-  end
-
-  def getValuesForTranscripts(transcripts_in_gene)
-    ExpressionValuesHelper.getValuesForTranscripts(transcripts_in_gene)
-  end
-
-  def getValuesForTranscript(gene)
-    ExpressionValuesHelper.getValuesForTranscript(gene)
-  end
-
-
-  def getDefaultOrder
-    ExperimentsHelper.getDefaultOrder
-  end
-
-  def getHomologueGenesForGene(transcripts_in_gene)
-    ret = Set.new
-    transcripts_in_gene.each do |t|
-      HomologyPair.where("gene_id = :gene_id", { gene_id: t.id }).each do |h|
-        hom = h.homology
-        HomologyPair.where("homology = :hom", { hom: hom }).each do |h2|
-          if h2.gene.gene_set_id == t.gene_set_id
-            ret << h2.gene.gene unless h2.gene == t.gene
-          end
-        end
-      end
-    end
-    ret
-  end
-
-  def getValuesForHomologueGenes(gene_name, transcripts, gene_set)
-    values = Hash.new
-    values[gene_name] = getValuesForTranscripts(transcripts)
-    homs = getHomologueGenesForGene transcripts
-    puts homs.inspect
-    homs.each do |e|
-      values[e] = getValuesForTranscripts(GenesHelper.findTranscripts(e, gene_set))
-    end
-    return values
-  end
-
   def getValuesToCompareTranscipts(gene, compare)
     values = Hash.new
-    values[gene.name] = getValuesForTranscript(gene)
-    values[compare.name] = getValuesForTranscript(compare)
+    values[gene.name]    = ExpressionValuesHelper.getValuesForTranscript(gene)
+    values[compare.name] = ExpressionValuesHelper.getValuesForTranscript(compare)
     return values
   end
 
   def getValuesToCompareGene(gene_name, compare_name, gene, compare)
     values = Hash.new
-    values[gene_name] = getValuesForTranscripts(gene)
-    values[compare_name] = getValuesForTranscripts(compare)
+    values[gene_name]    = ExpressionValuesHelper.getValuesForTranscripts(gene)
+    values[compare_name] = ExpressionValuesHelper.getValuesForTranscripts(compare)
     return values
   end
 
@@ -73,10 +29,10 @@ class ExpressionValuesController < ApplicationController
     ret["gene"] = gene_name
     values = Hash.new
     if compare.size > 0
-      values = getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
+      values = HomologyHelper.getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
       ret["compare"] = compare_name
     else
-      values = getValuesForHomologueGenes(gene_name, transcripts, gene_set)
+      values = HomologyHelper.getValuesForHomologueGenes(gene_name, transcripts, gene_set)
       add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
@@ -119,8 +75,8 @@ class ExpressionValuesController < ApplicationController
     genes.each do |g|
       gene, search_by = GenesHelper.findGeneName(g, gene_set)
       values[g] = search_by == "transcript" ?
-        getValuesForTranscript(gene) :
-        getValuesForTranscripts(GenesHelper.findTranscripts(g, gene_set))
+      ExpressionValuesHelper.getValuesForTranscript(gene) :
+      ExpressionValuesHelper.getValuesForTranscripts(GenesHelper.findTranscripts(g, gene_set))
     end
     ret["values"] = values
     add_ret_values(ret, params)
@@ -146,7 +102,7 @@ class ExpressionValuesController < ApplicationController
   private
 
   def add_ret_values(ret, params)
-    factorOrder, longFactorName, selectedFactors = getFactorOrder
+    factorOrder, longFactorName, selectedFactors = ExperimentsHelper.getFactorOrder
     experiments, groups =  ExperimentsHelper.getExperimentGroups
     params["studies"].each do |e|
       selectedFactors["study"][e] = true
@@ -157,7 +113,7 @@ class ExpressionValuesController < ApplicationController
 
     ret["selectedFactors"] = selectedFactors
     ret["defaultFactorSelection"] = getDefaultSelection
-    ret["defaultFactorOrder"] = getDefaultOrder
+    ret["defaultFactorOrder"] = ExperimentsHelper.getDefaultOrder
 
     ret["experiments"] = experiments
     ret["groups"] = groups
