@@ -42,6 +42,33 @@ class ExpressionValuesController < ApplicationController
     end
   end
 
+  def gene_values
+    ret = Hash.new
+    gene_name = params["name"]
+    gene_set_name = params["gene_set"]
+    gene_set = GeneSet.find_by name: gene_set_name
+    transcripts = GenesHelper.findTranscripts(gene_name, gene_set)
+    ret["gene_set"] = gene_set 
+    ret["name"]     = gene_name
+    ret["values"] = ExpressionValuesHelper.getValuesForTranscripts(transcripts)
+    respond_to do |format|
+      format.json {render json: ret, format: :json}
+    end
+  end
+
+  def transcript_values
+    ret = Hash.new
+    gene_set   = GeneSet.find_by name: params["gene_set"]
+    trasncript = Gene.find_by name: params["name"], gene_set: gene_set
+    values = ExpressionValuesHelper.getValuesForTranscript(trasncript)
+    ret["gene_set"] = gene_set 
+    ret["name"]     = params["name"]
+    ret["values"]   = values
+    respond_to do |format|
+      format.json {render json: ret, format: :json}
+    end
+  end
+
   def transcript
     ret = Hash.new
     puts params.inspect
@@ -55,7 +82,7 @@ class ExpressionValuesController < ApplicationController
       ret["compare"] = params["compare"]
     else
       values = ExpressionValuesHelper.getValuesForHomologuesTranscripts(gene)
-      gene_set_name = GeneSet.find(gene.gene_set_id).name
+      gene_set_name = gene_set.name
       add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values

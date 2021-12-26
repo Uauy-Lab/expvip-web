@@ -23,8 +23,9 @@ module ExperimentsHelper
 	end
 
 	def self.getExperimentGroups 
-		experiments = Hash.new
-		groups = Hash.new
+		return [@@experiments, @@groups] if defined? @@experiments
+		@@experiments = Hash.new
+		@@groups = Hash.new
 		Experiment.find_each do |g|
 			group = Hash.new
 			next unless g.study.active
@@ -34,16 +35,16 @@ module ExperimentsHelper
 			factors = Hash.new
 			g.factors.each { |f| factors[f.factor] = f.name } #TODO: This may be cached
 
-			experiments[g.id] = Hash.new
-			exp = experiments[g.id]
+			@@experiments[g.id] = Hash.new
+			exp = @@experiments[g.id]
 			exp["name"] = g.accession
 			exp["group"] = g.id.to_s
 			factors["study"] = g.study.accession
 
 			group["factors"] = factors
-			groups[g.id] = group
-			end
-		return [experiments, groups]
+			@@groups[g.id] = group
+		end
+		return [@@experiments, @@groups]
 	end
 
 	def self.getFactorOrder
