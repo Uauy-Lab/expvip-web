@@ -41,14 +41,16 @@ var $ = jQuery;
 // load everything
 
 var exts = require('./d3Extensions.js');
-var dataContainer = require( './dataContainer.js' );
+// var dataContainer = require( './dataContainer.js' );
 var barPlot = require('./barPlot.js');
 var ternaryPlot = require('./ternaryPlot.js');
 var heatmap = require('./heatmap.js');
-require('string.prototype.startswith');
-// require("jquery-ui-browserify");
+// var expressionValues = require("./expressionValues.ts");
 
-//qvar stats = require('stats-lite');
+import ExpressionData from "./dataContainer"
+import GeneralControls from "./generalControls"
+require('string.prototype.startswith');
+
 /*
  * expression-bar
  * https://github.com/homonecloco/expression-bar
@@ -57,23 +59,9 @@ require('string.prototype.startswith');
  * Licensed under the MIT license.
  */
 
-/**
-@class expressionbar
-*/
-
-/**
- * Private Methods
- */
-
-/*
- * Public Methods
- */
-
-
-
-
 // The constructor for the creating the chart
 export const ExpressionBar = function (options) {
+  
   // try{
     this.setDefaultOptions();    
     jQuery.extend(this.opt, options);
@@ -98,7 +86,7 @@ ExpressionBar.prototype._setUserDefaultValues = function (){
     this.opt.defaultGroupBy = this.opt.groupBy;
     this.opt.defaultRenderProperty = this.opt.renderProperty;
     this.opt.calculateLog = this.opt.defaultLog2State;
-    this._storeValue('calculateLog',this.opt.calculateLog);
+    this.storeValue('calculateLog',this.opt.calculateLog);
     this.opt.showTernaryPlot = false;
 };
 
@@ -107,7 +95,7 @@ ExpressionBar.prototype._restoreUserDefaults = function(){
   this.opt.renderProperty = this.opt.defaultRenderProperty;
   this.opt.selectedFactors = this.data.selectedFactors;
   this.opt.calculateLog = this.opt.defaultLog2State;
-  this._storeValue('calculateLog',this.opt.calculateLog);
+  this.storeValue('calculateLog',this.opt.calculateLog);
   this.opt.showTernaryPlot = false;
   this.opt.showHomoeologues = false;
 
@@ -353,7 +341,7 @@ ExpressionBar.prototype.setupContainer = function(){
    on('change', function(evt) {
     self.opt.calculateLog = this.checked;
     self.refresh();
-    self._storeValue('calculateLog',this.checked);
+    self.storeValue('calculateLog',this.checked);
   });
 
 
@@ -362,7 +350,7 @@ ExpressionBar.prototype.setupContainer = function(){
 
     if(self.opt.showTernaryPlot){
       $(`#${self.opt.target}_showTernaryPlot`).prop('checked', false);
-      self._storeValue('showTernaryPlot',false);
+      self.storeValue('showTernaryPlot',false);
       self.opt.showTernaryPlot = false;      
       self.opt.plot = "Bar";
     }    
@@ -372,7 +360,7 @@ ExpressionBar.prototype.setupContainer = function(){
       self.refresh();
     }
 
-    self._storeValue('showHomoeologues',this.checked);
+    self.storeValue('showHomoeologues',this.checked);
     self.refreshSVG();
   });
 
@@ -381,7 +369,7 @@ ExpressionBar.prototype.setupContainer = function(){
     .on('change', function(evt){
 
       $( '#' + self.opt.target + '_showHomoeologues' ).prop('checked', false);
-      self._storeValue('showHomoeologues',false);
+      self.storeValue('showHomoeologues',false);
       
       self.opt.showTernaryPlot = this.checked;
       if(self.opt.showTernaryPlot){
@@ -396,7 +384,7 @@ ExpressionBar.prototype.setupContainer = function(){
         self.refresh();
       }      
 
-      self._storeValue('showTernaryPlot',this.checked);
+      self.storeValue('showTernaryPlot',this.checked);
       self.refreshSVG();
   });    
 
@@ -499,7 +487,7 @@ ExpressionBar.prototype.updateGroupBy = function(self) {
   }
   if(ret){
     //sessionStorage.setItem( this.opt.target + 'groupBy' , self.opt.groupBy);
-    this._storeValue('groupBy', self.opt.groupBy);
+    this.storeValue('groupBy', self.opt.groupBy);
   }
 
 
@@ -508,7 +496,7 @@ ExpressionBar.prototype.updateGroupBy = function(self) {
 
 ExpressionBar.prototype.setDefaultExpressionValue = function(){
   var def = this.data.getDefaultProperty();
-  this._storeValue('renderProperty', def);
+  this.storeValue('renderProperty', def);
   this.restoreDisplayOptions();
 
 };
@@ -532,9 +520,9 @@ ExpressionBar.prototype.createInitialSessionStorage = function(){
   // var thisChart = this;
   var self = this;
   d3.json(this.opt.data).then(function(json) {
-    self.data = new dataContainer.ExpressionData(json, self.opt);
-    self._storeValue('selectedFactors', self.data.selectedFactors);
-    self._storeValue('groupBy', self.opt.groupBy);
+    self.data = new ExpressionData(json, self.opt);
+    self.storeValue('selectedFactors', self.data.selectedFactors);
+    self.storeValue('groupBy', self.opt.groupBy);
     self.updateGroupBy(self);
     self.refresh();
   }).catch(error => console.warn(error));
@@ -555,7 +543,7 @@ ExpressionBar.prototype._updateFilteredFactors = function(sortDivId){
     var value = src.data('value');
     self.data.selectedFactors[factor][value] = this.checked;
   });
-  this._storeValue('selectedFactors', this.data.selectedFactors);
+  this.storeValue('selectedFactors', this.data.selectedFactors);
   this.refreshSVGEnabled = true;
 
 };
@@ -576,7 +564,7 @@ ExpressionBar.prototype.toggleFactorCheckbox = function(shbtn){
 };
 
 
-ExpressionBar.prototype._storeValue = function(key, value){
+ExpressionBar.prototype.storeValue = function(key, value){
   var val = JSON.stringify(value);
   sessionStorage.setItem(this.opt.target + "_" + key, val);
 };
@@ -846,8 +834,8 @@ ExpressionBar.prototype._refershSortedOrder = function(factor){
   }
   );
   this.data.addSortPriority(factor, false);
-  this._storeValue('sortOrder', this.data.sortOrder);
-  this._storeValue('renderedOrder', this.renderedOrder);
+  this.storeValue('sortOrder', this.data.sortOrder);
+  this.storeValue('renderedOrder', this.renderedOrder);
 
   this.data.sortRenderedGroups(this.data.sortOrder, this.renderedOrder);
   this.setFactorColor(factor);
@@ -910,7 +898,7 @@ ExpressionBar.prototype.renderPropertySelector = function(){
   this.propertySelector.val(this.opt.renderProperty);
   this.propertySelector.on('change', function(event) {
    self.opt.renderProperty  = self.propertySelector.find(':selected').text();      
-   self._storeValue('renderProperty', self.opt.renderProperty);
+   self.storeValue('renderProperty', self.opt.renderProperty);
    self.refresh();
   });
 
@@ -1170,10 +1158,10 @@ ExpressionBar.prototype.loadExpression = function(url) {
   self.pb.show();
   var json_promise = d3.json(url);
   json_promise.then(function(json) {      
-      try{
+      // try{
 
-      self.data = new dataContainer.ExpressionData(json, self.opt);
-
+      self.data = new ExpressionData(json, self.opt);
+      self.general_controls = new GeneralControls(self, self.data);
       if(typeof self.data.compare === 'undefined'){
         self.data.compare = '';
       }      
@@ -1181,21 +1169,21 @@ ExpressionBar.prototype.loadExpression = function(url) {
       if(typeof sessionStorage.bar_expression_viewer_selectedFactors === 'undefined'){
         self.createInitialSessionStorage();
       }
-
+      self.general_controls.toggleHomologueButtons();
+      self.general_controls.toggleTernButtons();
+      console.log(json);
 			// If the data provided of the key "tern" and it's a 3 homoeolougy gene, add the ternary plot option checkbox			
-      if(typeof json.tern !== 'undefined'){
-        self._hasTernKey(json.values, json.tern);
-      } else {
-        self._storeValue('showTernaryPlot',false);
-      }
+      //  self._hasTernKey();
+             
     
-      } catch(err){
-        alert ('Data couldn\'t be loaded');
-        console.error(err);
-        if(typeof $(`#bar_expression_viewer-progressbar`) !== 'undefined'){
-          $(`#bar_expression_viewer-progressbar`).hide();
-        }
-			}
+    
+      // } catch(err){
+      //   alert ('Data couldn\'t be loaded');
+      //   console.error(err);
+      //   if(typeof $(`#bar_expression_viewer-progressbar`) !== 'undefined'){
+      //     $(`#bar_expression_viewer-progressbar`).hide();
+      //   }
+			// }
 			
 			self.pb.hide();
       self.dataLoaded();
@@ -1401,7 +1389,7 @@ ExpressionBar.prototype.renderTitles = function(){
   var arr = this.data.renderedData[0];
   var titleSetOffset = this.getTitleSetOffset();
   var factorWidth = this.opt.groupBarWidth - 2;
-  for(i in arr){
+  for(let i in arr){
 
     var pos = arr[i].renderIndex ;
     this.titleGroup.append('text')
@@ -1433,7 +1421,7 @@ ExpressionBar.prototype.renderTitles = function(){
         rect.on('mouseenter', function(){self.showTooltip(tooltip, this, this.tooltip, this.tooltipBox, false)})
         .on('click', function(){
           self.data.addSortPriority(key, false);
-          self._storeValue('sortOrder', self.data.sortOrder);
+          self.storeValue('sortOrder', self.data.sortOrder);
           self.data.sortRenderedGroups();
           self.setFactorColor(key);
           self.refresh();
@@ -1453,7 +1441,7 @@ ExpressionBar.prototype.renderTitles = function(){
 
 ExpressionBar.prototype.setFactorColor = function(factor){
   this.opt.colorFactor = factor;
-  this._storeValue('colorFactor', factor);
+  this.storeValue('colorFactor', factor);
 };
 
 ExpressionBar.prototype.renderTooltip = function(){
@@ -1808,31 +1796,38 @@ ExpressionBar.prototype.resizeChart =  function(newHeight){
   this.setupSVG();
   this.refreshSVG();
 }
-
-ExpressionBar.prototype._hasTernKey = function(values, tern){
-
-  // If there is no homoeologues
-  if(Object.keys(values).length == 1){
-
-    $(`#${this.opt.target}_homSpan`).hide('fast');
-    $(`#${this.opt.target}_ternSpan`).html("");
-    this._storeValue('showTernaryPlot',false);
-    this._storeValue('showHomoeologues',false);
-
-  } else {  // If there is homoeologues
-
-    $(`#${this.opt.target}_homSpan`).css('display', 'initial');
-    $(`#${this.opt.target}_ternSpan`).css('display', 'initial');
-
-    if(Object.keys(tern).length === 3){
-      $(`#${this.opt.target}_ternSpan`).css('display', 'initial');
-    } else {
-      $(`#${this.opt.target}_ternSpan`).html("No homologies for ternary plot").css('display', 'initial').css('color', 'red');
-      this._storeValue('showTernaryPlot',false);
-    }
+Object.defineProperty(ExpressionBar.prototype, "target", {
+  get: function target() {
+      return this.opt.target;
   }
+});
 
-}
+// ExpressionBar.prototype._hasTernKey = function(){
+//   console.log("About to render tern buttons");
+//   console.log(this.data);
+//   // If there is no homoeologues
+//   if(!this.data.hasHomologues){
+//     console.log("No Homs");
+//     $(`#${this.opt.target}_homSpan`).hide('fast');
+//     $(`#${this.opt.target}_ternSpan`).html("");
+//     this.storeValue('showTernaryPlot',false);
+//     this.storeValue('showHomoeologues',false);
+
+//   } else {  // If there is homoeologues
+//     console.log("Has Homs");
+//     $(`#${this.opt.target}_homSpan`).css('display', 'initial');
+//     $(`#${this.opt.target}_ternSpan`).css('display', 'initial');
+
+//     if(this.data.hasTern ){
+//       console.log("Has tern");
+//       $(`#${this.opt.target}_ternSpan`).css('display', 'initial');
+//     } else {
+//       $(`#${this.opt.target}_ternSpan`).html("No homologies for ternary plot").css('display', 'initial').css('color', 'red');
+//       this.storeValue('showTernaryPlot',false);
+//     }
+//   }
+
+// }
 
 var heatmap = require( "./heatmap.js" );
 

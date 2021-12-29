@@ -27,15 +27,27 @@ class ExpressionValuesController < ApplicationController
     transcripts = GenesHelper.findTranscripts(gene_name, gene_set)
     compare = GenesHelper.findTranscripts(compare_name, gene_set) if compare_name
     ret["gene"] = gene_name
+    ret["gene_set"] = params["gene_set"]
+    ret["paths"]  = {
+      params["name"] => path_for("gene",gene_name,gene_set_name)
+    }
+    ret["homologues"] = Array.new
     values = Hash.new
     if compare.size > 0
       values = HomologyHelper.getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
+      ret["paths"][compare_name] = path_for("gene",compare_name,gene_set_name)
       ret["compare"] = compare_name
     else
+      HomologyHelper.getHomologueGenesForGene(transcripts).each do |g|  
+        ret["paths"][g] = path_for("gene",g,gene_set_name)
+        ret["homologues"] << g 
+      end
       values = HomologyHelper.getValuesForHomologueGenes(gene_name, transcripts, gene_set)
       add_triads(ret, gene_set_name, values.keys)
     end
     ret["values"] = values
+    
+
     add_ret_values(ret, params)
     respond_to do |format|
       format.json { render json: ret, format: :json }
@@ -127,6 +139,10 @@ class ExpressionValuesController < ApplicationController
   end
 
   private
+
+  def path_for(type, name, gene_set)
+    "../expression/#{gene_set}/#{type}/#{name}"
+  end
 
   def add_ret_values(ret, params)
     factorOrder, longFactorName, selectedFactors = ExperimentsHelper.getFactorOrder

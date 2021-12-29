@@ -2,8 +2,9 @@
 var science = require('science');
 var colorbrewer = require('colorbrewer');
 require('string.prototype.startswith');
-
-class ExpressionData{
+//  require("./expressionValues")
+import ExpressionValues from "./expressionValues"
+ class ExpressionData{
 	constructor(data, options) {
 		for (var attrname in data) {
 			if (attrname == 'values'){
@@ -25,7 +26,7 @@ class ExpressionData{
 		var firstVals = this.values[keys[0]];
 		return Object.keys(firstVals);
 	}
-	
+
 	mean(data){
 		
 		var values = Object.keys(data).map(function(val) {
@@ -34,12 +35,10 @@ class ExpressionData{
 
 		values = values.sort();
 		var toRemove = values.length * 0.1;
-
 		values.splice(0, toRemove);
 		values.splice(-1 * toRemove);
-
 		return science.stats.mean(values);
-	};
+	}
 
 	log2(val){
 		var newVal = val;
@@ -107,7 +106,7 @@ class ExpressionData{
 
 
 
-	prepareColorsForFactors(){
+	prepareColorsForFactors(){//TODO: this should go somewher in the rendering, not in the data. 
 	//this.factorColors = Map.new();
 	this.totalColors = 8;
 	var self = this;
@@ -456,24 +455,13 @@ class ExpressionData{
 		var arrOffset = 0;
 		for(var i in groupBy) {
 			var grpby = groupBy[i];
-
-			// TODO: This is a patch.
-			// We should have a list of elements that we don't
-			// want to display
-			// if(grpby === 'study'){
-			// 	arrOffset ++;
-			// 	continue;
-			// }
-
 			var currFact = factorNames[grpby];
-
 			var currShort =  o.factors[groupBy[i]]; 
 			if(typeof currShort === 'undefined' ){
 				console.error(groupBy[i] + ' is not present in ' + o.factors );
 				console.error(o.factors);
 			}
 			var currLong = currFact[currShort];
-
 			factorArray[i - arrOffset ] = currLong;
 			if(numOfFactors > 4 || currLong.length > 20 ){
 				factorArray[i - arrOffset ] = currShort;
@@ -520,14 +508,14 @@ class ExpressionData{
 	};
 
 	_equals(factorA, factorB){
-		for(a in factorA){		
+		for(let a in factorA){		
 			if(factorA[a] != factorB[a]){
 				return false
 			}
 		}
 		//We test in both sides, to make sure to compare all the 
 		//possible entries in both objects. 
-		for(a in factorB){
+		for(let a in factorB){
 			if(factorA[a] != factorB[a]){
 				return false
 			}
@@ -536,7 +524,7 @@ class ExpressionData{
 	};
 
 	_arrayContains(array, object){
-		for(i in array){
+		for(let i in array){
 			if(this._equals(array[i], object)){
 				return i;
 			}
@@ -550,7 +538,7 @@ class ExpressionData{
 		for( var i in dataArray){
 			var gene = dataArray[i];
 			for(var j in gene){
-				factors = dataArray[i][j].factors
+				var factors = dataArray[i][j].factors
 				if(this._arrayContains(allFactors, factors) == -1){
 					allFactors.push(factors);
 				}
@@ -627,7 +615,7 @@ class ExpressionData{
 		}
 	};
 
-	_sortGeneOrder (key, value){
+	_sortGeneOrder (key, value){ //TODO: This method shouldn't be needed. 
 		var geneOrder = {};
 		var gene;
 		if(typeof this.tern !== 'undefined' && !$.isEmptyObject(this.tern)){
@@ -642,8 +630,32 @@ class ExpressionData{
 			return value;	
 		}
 	}
+
+	get hasTern(){
+		return "tern" in this && Object.keys(this.tern).length === 3;
+	}
+
+	get hasHomologues(){
+		return "homologues" in this && this.homologues.length > 0
+	}
+
+	// get values(){
+	// 	if(this.#values != null){
+	// 		return this.#values;
+	// 	}
+	// 	console.log("We will load them")
+	// 	this.#values = new Map();
+	// 	Object.keys(this.paths).forEach(k => {
+	// 		this.#values.set(k, this.#expressionValues.values();
+	// 	})
+	// 	console.log("Loaded");
+	// 	console.log(this.#values);
+	// 	return this.#values;
+	// 	//TODO: This is an eager load. it may be better to find a way to make this lazy, but values is very tightly integrated to the object
+	// 	// throw("We need to fix this!");
+	// }
 }
 
 
-//require('biojs-events').mixin(ExpressionData.prototype);
-module.exports.ExpressionData = ExpressionData;
+// module.exports.ExpressionData = ExpressionData;
+export default ExpressionData;

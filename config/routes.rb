@@ -28,11 +28,11 @@ Rails.application.routes.draw do
   get 'expression/:gene_set/gene/:name',
     to: 'expression_values#gene_values',
     defaults: {format: 'json'},
-    constraints: {name: /.*/}
+    constraints: {name: /.*/, gene_set: /.*/}
   get 'expression/:gene_set/transcript/:name', 
     to: 'expression_values#transcript_values',
     defaults: {format: 'json'},
-    constraints: {name: /.*/}
+    constraints: {name: /.*/, gene_set: /.*/}
   
 
   resources :gene_sets  do
