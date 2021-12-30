@@ -52,12 +52,12 @@ import ExpressionValues from "./expressionValues"
 
 	calculateLog2(){
 		
-		for(g in this.renderedData){
-			for(v in this.renderedData[g]){
+		for(let g in this.renderedData){
+			for(let v in this.renderedData[g]){
 				var toTransform = this.renderedData[g][v];
 				toTransform.stdev = this.log2(toTransform.stdev );
 				toTransform.value = this.log2(toTransform.value );
-				for(d in toTransform.data){
+				for(let d in toTransform.data){
 					toTransform.data[d] = this.log2(toTransform.data[d]);
 				}
 			}

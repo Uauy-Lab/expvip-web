@@ -18,4 +18,8 @@ class Gene < ActiveRecord::Base
 	def to_s
 		name
 	end
+
+	def full_gene_name
+		"#{gene_set.name}:#{gene}"
+	end
 end

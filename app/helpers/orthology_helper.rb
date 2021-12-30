@@ -69,4 +69,32 @@ module OrthologyHelper
 			os.save!
 		end
 	end
+
+	def self.getOrthologueValuesForGene(transcripts, ret)
+		ret["ortholog_groups"] = Hash.new {|h,k| h[k] = Hash.new }
+		genes_to_find = Hash.new
+		transcripts.each do |t|  
+			t.ortholog_groups.each do |og|
+				puts "#######"
+				puts og.inspect
+				ogs = og.ortholog_set 
+				ret["ortholog_groups"][ogs.name][og.name] = Array.new 
+				og.genes.each do |g|
+					puts g.inspect
+					ret["ortholog_groups"][ogs.name][og.name] << {
+						"gene": g.gene, 
+						"gene_set":  g.gene_set.name, 
+						"full_name": g.full_gene_name}
+					genes_to_find[g.full_gene_name] = g
+				end
+			end
+		end
+
+		genes_to_find.each_pair do |k, g|
+			transcripts = GenesHelper.findTranscripts(g.gene, g.gene_set)
+			ret["values"][k] = ExpressionValuesHelper.getValuesForTranscripts(transcripts)
+		end
+
+	end
+
 end

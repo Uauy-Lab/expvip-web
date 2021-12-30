@@ -14,15 +14,13 @@ module HomologyHelper
 		ret
 	end
 
-	def self.getValuesForHomologueGenes(gene_name, transcripts, gene_set)
-		values = Hash.new
-		values[gene_name] = ExpressionValuesHelper.getValuesForTranscripts(transcripts)
+	def self.getValuesForHomologueGenes(transcripts, gene_set, ret)
+		gene_name = ret["gene"]
+		ret["values"][gene_name] = ExpressionValuesHelper.getValuesForTranscripts(transcripts)
 		homs = getHomologueGenesForGene(transcripts)
-		puts homs.inspect
 		homs.each do |e|
-			values[e] = ExpressionValuesHelper.getValuesForTranscripts(GenesHelper.findTranscripts(e, gene_set))
+			ret["values"][e] = ExpressionValuesHelper.getValuesForTranscripts(GenesHelper.findTranscripts(e, gene_set))
 		end
-		return values
 	end
 
 

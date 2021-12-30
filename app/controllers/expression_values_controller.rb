@@ -10,11 +10,21 @@ class ExpressionValuesController < ApplicationController
     return values
   end
 
-  def getValuesToCompareGene(gene_name, compare_name, gene, compare)
-    values = Hash.new
-    values[gene_name]    = ExpressionValuesHelper.getValuesForTranscripts(gene)
-    values[compare_name] = ExpressionValuesHelper.getValuesForTranscripts(compare)
-    return values
+
+  def getValuesToCompareGene(compare_name, gene_set, ret)
+    return unless compare_name
+    compare = GenesHelper.findTranscripts(compare_name, gene_set)
+    if compare.size > 0
+      ret["values"][compare_name] = ExpressionValuesHelper.getValuesForTranscripts(compare)
+      ret["compare"] = compare_name
+    end
+  end
+
+  def getHomologuesForGene(transcripts,gene_set,  ret)
+    HomologyHelper.getHomologueGenesForGene(transcripts).each do |g|  
+      ret["homologues"] << g 
+    end
+    HomologyHelper.getValuesForHomologueGenes(transcripts, gene_set, ret)
   end
 
   def gene
@@ -25,29 +35,16 @@ class ExpressionValuesController < ApplicationController
     gene_set = GeneSet.find_by name: gene_set_name
 
     transcripts = GenesHelper.findTranscripts(gene_name, gene_set)
-    compare = GenesHelper.findTranscripts(compare_name, gene_set) if compare_name
+    
     ret["gene"] = gene_name
     ret["gene_set"] = params["gene_set"]
-    ret["paths"]  = {
-      params["name"] => path_for("gene",gene_name,gene_set_name)
-    }
     ret["homologues"] = Array.new
-    values = Hash.new
-    if compare.size > 0
-      values = HomologyHelper.getValuesToCompareGene(gene_name, compare_name, transcripts, compare)
-      ret["paths"][compare_name] = path_for("gene",compare_name,gene_set_name)
-      ret["compare"] = compare_name
-    else
-      HomologyHelper.getHomologueGenesForGene(transcripts).each do |g|  
-        ret["paths"][g] = path_for("gene",g,gene_set_name)
-        ret["homologues"] << g 
-      end
-      values = HomologyHelper.getValuesForHomologueGenes(gene_name, transcripts, gene_set)
-      add_triads(ret, gene_set_name, values.keys)
-    end
-    ret["values"] = values
-    
-
+    ret["values"] = Hash.new
+    ret["values"][gene_name]    = ExpressionValuesHelper.getValuesForTranscripts(transcripts)
+    getValuesToCompareGene(compare_name,gene_set, ret)
+    getHomologuesForGene(transcripts, gene_set, ret)
+    add_triads(ret, gene_set_name)
+    OrthologyHelper.getOrthologueValuesForGene(transcripts, ret)
     add_ret_values(ret, params)
     respond_to do |format|
       format.json { render json: ret, format: :json }
@@ -163,8 +160,9 @@ class ExpressionValuesController < ApplicationController
   end
 
   # Adding the tern_order and tern values (triads) to the data which enables the ternary plot to be displayed
-  def add_triads(ret, gene_set, triads)
-
+  # TODO: This seems very patchy
+  def add_triads(ret, gene_set)
+    triads = ret["values"].keys
     # Adding the tern order
     ret["tern_order"] = ["A", "D", "B"]
     ret["tooltip_order"] = ["A", "B", "D"]
