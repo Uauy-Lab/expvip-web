@@ -21,31 +21,12 @@ require("jquery-ui/ui/widgets/slider");
 require("jquery-ui/ui/widgets/progressbar");
 require("jquery-ui/ui/widgets/sortable");
 
-
-// var jQuery = require(["jquery", "jquery-ui"]);
-
-
-
-
-//var jQuery = require("jquery");
-console.log(jQuery.value)
-// var jqueryui = require("jquery-ui");
-// var jQuery = require('jquery');
 var $ = jQuery;
-// console.log($);
-// console.log("Sliiider");
-// console.log(sld)
-//require('jquery-ui');
-// require('jquery/tooltip')
-// console.log("tooltip");
-// load everything
 
 var exts = require('./d3Extensions.js');
-// var dataContainer = require( './dataContainer.js' );
 var barPlot = require('./barPlot.js');
 var ternaryPlot = require('./ternaryPlot.js');
 var heatmap = require('./heatmap.js');
-// var expressionValues = require("./expressionValues.ts");
 
 import ExpressionData from "./dataContainer"
 import GeneralControls from "./generalControls"
@@ -65,6 +46,7 @@ export const ExpressionBar = function (options) {
   // try{
     this.setDefaultOptions();    
     jQuery.extend(this.opt, options);
+    this.general_controls = new GeneralControls(this, null);
     this._setUserDefaultValues();
     this.setupContainer();
     this.setupProgressBar();
@@ -271,15 +253,6 @@ ExpressionBar.prototype.setupButtons = function(){
  var self = this;
  this.propertySelector = jQuery('#'+ this.opt.target+'_property');
  this.groupSelectorColour = jQuery('#'+ this.opt.target+'_group');
- this.saveSVGButton = jQuery('#'+ this.opt.target+'_save');
- this.saveSVGButton.click(function(e) {
-  self.saveRenderedSVG();
-});
-
- this.savePNGButton = jQuery('#'+ this.opt.target+'_save_png');
- this.savePNGButton.click(function(e) {
-  self.saveRenderedPNG();
-});
 };
 
 ExpressionBar.prototype.setupContainer = function(){
@@ -294,19 +267,8 @@ ExpressionBar.prototype.setupContainer = function(){
   this.chartScale = this.opt.target + '_scale';  
   this.plotContainer = this.opt.target + '_plot_container'
   
-
-	var containerContent = `<div id="${this.opt.target}_options">
-	<label for="${this.opt.target}_property" style="cursor: pointer;">Expression unit: </label><select style="cursor: pointer;" id="${this.opt.target}_property"></Select>
-	<span id="${this.opt.target}_log2Span"><input type="checkbox" id="${this.opt.target}_log2" style="cursor: pointer;"><label for="${this.opt.target}_log2" style="cursor: pointer;">Log<sub>2</sub></label></input></span>
-  <button type="button" style="cursor: pointer;" id="${this.opt.target}_save">Save as SVG</button>
-  <button type="button" style="cursor: pointer;" id="${this.opt.target}_save_png">Save as PNG</button>
-  <button type="button" style="cursor: pointer;" id="${this.opt.target}_save_data">Save data</button>
-  <button type="button" style="cursor: pointer;" id="${this.opt.target}_save_raw_data">Save raw data</button>
-  <button type="button" style="cursor: pointer;" id="${this.opt.target}_restore_defaults">Restore Defaults</button>
-  <span id="${this.opt.target}_homSpan"><input style="cursor: pointer;" id="${this.opt.target}_showHomoeologues" type="checkbox"name="showHomoeologues" value="show"><label style="cursor: pointer;" for="${this.opt.target}_showHomoeologues">Homoeologues</label></input> </span>
-  <span id="${this.opt.target}_ternSpan"><input style="cursor: pointer;" id="${this.opt.target}_showTernaryPlot" type="checkbox"name="showHomoeologues" value="show"><label style="cursor: pointer;" for="${this.opt.target}_showTernaryPlot">Show Ternary Plot</label></input></span>
-  <div id="${this.chartScale}"></div>
-  </div>
+ this.general_controls.addButtons();
+	var containerContent = `
   <br />
   <div id="${this.chartSVGidHeadDiv}" style="overflow: inherit;">
   <svg id="${this.chartSVGidHead}" ></svg>
@@ -321,48 +283,25 @@ ExpressionBar.prototype.setupContainer = function(){
 
   this._container.append(containerContent);      
 
-	// jQuery('#' + this.opt.target + '-progressbar').progressbar({
-	// 	value:false
-	// });
-			
-  jQuery( '#' + this.opt.target + '_save_data' ).on('click', function(evt) {
-    self.saveRenderedData(self, false);
-  });
 
-  jQuery( '#' + this.opt.target + '_save_raw_data' ).on('click', function(evt) {
-    self.saveRawData(self);
-  });
+  // jQuery( '#' + this.opt.target + '_showHomoeologues' ).
+  //  on('change', function(evt) {
 
-  jQuery( '#' + this.opt.target + '_restore_defaults' ).on('click', function(evt) {
-    self.restoreDefaults();
-  });
+  //   if(self.opt.showTernaryPlot){
+  //     $(`#${self.opt.target}_showTernaryPlot`).prop('checked', false);
+  //     self.storeValue('showTernaryPlot',false);
+  //     self.opt.showTernaryPlot = false;      
+  //     self.opt.plot = "Bar";
+  //   }    
 
-  jQuery( '#' + this.opt.target + '_log2' ).
-   on('change', function(evt) {
-    self.opt.calculateLog = this.checked;
-    self.refresh();
-    self.storeValue('calculateLog',this.checked);
-  });
+  //   self.opt.showHomoeologues = this.checked;    
+  //   if(typeof self.opt.sortOrder !== 'undefined'){
+  //     self.refresh();
+  //   }
 
-
-  jQuery( '#' + this.opt.target + '_showHomoeologues' ).
-   on('change', function(evt) {
-
-    if(self.opt.showTernaryPlot){
-      $(`#${self.opt.target}_showTernaryPlot`).prop('checked', false);
-      self.storeValue('showTernaryPlot',false);
-      self.opt.showTernaryPlot = false;      
-      self.opt.plot = "Bar";
-    }    
-
-    self.opt.showHomoeologues = this.checked;    
-    if(typeof self.opt.sortOrder !== 'undefined'){
-      self.refresh();
-    }
-
-    self.storeValue('showHomoeologues',this.checked);
-    self.refreshSVG();
-  });
+  //   self.storeValue('showHomoeologues',this.checked);
+  //   self.refreshSVG();
+  // });
 
 
   $(`#${this.opt.target}_showTernaryPlot`)
@@ -1022,12 +961,12 @@ ExpressionBar.prototype._generateFileName = function(renderedProperty, toSave, i
   return fileName += ".tsv"
 }
 
-ExpressionBar.prototype.saveRenderedData = function(self){
-  var toSave = self.data.renderedData;
-  var selectedFactors = self.data.selectedFactors;
+ExpressionBar.prototype.saveRenderedData = function(){
+  var toSave = this.data.renderedData;
+  var selectedFactors = this.data.selectedFactors;
   var output = '';
   var factorNames = this.data.longFactorName;
-	var renderedProperty = self.opt.renderProperty ;
+	var renderedProperty = this.opt.renderProperty ;
   var fileName = '';
 		
   // Printing all the factors used
@@ -1064,10 +1003,11 @@ ExpressionBar.prototype.saveRenderedData = function(self){
   // Generating the fileName
   fileName = this._generateFileName(renderedProperty, toSave, false);
 
-	self.saveTextFile(fileName, output);
+	this.saveTextFile(fileName, output);
 };
 
-ExpressionBar.prototype.saveRawData = function(self){
+ExpressionBar.prototype.saveRawData = function(){
+  var self = this;
 		var allData = self.data;
 		var toSave = self.data.renderedData;
 		var selectedFactors = self.data.selectedFactors;
@@ -1161,7 +1101,8 @@ ExpressionBar.prototype.loadExpression = function(url) {
       // try{
 
       self.data = new ExpressionData(json, self.opt);
-      self.general_controls = new GeneralControls(self, self.data);
+      // self.general_controls = new GeneralControls(self, self.data);
+      self.general_controls.data = self.data;
       if(typeof self.data.compare === 'undefined'){
         self.data.compare = '';
       }      
@@ -1802,32 +1743,6 @@ Object.defineProperty(ExpressionBar.prototype, "target", {
   }
 });
 
-// ExpressionBar.prototype._hasTernKey = function(){
-//   console.log("About to render tern buttons");
-//   console.log(this.data);
-//   // If there is no homoeologues
-//   if(!this.data.hasHomologues){
-//     console.log("No Homs");
-//     $(`#${this.opt.target}_homSpan`).hide('fast');
-//     $(`#${this.opt.target}_ternSpan`).html("");
-//     this.storeValue('showTernaryPlot',false);
-//     this.storeValue('showHomoeologues',false);
-
-//   } else {  // If there is homoeologues
-//     console.log("Has Homs");
-//     $(`#${this.opt.target}_homSpan`).css('display', 'initial');
-//     $(`#${this.opt.target}_ternSpan`).css('display', 'initial');
-
-//     if(this.data.hasTern ){
-//       console.log("Has tern");
-//       $(`#${this.opt.target}_ternSpan`).css('display', 'initial');
-//     } else {
-//       $(`#${this.opt.target}_ternSpan`).html("No homologies for ternary plot").css('display', 'initial').css('color', 'red');
-//       this.storeValue('showTernaryPlot',false);
-//     }
-//   }
-
-// }
 
 var heatmap = require( "./heatmap.js" );
 

@@ -75,12 +75,9 @@ module OrthologyHelper
 		genes_to_find = Hash.new
 		transcripts.each do |t|  
 			t.ortholog_groups.each do |og|
-				puts "#######"
-				puts og.inspect
 				ogs = og.ortholog_set 
 				ret["ortholog_groups"][ogs.name][og.name] = Array.new 
 				og.genes.each do |g|
-					puts g.inspect
 					ret["ortholog_groups"][ogs.name][og.name] << {
 						"gene": g.gene, 
 						"gene_set":  g.gene_set.name, 
