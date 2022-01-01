@@ -99,14 +99,14 @@ export class ExpressionBar {
 
     switch (this.opt.plot) {
       case 'Bar':
-        $(`#${this.opt.target}_log2Span`).css('display', 'initial');
-        this.opt.calculateLog = this._retrieveValue("calculateLog");
-        this.opt.showTernaryPlot = false;
+        $(`#${this.opt.target}_calculateLogSpan`).css('display', 'initial');
+        // this.opt.calculateLog = this._retrieveValue("calculateLog");
+        // this.opt.showTernaryPlot = false;
         this.renderObject = new barPlot.BarPlot(this);
         break;
 
       case 'HeatMap':
-        $(`#${this.opt.target}_log2Span`).css('display', 'initial');
+        $(`#${this.opt.target}_calculateLogSpan`).css('display', 'initial');
         this.opt.showHomoeologues = true;
         this.opt.showTernaryPlot = false;
         // If there is no session value for calculate log show the log2 for heatmap
@@ -115,13 +115,13 @@ export class ExpressionBar {
         break;
 
       case 'Ternary':
-        if ($(`#${this.opt.target}_log2`).prop('checked')) {
-          $(`#${this.opt.target}_log2`).trigger("click");
+        if ($(`#${this.opt.target}_calculateLog`).prop('checked')) {
+          $(`#${this.opt.target}_calculateLog`).trigger("click");
         }
-        $(`#${this.opt.target}_log2Span`).css('display', 'none');
-        this.opt.showHomoeologues = true;
-        this.opt.showTernaryPlot = true;
-        this.opt.calculateLog = this._retrieveValue("calculateLog");
+        $(`#${this.opt.target}_calculateLogSpan`).css('display', 'none');
+        // this.opt.showHomoeologues = true;
+        // this.opt.showTernaryPlot = true;
+        // this.opt.calculateLog = this._retrieveValue("calculateLog");
         this.renderObject = new ternaryPlot.TernaryPlot(this);
         break;
       default:
@@ -194,7 +194,7 @@ export class ExpressionBar {
       this.opt.calculateLog = true;
       log_checked = true;
     }
-    jQuery('#' + this.opt.target + '_log2')
+    jQuery('#' + this.opt.target + '_calculateLog')
       .prop('checked', log_checked);
 
   }
@@ -1019,18 +1019,10 @@ export class ExpressionBar {
     var source = this.prepareSVGForSaving();
     //convert svg source to URI data scheme.
     var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(source);
-
     var pom = document.createElement('a');
     pom.href = url;
     pom.setAttribute('download', 'expVIP_' + Date.now() + 'plot.svg');
-    if (document.createEvent) {
-      var event = document.createEvent('MouseEvents');
-      event.initEvent('click', true, true);
-      pom.dispatchEvent(event);
-    }
-    else {
-      console.log("Create event not working");
-    }
+    pom.click();
     if (pom.parentElement) {
       pom.parentElement.removeChild(pom);
     }
@@ -1064,15 +1056,7 @@ export class ExpressionBar {
       self.general_controls.toggleHomologueButtons();
       self.general_controls.toggleTernButtons();
       console.log(json);
-      // If the data provided of the key "tern" and it's a 3 homoeolougy gene, add the ternary plot option checkbox			
-      //  self._hasTernKey();
-      // } catch(err){
-      //   alert ('Data couldn\'t be loaded');
-      //   console.error(err);
-      //   if(typeof $(`#bar_expression_viewer-progressbar`) !== 'undefined'){
-      //     $(`#bar_expression_viewer-progressbar`).hide();
-      //   }
-      // }
+      
       self.pb.hide();
       self.dataLoaded();
 

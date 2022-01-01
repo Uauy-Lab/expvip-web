@@ -18,6 +18,8 @@ abstract class Control{
 	}
 
 	abstract render(): void;
+
+	abstract saveStatus(): void;
 }
 
 export default Control;

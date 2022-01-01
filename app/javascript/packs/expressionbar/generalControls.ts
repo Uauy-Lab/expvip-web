@@ -10,10 +10,12 @@ class GeneralControls{
 	#data : ExpressionData;
 	#options_div: JQuery;
 	#container: JQuery;
+	#updating : boolean;
 	constructor(expression_bar : ExpressionBar , data: ExpressionData ){
 		this.#expression_bar = expression_bar;
 		this.#data = data;
 		this.#container = jQuery('#'+expression_bar.target);
+		this.#updating = false;
 	}
 
 	addButtons(){
@@ -21,63 +23,39 @@ class GeneralControls{
 		this.#options_div.attr("id", `${this.#expression_bar.target}_options`);
 		let pre_button = `<label for="${this.#expression_bar.target}_property" style="cursor: pointer;">Expression unit: </label><select style="cursor: pointer;" id="${this.#expression_bar.target}_property"></Select>`
 		this.#options_div.append(pre_button);
-		let eb = this.#expression_bar;
-		new Checkbox(this.#expression_bar, "log2", "Log<sub>2</sub>", this.#options_div)
-			.el.on('change', function(evt) {
-				let checked = jQuery(this).is(":checked");
-				eb.opt.calculateLog = checked;
-				eb.refresh();
-				eb.storeValue('calculateLog',checked);
-			});
-
-		new Button(this.#expression_bar, "save", "Save as SVG", this.#options_div)
-			.el.on('click', evt => this.#expression_bar.saveRenderedSVG());
-		new Button(this.#expression_bar, "save_png", "Save as PNG", this.#options_div)
-			.el.on('click', evt => this.#expression_bar.saveRenderedPNG());
-		new Button(this.#expression_bar, "save_data", "Save data", this.#options_div)
-			.el.on('click', evt => this.#expression_bar.saveRenderedData());
-		new Button(this.#expression_bar, "save_raw_data", "Save raw data", this.#options_div)
-			.el.on('click', evt => this.#expression_bar.saveRawData());
-		new Button(this.#expression_bar, "restore_defaults", "Restore defaults", this.#options_div)
-			.el.on('click', evt => this.#expression_bar.restoreDefaults());
-		
-		// <span id="${this.#expression_bar.target}_showHomoeologuesSpan"><input style="cursor: pointer;" id="${this.#expression_bar.target}_showHomoeologues" type="checkbox"name="showHomoeologues" value="show"><label style="cursor: pointer;" for="${this.#expression_bar.target}_showHomoeologues">Homoeologues</label></input> </span>
-		new Checkbox(this.#expression_bar, "showHomoeologues",  "Homoeologues", this.#options_div)
-			.el.on('change', function(evt){
-				let checked = jQuery(this).is(":checked");
-				jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false);
-				eb.storeValue('showTernaryPlot',false);
-				eb.storeValue('showHomoeologues', checked);
-				eb.opt.showHomoeologues = checked;
-				eb.opt.showTernaryPlot = false;      
-				eb.opt.plot = "Bar";
-				eb.refresh();
-   				eb.refreshSVG();
-			});
-
-		new Checkbox(this.#expression_bar, "showTernaryPlot", "Ternary plot", this.#options_div)
-			.el.on('change', function(evt){
-				let checked = jQuery(this).is(":checked");
-				jQuery( '#' + eb.target + '_showHomoeologues' ).prop('checked', false);
-				eb.storeValue('showHomoeologues',false);
-				eb.storeValue('showTernaryPlot', checked);
-				eb.opt.showTernaryPlot = checked;
-				eb.opt.showHomoeologues = true;   // For the homoeologues data to be calculated        
-				eb.opt.plot = "Ternary"; 
-				if(!checked){        
-				  eb.opt.showHomoeologues = false;      
-				  eb.opt.plot = "Bar";        
-				}
-				eb.refresh();      
-				eb.refreshSVG();
-			})
-
+		new Checkbox(this.#expression_bar, "calculateLog", "Log<sub>2</sub>", this.#options_div);
+		new Button(this.#expression_bar, "saveRenderedSVG", "Save as SVG", this.#options_div);
+		new Button(this.#expression_bar, "saveRenderedPNG", "Save as PNG", this.#options_div);
+		new Button(this.#expression_bar, "saveRenderedData", "Save data", this.#options_div);
+		new Button(this.#expression_bar, "saveRawData", "Save raw data", this.#options_div);
+		new Button(this.#expression_bar, "restoreDefaults", "Restore defaults", this.#options_div);
+		new Checkbox(this.#expression_bar, "showHomoeologues",  "Homoeologues", this.#options_div);
+		new Checkbox(this.#expression_bar, "showTernaryPlot", "Ternary plot", this.#options_div);
+		new Checkbox(this.#expression_bar, "orthologues", "Pangenome orthologues", this.#options_div);
 		let chartScale = this.#expression_bar.target + '_scale';
-		let post_button = ` 
-		<div id="${chartScale}"></div>`
+		let post_button = `<div id="${chartScale}"></div>`
 		this.#options_div.append(post_button);
 		this.#container.append(this.#options_div);
+	}
 
+	updateControls(){
+		if(this.#updating){
+			return;
+		}
+		this.#updating = true;
+		let eb = this.#expression_bar;
+		eb.opt.plot = "Bar";
+		if(eb.opt.showHomoeologues){
+			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false);
+		}
+		if(eb.opt.showTernaryPlot){
+			jQuery( '#' + eb.target + '_showHomoeologues' ).prop('checked', false);
+			eb.opt.showHomoeologues = true;   // For the homoeologues data to be calculated        
+			eb.opt.plot = "Ternary"; 
+		}
+		eb.refresh();
+		eb.refreshSVG();
+		this.#updating = false;
 	}
 
 	toggleHomologueButtons(){
@@ -104,8 +82,6 @@ class GeneralControls{
 	set data(data: ExpressionData){
 		this.#data = data;
 	}
-
-
 
 }
 export default GeneralControls;
