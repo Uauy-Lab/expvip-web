@@ -836,7 +836,7 @@ export class ExpressionBar {
 
     //img.width = this.opt.width * scaleBy;
     //img.height = (this.opt.headerOffset + 20 + this.totalHeight) * scaleBy ;
-    img.src = "data:image/svg+xml;base64," + btoa(svgData);
+    img.src = `data:image/svg+xml;base64,${btoa(svgData)}`;
     img.style = 'width:100%';
 
     img.onload = function () {

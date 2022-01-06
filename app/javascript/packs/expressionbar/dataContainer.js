@@ -4,18 +4,25 @@ var colorbrewer = require('colorbrewer');
 require('string.prototype.startswith');
 //  require("./expressionValues")
 import ExpressionValues from "./expressionValues"
+import GroupedValues from "./groupedValues"
+import parseFactors from "./parseFactors"
  class ExpressionData{
 	constructor(data, options) {
 		for (var attrname in data) {
+			console.log(attrname);
 			if (attrname == 'values'){
 				this[attrname] = this._sortGeneOrder(attrname, data[attrname]);
+			}else if(attrname == 'factors'){
+				this[attrname] = parseFactors(data[attrname]);
 			} else {
 				this[attrname] = data[attrname];
 			}
-		}	
+			console.log(this[attrname]);
+		}
 	
 		this.opt = options;
 		this.sortOrder = [];
+		console.log(this);
 	}
 
 	getExpressionValueTypes(){
@@ -27,42 +34,6 @@ import ExpressionValues from "./expressionValues"
 		return Object.keys(firstVals);
 	}
 
-	mean(data){
-		
-		var values = Object.keys(data).map(function(val) {
-			return data[val].value;
-		});
-
-		values = values.sort();
-		var toRemove = values.length * 0.1;
-		values.splice(0, toRemove);
-		values.splice(-1 * toRemove);
-		return science.stats.mean(values);
-	}
-
-	log2(val){
-		var newVal = val;
-		if(newVal < 1){
-			newVal = 0;
-		}else{
-			newVal = Math.log2(newVal); 
-		}
-		return newVal;
-	};
-
-	calculateLog2(){
-		
-		for(let g in this.renderedData){
-			for(let v in this.renderedData[g]){
-				var toTransform = this.renderedData[g][v];
-				toTransform.stdev = this.log2(toTransform.stdev );
-				toTransform.value = this.log2(toTransform.value );
-				for(let d in toTransform.data){
-					toTransform.data[d] = this.log2(toTransform.data[d]);
-				}
-			}
-		}
-	};
 
 	setAvailableFactors(){
 		var groups = this.factorOrder;
@@ -91,17 +62,17 @@ import ExpressionValues from "./expressionValues"
 		this.selectedFactors = jQuery.extend(true, {},  sf);
 		var factorOrder = this.defaultFactorOrder;
 
-		this.factors = new Map();
-		for (var f in factorOrder) {
-			var g = factorOrder[f];
-			for(var k in groups[g]){
-				if(! this.factors.has(g)){
-					this.factors.set(g, new Set());
-				}
-				var currentSet = this.factors.get(g);
-				currentSet.add(k);
-			}  
-		}
+		// this.factors = new Map();
+		// for (var f in factorOrder) {
+		// 	var g = factorOrder[f];
+		// 	for(var k in groups[g]){
+		// 		if(! this.factors.has(g)){
+		// 			this.factors.set(g, new Set());
+		// 		}
+		// 		var currentSet = this.factors.get(g);
+		// 		currentSet.add(k);
+		// 	}  
+		// }
 	};
 
 
@@ -191,7 +162,12 @@ import ExpressionValues from "./expressionValues"
 
 		for(i = 0; i < this.renderedData.length; i++){
 			for (var j = 0; j < sorted.length; j++) { 
+				// console.log(sorted[j]);
 				var obj = this.renderedData[i][sorted[j].id];
+				if(!obj){
+					continue;
+				}
+				// console.log(obj);
 				obj.renderIndex = sorted[j].renderIndex;
 			}
 		}
@@ -222,8 +198,10 @@ import ExpressionValues from "./expressionValues"
 	//This means that the function is not stateles, but the object is the container
 	//For the data. It could be possible to make it "reentrant"
 	getGroupedData(property, groupBy){
+		console.log(groupBy);
 		var dataArray = [];
 		for(var gene in this.values){
+			// console.log(gene);
 			if(!this.opt.showHomoeologues && 
 				( 	
 					gene !== this.gene &&  
@@ -255,7 +233,7 @@ import ExpressionValues from "./expressionValues"
 				dataArray.push(innerArray);
 			}else if(groupBy.constructor === Array){
 				//This is grouping by factors.  
-				innerArray = this._fillGroupByFactor(i++, gene, property, groupBy);
+				innerArray = this.#fillGroupByFactor(i++, gene, property, groupBy);
 				dataArray.push(innerArray);
 			}else{
 				console.log('Not yet implemented');
@@ -266,9 +244,11 @@ import ExpressionValues from "./expressionValues"
 			this.setRenderIndexes(dataArray,this.renderedData);
 		}
 		this.renderedData = dataArray;
-		if(this.isLog()){
-			this.calculateLog2();
-		}
+		// this.renderedData.forEach(gene_arr => gene_arr.forEach(group => group.log = this.isLog));
+		// if(this.isLog()){
+
+		// 	this.calculateLog2();
+		// }
 		this.calculateMinMax();
 		return dataArray;
 	};
@@ -327,29 +307,6 @@ import ExpressionValues from "./expressionValues"
 		return newObject;
 	};
 
-	_prepareGroupedByExperiment(index, group){
-		var newObject= {};
-		newObject.renderIndex = index;
-		newObject.id = index;
-		newObject.name = this.data.groups[group].description;
-		newObject.data = [];
-		newObject.factors = this.data.groups[group].factors;
-		newObject.value = 0;
-		newObject.stdev = 0.0;
-		return newObject;
-	};
-
-	_prepareGroupedByFactor(index, description){
-		var newObject= {};
-		newObject.renderIndex = index;
-		newObject.id = index;
-		newObject.name = description;
-		newObject.data = [];
-		newObject.factors = {};
-		newObject.value = 0;
-		newObject.stdev = 0.0;
-		return newObject;
-	};
 
 
 	_fillGroupByExperiment(index, gene, property){
@@ -367,7 +324,7 @@ import ExpressionValues from "./expressionValues"
 			groups[o] = newObject;
 		}
 		for(o in e){
-			groups[e[o].group].data.push(data[o].value);
+			groups[e[o].group].addValueObject(data[o]);
 		}
 		i = index;
 		for(o in groups){
@@ -384,8 +341,9 @@ import ExpressionValues from "./expressionValues"
 		return innerArray;
 	};
 
-	_fillGroupByFactor(index, gene, property, groupBy){
+	#fillGroupByFactor(index, gene, property, groupBy){
 		var groups ={};
+		/** @type {[GroupedValues]} */
 		var innerArray = [];
 		var data = this.values[gene][property];
 		var g = this.groups;
@@ -398,7 +356,7 @@ import ExpressionValues from "./expressionValues"
 			var description = this.getGroupFactorDescription(g[o], groupBy);
 			var longDescription = this.getGroupFactorLongDescription(g[o], groupBy);
 			if(names.indexOf(description) === -1){
-				var newObject = this._prepareGroupedByFactor(i++, description);
+				var newObject = new GroupedValues(i++, description);
 				newObject.gene = gene;
 				newObject.longDescription = longDescription;
 				var factorValues = this.getGroupFactor(g[o], groupBy);
@@ -409,28 +367,23 @@ import ExpressionValues from "./expressionValues"
 		}
 		i = index;
 		for(o in e){
-			if(typeof data[o] === 'undefined' ){
+			if( !data  || typeof data[o] === 'undefined' ){
 				continue; //This is for the cases when the data is set up but not defined
 			}
-
 			var group = g[e[data[o].experiment].group];
 
 			if(!this.isFiltered(group)){
 				var description = this.getGroupFactorDescription(g[e[o].group], groupBy);
-				groups[description].data.push(data[o].value);
+				groups[description].addValueObject(data[o]);
 			}
 		}
 		for(o in groups){
 			var newObject = groups[o];
-			if( newObject.data.length === 0){
+			if(newObject.isEmpty){
 				continue;
 			}
-			this.calculateStats(newObject);
-			if(!this.isFiltered(newObject)){
-				newObject.renderIndex = i;
-				newObject.id = i++;
-				innerArray.push(newObject);
-			}
+			newObject.log = this.isLog();
+			innerArray.push(newObject);
 		}
 		return innerArray;
 	};
@@ -548,6 +501,9 @@ import ExpressionValues from "./expressionValues"
 		var fullDataArray = []
 		for(var i in dataArray){
 			var gene = dataArray[i];
+			if(gene.length == 0){
+				continue;
+			}
 			var localFactors = [];
 			var tmpDataArray = [];
 			var localDataArray = [];
@@ -562,7 +518,9 @@ import ExpressionValues from "./expressionValues"
 					localDataArray.push(tmpDataArray[localObject]);
 					//console.log(tmpDataArray[localObject]);
 				}else{
-					var obj = this._prepareGroupedByFactor(j, "");
+					var obj = new GroupedValues(j, "");
+					// console.log(gene);
+					// console.log(obj);
 					obj.gene = gene[0].gene;
 					obj.factors = allFactors[j];
 					localDataArray.push( obj);
@@ -639,23 +597,6 @@ import ExpressionValues from "./expressionValues"
 		return "homologues" in this && this.homologues.length > 0
 	}
 
-	// get values(){
-	// 	if(this.#values != null){
-	// 		return this.#values;
-	// 	}
-	// 	console.log("We will load them")
-	// 	this.#values = new Map();
-	// 	Object.keys(this.paths).forEach(k => {
-	// 		this.#values.set(k, this.#expressionValues.values();
-	// 	})
-	// 	console.log("Loaded");
-	// 	console.log(this.#values);
-	// 	return this.#values;
-	// 	//TODO: This is an eager load. it may be better to find a way to make this lazy, but values is very tightly integrated to the object
-	// 	// throw("We need to fix this!");
-	// }
 }
 
-
-// module.exports.ExpressionData = ExpressionData;
 export default ExpressionData;

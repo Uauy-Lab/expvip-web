@@ -24,7 +24,7 @@ module ExperimentsHelper
 
 	def self.getExperimentGroups 
 
-		Rails.cache.fetch("getExperimentGroups", expires_in: 12.hours) do
+		Rails.cache.fetch("getExperimentGroups", expires_in: 24.hours) do
 			experiments = Hash.new
 			groups = Hash.new
 			Experiment.find_each do |g|
@@ -96,4 +96,22 @@ module ExperimentsHelper
 		return df_hash.values
 	end
 
+	def self.getFactors
+		# Rails.cache.fetch("getFactors", expires_in: 24.hours) do
+			ret = Array.new
+			DefaultFactorOrder.find_each do |dfo|
+				val = dfo.to_h
+				if val["name"] == "study"
+					factors = Array.new
+					Study.find_each do |s|
+						next unless s.active 
+						factors << s.to_factor
+					end
+					val["factors"] = factors.sort_by(&:order).map(&:to_h)
+				end
+				ret << val
+			end
+			return ret
+		# end
+	end
 end

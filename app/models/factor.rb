@@ -7,4 +7,13 @@ class Factor < ActiveRecord::Base
 		@@factor_names[self.id] ||=  self.default_factor_order.name
 		return @@factor_names[self.id]  
 	end
+
+	def to_h
+		ret = Hash.new
+		ret["name"] = self.name
+		ret["description"] = self.description
+		ret["order"] = self.order
+		return ret
+	end
+
 end

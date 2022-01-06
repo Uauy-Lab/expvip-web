@@ -23,8 +23,6 @@ class ExpressionValues{
 			}
 			return;
 		}
-
-
 		this.loading = true;
 		const fetch_promise = fetch(this.path);
 		await fetch_promise.then (data => data.json()) 

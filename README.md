@@ -11,13 +11,12 @@ Expvip runs on **Unix-Like** environments (Linux distribution or mac).<br>
 The following must be installed on your environment (minimum requirements):
 ```
 Git
-Ruby 2.2
-Rails 4.2.1
-Nodejs 6.0.0
-NPM 3.8.6 || Yarn 1.7.0
-MySQL 5.5 (along with its development files - libmysqlclient-dev)
-MongoDB 3.4
-Kallisto 0.42.3 (optional)
+Ruby 2.7
+Rails 6.0
+Nodejs v14
+yarn 1.22
+MySQL 8.0 (along with its development files - libmysqlclient-dev)
+Kallisto 0.44.0 (optional)
 ```
 Get Kallisto from [here](http://pachterlab.github.io/kallisto/)
 

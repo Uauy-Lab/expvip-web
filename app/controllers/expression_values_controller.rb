@@ -142,21 +142,22 @@ class ExpressionValuesController < ApplicationController
   end
 
   def add_ret_values(ret, params)
-    factorOrder, longFactorName, selectedFactors = ExperimentsHelper.getFactorOrder
+    # factorOrder, longFactorName, selectedFactors = ExperimentsHelper.getFactorOrder
     experiments, groups =  ExperimentsHelper.getExperimentGroups
-    params["studies"].each do |e|
-      selectedFactors["study"][e] = true
-    end if params["studies"] and params["studies"].respond_to?("each")
+    # params["studies"].each do |e|
+    #   selectedFactors["study"][e] = true
+    # end if params["studies"] and params["studies"].respond_to?("each")
 
-    ret["factorOrder"] = factorOrder
-    ret["longFactorName"] = longFactorName
+    # ret["factorOrder"] = factorOrder
+    # ret["longFactorName"] = longFactorName
 
-    ret["selectedFactors"] = selectedFactors
-    ret["defaultFactorSelection"] = getDefaultSelection
-    ret["defaultFactorOrder"] = ExperimentsHelper.getDefaultOrder
+    # ret["selectedFactors"] = selectedFactors
+    # ret["defaultFactorSelection"] = getDefaultSelection
+    # ret["defaultFactorOrder"] = ExperimentsHelper.getDefaultOrder
 
     ret["experiments"] = experiments
     ret["groups"] = groups
+    ret["factors"] = ExperimentsHelper.getFactors
   end
 
   # Adding the tern_order and tern values (triads) to the data which enables the ternary plot to be displayed
