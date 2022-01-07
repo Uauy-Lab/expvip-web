@@ -5,7 +5,8 @@ require('string.prototype.startswith');
 //  require("./expressionValues")
 import ExpressionValues from "./expressionValues"
 import GroupedValues from "./groupedValues"
-import parseFactors from "./parseFactors"
+import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} from "./factorHelpers"
+
  class ExpressionData{
 	constructor(data, options) {
 		for (var attrname in data) {
@@ -93,14 +94,15 @@ import parseFactors from "./parseFactors"
 	];
 	this.factorColors= new Map();  
 	var i = 0;  
-	this.factors.forEach(function(value, key, map){
+	this.factors.forEach(function(fg, key, map){
 		var color = new Map();
 		var index =  i % self.totalColors ;
 		var currentColorSet = colors[index];
-		var j = 0;   
-		value.forEach(function(name){
-			color[name] = currentColorSet[j++ % self.totalColors ];
-		});
+		var j = 0;  
+		fg.factors.forEach((factor, name) => {
+			color[name] = currentColorSet[j++ % self.totalColors ]; //We will eventually need to remove this line. 
+			factor.color = color[name];
+		}) 
 		i ++ ; 
 		self.factorColors[key] = color;
 	});
@@ -142,14 +144,18 @@ import parseFactors from "./parseFactors"
 		}
 		var sortable = this.renderedData[0].slice();
 		var sortOrder =  this.sortOrder;
-		var factorOrder= this.renderedOrder; 
-		var sorted = sortable.sort(function(a, b){
-			for(i in sortOrder){
-				var o = sortOrder[i];
-				if(factorOrder[o][a.factors[o]] > factorOrder[o][b.factors[o]]) {
+		var sorted = sortable.sort((a, b) => {
+			for(let o of sortOrder){
+				let fg = this.factors.get(o);
+				let fa = fg.factors.get(a.factors[o]);
+				let fb = fg.factors.get(b.factors[o]);
+				if(typeof fa === 'undefined' || typeof fb === 'undefined'){
+					continue;
+				}
+				if(fa.order > fb.order) {
 					return 1;
 				}
-				if (factorOrder[o][a.factors[o]] < factorOrder[o][b.factors[o]]) {
+				if (fa.order < fb.order) {
 					return -1;
 				}
 			}
@@ -402,42 +408,44 @@ import parseFactors from "./parseFactors"
 	};
 
 	getGroupFactorDescription(o,groupBy){
-		var factorArray = [];
-		var factorNames = this.longFactorName;
-		var numOfFactors = groupBy.length;
-		var arrOffset = 0;
-		for(var i in groupBy) {
-			var grpby = groupBy[i];
-			var currFact = factorNames[grpby];
-			var currShort =  o.factors[groupBy[i]]; 
-			if(typeof currShort === 'undefined' ){
-				console.error(groupBy[i] + ' is not present in ' + o.factors );
-				console.error(o.factors);
-			}
-			var currLong = currFact[currShort];
-			factorArray[i - arrOffset ] = currLong;
-			if(numOfFactors > 4 || currLong.length > 20 ){
-				factorArray[i - arrOffset ] = currShort;
-			}
-		};
-		return factorArray.join(', ');
+		return getGroupFactorDescription(o, groupBy, this.factors)
+		// var factorArray = [];
+		// var factorNames = this.longFactorName;
+		// var numOfFactors = groupBy.length;
+		// var arrOffset = 0;
+		// for(var i in groupBy) {
+		// 	var grpby = groupBy[i];
+		// 	var currFact = factorNames[grpby];
+		// 	var currShort =  o.factors[groupBy[i]]; 
+		// 	if(typeof currShort === 'undefined' ){
+		// 		console.error(groupBy[i] + ' is not present in ' + o.factors );
+		// 		console.error(o.factors);
+		// 	}
+		// 	var currLong = currFact[currShort];
+		// 	factorArray[i - arrOffset ] = currLong;
+		// 	if(numOfFactors > 4 || currLong.length > 20 ){
+		// 		factorArray[i - arrOffset ] = currShort;
+		// 	}
+		// };
+		// return factorArray.join(', ');
 	};
 
 	getGroupFactorLongDescription(o,groupBy){
-		var factorArray = [];
-		var factorNames = this.longFactorName;
-		//console.log(factorNames);
+		return getGroupFactorLongDescription(o, groupBy, this.factors);
+		// var factorArray = [];
+		// var factorNames = this.longFactorName;
+		// //console.log(factorNames);
 
-		var numOfFactors = groupBy.length;
-		for(var i in groupBy) {
-			var grpby = groupBy[i];
-			var currFact = factorNames[grpby];
-			var currShort =  o.factors[groupBy[i]]; 
-			var currLong = currFact[currShort];
-			factorArray[i] = currLong;
+		// var numOfFactors = groupBy.length;
+		// for(var i in groupBy) {
+		// 	var grpby = groupBy[i];
+		// 	var currFact = factorNames[grpby];
+		// 	var currShort =  o.factors[groupBy[i]]; 
+		// 	var currLong = currFact[currShort];
+		// 	factorArray[i] = currLong;
 
-		}
-		return factorArray.join(', ');
+		// }
+		// return factorArray.join(', ');
 	};
 
 

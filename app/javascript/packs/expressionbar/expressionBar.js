@@ -1257,7 +1257,8 @@ export class ExpressionBar {
       this.data.factors.forEach(function (value, key, map) {
         var factorValue = arr[i].factors[key];
 
-        var factorLongName = self.data.longFactorName[key][factorValue];
+        // var factorLongName = self.data.longFactorName[key][factorValue];
+        var factorLongName = '-'; //TODO: Fix this, the tooltip is not comning with the long names. 
         var color = self.factorColors[key][factorValue];
         var tooltip = key + ': ' + factorLongName;
         var rect = self.titleGroup.append('rect')
