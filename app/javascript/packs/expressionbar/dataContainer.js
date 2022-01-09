@@ -123,14 +123,18 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 		return !ret;
 	};
 
-	getSortedKeys(factor) {
-		var i = this.defaultFactorOrder[factor];
-		var obj = this.renderedOrder[i];
-		var keys = []; 
-		for(var key in obj) {
-			keys.push(key);
-		}
-		return keys.sort(function(a,b){return obj[a] - obj[b];});
+	getSortedKeys(fact) {
+		let gf = this.factors.get(fact);
+		let factors = [...gf.factors.values()]
+		return factors.sort((a,b) => a.order - b.order).map(f => f.order);
+		
+		// var i = this.defaultFactorOrder[factor];
+		// var obj = this.renderedOrder[i];
+		// var keys = []; 
+		// for(var key in obj) {
+		// 	keys.push(key);
+		// }
+		// return keys.sort(function(a,b){return obj[a] - obj[b];});
 	};
 
 

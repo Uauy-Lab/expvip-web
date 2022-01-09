@@ -16,4 +16,9 @@ export default class FactorGroup{
 			this.factors.set(factor.name, f);
 	   }
 	}
+
+	sortedFactors(){
+		let factors = [...this.factors.values()]
+		return factors.sort((a,b) => a.order - b.order);
+	}
 }

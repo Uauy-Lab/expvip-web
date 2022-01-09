@@ -30,6 +30,8 @@ var heatmap = require('./heatmap.js');
 
 import ExpressionData from "./dataContainer"
 import GeneralControls from "./generalControls"
+import SortWindow from "./sortWindow"
+
 require('string.prototype.startswith');
 
 /*
@@ -50,6 +52,11 @@ require('string.prototype.startswith');
  */
 // The constructor for the creating the chart
 export class ExpressionBar {
+
+/**
+  * @type {ExpressionData}
+  */
+  data;
   constructor(options) {
 
     // try{
@@ -215,7 +222,7 @@ export class ExpressionBar {
     var self = this;
     var fontSize = this.opt.fontSize;
     this.renderGroupSelectorColour();
-    this.chart = d3.select('#' + this.chartSVGid).
+    this.chart = d3.select('#' + this.chartSVGid). 
       attr('width', this.opt.width).
       style('font-family', self.opt.fontFamily).
       style('font-size', fontSize + 'px');
@@ -296,28 +303,28 @@ export class ExpressionBar {
     //   self.storeValue('showHomoeologues',this.checked);
     //   self.refreshSVG();
     // });
-    $(`#${this.opt.target}_showTernaryPlot`)
-      .on('change', function (evt) {
+    // $(`#${this.opt.target}_showTernaryPlot`)
+    //   .on('change', function (evt) {
 
-        $('#' + self.opt.target + '_showHomoeologues').prop('checked', false);
-        self.storeValue('showHomoeologues', false);
+    //     $('#' + self.opt.target + '_showHomoeologues').prop('checked', false);
+    //     self.storeValue('showHomoeologues', false);
 
-        self.opt.showTernaryPlot = this.checked;
-        if (self.opt.showTernaryPlot) {
-          self.opt.showHomoeologues = true; // For the homoeologues data to be calculated        
-          self.opt.plot = "Ternary";
-        } else {
-          self.opt.showHomoeologues = false;
-          self.opt.plot = "Bar";
-        }
+    //     self.opt.showTernaryPlot = this.checked;
+    //     if (self.opt.showTernaryPlot) {
+    //       self.opt.showHomoeologues = true; // For the homoeologues data to be calculated        
+    //       self.opt.plot = "Ternary";
+    //     } else {
+    //       self.opt.showHomoeologues = false;
+    //       self.opt.plot = "Bar";
+    //     }
 
-        if (typeof self.opt.sortOrder !== 'undefined') {
-          self.refresh();
-        }
+    //     if (typeof self.opt.sortOrder !== 'undefined') {
+    //       self.refresh();
+    //     }
 
-        self.storeValue('showTernaryPlot', this.checked);
-        self.refreshSVG();
-      });
+    //     self.storeValue('showTernaryPlot', this.checked);
+    //     self.refreshSVG();
+    //   });
 
     $(`#bar_expression_viewer_ternSpan`).css('display', 'none');
 
@@ -544,7 +551,10 @@ export class ExpressionBar {
     }
   }
   renderSortWindow() {
+    var sw = new SortWindow(this);
+    sw.render();
     var self = this;
+    return;
     var selectedFactors = this.data.selectedFactors;
 
     if (typeof this.opt.selectedFactors !== 'undefined') {
@@ -556,6 +566,7 @@ export class ExpressionBar {
     var factorCount = 0;
 
     for (let fo in this.data.defaultFactorOrder) {
+      console.log("In default factor order loop");
       var i = this.data.defaultFactorOrder[fo];
       factorCount++;
       var orderedKeys = this.data.getSortedKeys(fo);
@@ -566,7 +577,7 @@ export class ExpressionBar {
         name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" title="Filter/reorder" ></span><br>';
       listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus"\
     title="Display/Hide Category"  ></span>';
-
+//////////////////////////////////////
       listText += '<div id="dialog_' + name + '"  \
     style="z-index:3; overflow:auto; min-width:250px; max-height:' + this.opt.height / 2 + 'px" >';
 
@@ -614,7 +625,7 @@ export class ExpressionBar {
       track: true
     });
 
-    this.sortDiv.html(listText);
+    //this.sortDiv.html(listText);
     //this.sortDiv.css('column-count',factorCount);
     //this.sortDiv.css('height',factorCount * this.opt.barHeight *2);
     //this.sortDiv.disableSelection();
@@ -1231,6 +1242,10 @@ export class ExpressionBar {
   getTitleFactorWidth() {
     return this.opt.labelWidth - this.getTitleSetOffset();
   }
+
+  /**
+   * This is rendering the titles of each row. 
+   */
   renderTitles() {
     var barHeight = this.opt.barHeight;
     var self = this;

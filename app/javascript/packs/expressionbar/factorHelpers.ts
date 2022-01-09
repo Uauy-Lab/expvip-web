@@ -31,4 +31,8 @@ function getFactorsForSample(sample: {description: string, name:string, factors:
 	return factorArray;
 }
 
-export {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription}
+function html_name(name: string):string{
+	return name.split(" ").join("_");
+}
+
+export {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, html_name}
