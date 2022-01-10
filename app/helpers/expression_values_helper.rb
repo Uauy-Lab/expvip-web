@@ -100,10 +100,12 @@ module ExpressionValuesHelper
 		#TODO: Add code to validate for different experiments.
 		values = Hash.new
 		ExpressionValue.where("gene_id = :gene", { gene: gene.id }).each do |ev|
-		  type_of_value = ev.type_of_value.name
-		  values[type_of_value] = Hash.new unless values[type_of_value]
-		  obj = ev.values
-		  obj.each_pair { |k, val| values[type_of_value][k.to_s] = { experiment: k, value: val } unless k == "_id" }
+			type_of_value = ev.type_of_value.name
+			values[type_of_value] = Hash.new unless values[type_of_value]
+			obj = ev.values
+			obj.each_pair { |k, val| 
+				values[type_of_value][k.to_s] = { experiment: k, value: val } unless k == "_id" 
+			} if obj
 		end
 		removeInactiveValues values
 		return values
