@@ -20,7 +20,7 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 			}
 			console.log(this[attrname]);
 		}
-	
+		console.log(options);
 		this.opt = options;
 		this.sortOrder = [];
 		console.log(this);
@@ -126,8 +126,9 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 	getSortedKeys(fact) {
 		let gf = this.factors.get(fact);
 		let factors = [...gf.factors.values()]
-		return factors.sort((a,b) => a.order - b.order).map(f => f.order);
-		
+		let sortedFactors = factors.sort((a,b) => a.order - b.order);
+		return sortedFactors;
+
 		// var i = this.defaultFactorOrder[factor];
 		// var obj = this.renderedOrder[i];
 		// var keys = []; 

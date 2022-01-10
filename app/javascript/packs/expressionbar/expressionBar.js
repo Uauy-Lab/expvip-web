@@ -463,10 +463,10 @@ export class ExpressionBar {
     //checks = jQuery(":checkbox[id*='|']");
     var toSearch = '#' + sortDivId + ' input:checkbox';
     this.refreshSVGEnabled = false;
-
+    var self = this;
     jQuery(toSearch).each(function () {
       var src = jQuery(this);
-      var self = src.data('expression-bar');
+      // var self = src.data('expression-bar');
       var factor = src.data('factor');
       var value = src.data('value');
       self.data.selectedFactors[factor][value] = this.checked;
@@ -551,101 +551,104 @@ export class ExpressionBar {
     }
   }
   renderSortWindow() {
+    $('#' + this.opt.target).css('overflow', 'hidden'); //TODO: maybe this needs to go elsewhere
     var sw = new SortWindow(this);
     sw.render();
-    var self = this;
+    // var self = this;
     return;
-    var selectedFactors = this.data.selectedFactors;
+    // var selectedFactors = this.data.selectedFactors;
 
-    if (typeof this.opt.selectedFactors !== 'undefined') {
-      selectedFactors = this.opt.selectedFactors;
-    }
+    // if (typeof this.opt.selectedFactors !== 'undefined') {
+    //   selectedFactors = this.opt.selectedFactors;
+    // }
 
-    var listText = '';
+    // var listText = '';
 
-    var factorCount = 0;
+    // var factorCount = 0;
 
-    for (let fo in this.data.defaultFactorOrder) {
-      console.log("In default factor order loop");
-      var i = this.data.defaultFactorOrder[fo];
-      factorCount++;
-      var orderedKeys = this.data.getSortedKeys(fo);
-      name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
+    // for (let fo in this.data.defaultFactorOrder) {
+    //   console.log("In default factor order loop");
+    //   var i = this.data.defaultFactorOrder[fo];
+    //   factorCount++;
+    //   var orderedKeys = this.data.getSortedKeys(fo);
+    //   name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
 
-      listText += '<div class="' + this.opt.target + '_factor">';
-      listText += '<span id="span_' +
-        name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" title="Filter/reorder" ></span><br>';
-      listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus"\
-    title="Display/Hide Category"  ></span>';
-//////////////////////////////////////
-      listText += '<div id="dialog_' + name + '"  \
-    style="z-index:3; overflow:auto; min-width:250px; max-height:' + this.opt.height / 2 + 'px" >';
+    //   listText += '<div class="' + this.opt.target + '_factor">';
+    //   listText += '<span id="span_' +
+    //     name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" title="Filter/reorder" ></span><br>';
+    //   listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus"\
+    // title="Display/Hide Category"  ></span>';
 
-      listText += '<div id="all_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">all</div>';
-      listText += '<div id="none_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">none</div>';
-      listText += '<div id="div_' + name + '">';
-      listText += '<form id="' + name + '">';
+    //   listText += '<div id="dialog_' + name + '"  \
+    // style="z-index:3; overflow:auto; min-width:250px; max-height:' + this.opt.height / 2 + 'px" >';
 
-      // Forms for each facor to select displayed data
-      //console.log(name);
-      for (let j in orderedKeys) {
-        var bgcolor = this.factorColors[i][orderedKeys[j]];
-        var longFactorName = this.data.longFactorName[i][orderedKeys[j]];
-        var shortId = i.split(' ').join('_') + '|' + orderedKeys[j];
-        var checked = '';
-        if (selectedFactors[i][orderedKeys[j]]) {
-          checked = 'checked';
-        }
+    //   listText += '<div id="all_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">all</div>';
+    //   listText += '<div id="none_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">none</div>';
 
-        listText += '<div \
-      id="' + this.opt.target + '_sorted_position:' + shortId + '" \
-      style="background-color:' + bgcolor + '" \
-      height="' + this.opt.barHeight + 'px" \
-      data-factor="' + i + '" \
-      data-value="' + orderedKeys[j] + '" \
-      title="' + longFactorName + '"\
-      >';
-        var toDisplay = longFactorName.length > 40 ? orderedKeys[j] : longFactorName;
-        listText += '<input type="checkbox" id="' + shortId + '" \
-      name="' + shortId + '" \
-      data-factor="' + i + '" \
-      data-value="' + orderedKeys[j] + '" \
-      ' + checked + '/>';
-        listText += toDisplay + '</div>';
+    //   listText += '<div id="div_' + name + '">';
+    //   listText += '<form id="' + name + '">';
 
-      }
-      listText += '</form>';
-      listText += "</div>";
-      listText += "</div>";
-      listText += "</div>";
-    }
+    //   // Forms for each facor to select displayed data
+    //   //console.log(name);
+    //   for (let j in orderedKeys) {
+    //     var bgcolor = this.factorColors[i][orderedKeys[j]];
+    //     var longFactorName = this.data.longFactorName[i][orderedKeys[j]];
+    //     var shortId = i.split(' ').join('_') + '|' + orderedKeys[j];
+    //     var checked = '';
+    //     if (selectedFactors[i][orderedKeys[j]]) {
+    //       checked = 'checked';
+    //     }
 
-    this.sortDiv = jQuery('#' + this.sortDivId);
-    this.sortDiv.tooltip({
-      track: true
-    });
+    //     listText += '<div \
+    //   id="' + this.opt.target + '_sorted_position:' + shortId + '" \
+    //   style="background-color:' + bgcolor + '" \
+    //   height="' + this.opt.barHeight + 'px" \
+    //   data-factor="' + i + '" \
+    //   data-value="' + orderedKeys[j] + '" \
+    //   title="' + longFactorName + '"\
+    //   >';
+    //     var toDisplay = longFactorName.length > 40 ? orderedKeys[j] : longFactorName;
+    //     listText += '<input type="checkbox" id="' + shortId + '" \
+    //   name="' + shortId + '" \
+    //   data-factor="' + i + '" \
+    //   data-value="' + orderedKeys[j] + '" \
+    //   ' + checked + '/>';
+    //     listText += toDisplay + '</div>';
 
+    //   }
+    //   listText += '</form>';
+    //   listText += "</div>";
+    //   listText += "</div>";
+    //   listText += "</div>";
+    // }
+
+    // this.sortDiv = jQuery('#' + this.sortDivId);
+    // this.sortDiv.tooltip({
+    //   track: true
+    // });
+
+      //////////////////////////////////////
     //this.sortDiv.html(listText);
     //this.sortDiv.css('column-count',factorCount);
     //this.sortDiv.css('height',factorCount * this.opt.barHeight *2);
     //this.sortDiv.disableSelection();
-    var checks = jQuery(":checkbox[id*='|']");
+    // var checks = jQuery(":checkbox[id*='|']");
 
-    checks.on("click", function (evt) {
-      var src = jQuery(this);
-      var self2 = src.data('expression-bar');
-      self2._updateFilteredFactors(self2.sortDivId);
-      if (self2.refreshSVGEnabled == true) {
-        self2.updateGroupBy(self2);
-        self2.refreshSVG(self2);
-        self2.data.sortRenderedGroups();
-        self2.refresh();
-      }
-    });
+    // checks.on("click", function (evt) {
+    //   var src = jQuery(this);
+    //   var self2 = src.data('expression-bar');
+    //   self2._updateFilteredFactors(self2.sortDivId);
+    //   if (self2.refreshSVGEnabled == true) {
+    //     self2.updateGroupBy(self2);
+    //     self2.refreshSVG(self2);
+    //     self2.data.sortRenderedGroups();
+    //     self2.refresh();
+    //   }
+    // });
 
-    // icons stylings
-    checks.data("expression-bar", this);
-    var xFact = 0;
+    // // icons stylings
+    // checks.data("expression-bar", this);
+    
     for (var fo in this.data.defaultFactorOrder) {
       i = this.data.defaultFactorOrder[fo];
       var name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
@@ -675,7 +678,7 @@ export class ExpressionBar {
 
       $('#' + this.opt.target).css('overflow', 'hidden');
 
-      $('.ui-icon').css('margin', 0);
+      // $('.ui-icon').css('margin', 0);
 
       var iconWidth = factorDiv.width();
       factorDiv.css('display', 'inline-block');
@@ -694,7 +697,7 @@ export class ExpressionBar {
         self.selectAllorNoneFactor(nameinside, false);
 
       });
-
+      var xFact = 0;
       s.css('text-align', 'left');
       s.css('max-width', '100%;');
       s.css('overflow-x', 'hidden;');
@@ -746,7 +749,7 @@ export class ExpressionBar {
     var find = factor.replace(/ /g, '_');
     var name = this.opt.target + '_sorted_list_' + find;
     jQuery('#' + name + ' div').each(function (e) {
-      div = jQuery(this);
+      let div = jQuery(this);
       var factor = div.data('factor');
       var value = div.data('value');
       self.data.renderedOrder[factor][value] = div.index();
