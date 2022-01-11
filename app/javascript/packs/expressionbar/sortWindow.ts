@@ -32,6 +32,8 @@ export default class SortWindow{
 		span.attr("class", `ui-icon ${icon}`);
 		span.attr("title", text);
 		span.css("margin", 0);
+		span.attr('width', this.#eb.opt.barHeight * 2);
+		span.attr('height', this.#eb.opt.barHeight);
 		return span;
 		// target_div.append(span);
 	}
@@ -74,6 +76,7 @@ export default class SortWindow{
 
 	#appendFactorDialog(fg: FactorGroup, name:string, div: JQuery){
 		let factors = fg.sortedFactors();
+		let xFact = 0
 		let dialog_div = jQuery("<div/>");
 		dialog_div.attr("id", `dialog_${name}`);
 		dialog_div.attr("style", `z-index:3; overflow:auto; min-width:250px; max-height:${this.#eb.opt.height / 2}px`);
@@ -102,6 +105,10 @@ export default class SortWindow{
 		});
 		dialog_div.append(form);
 		div.append(dialog_div);
+		dialog_div.css('position', 'absolute');
+		dialog_div.css('left', xFact);
+		dialog_div.css('background-color', 'white');
+		dialog_div.css('border', 'outset');
 		dialog_div.hide();
 
 		return dialog_div;
@@ -169,11 +176,11 @@ export default class SortWindow{
 	render(){
 		this.#setDefault();
 		var data:ExpressionData = this.#eb.data;
-		var selectedFactors:object = data.selectedFactors;
+		var selectedFactors:Map<string, FactorGroup> = data.factors;
 		var sorted_div = jQuery(`#${this.#eb.sortDivId}`);
-		for(let fo in selectedFactors){
-			console.log("About to render", fo);
-			let fg:FactorGroup = data.factors.get(fo);
+		for(let fg of selectedFactors.values()){
+			// console.log("About to render", fo);
+			// let fg:FactorGroup = data.factors.get(fo);
 			let fdiv = this.#renderSingleFactorDiv(fg);
 			sorted_div.append(fdiv);
 

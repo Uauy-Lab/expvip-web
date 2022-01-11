@@ -10,7 +10,7 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
  class ExpressionData{
 	constructor(data, options) {
 		for (var attrname in data) {
-			console.log(attrname);
+			// console.log(attrname);
 			if (attrname == 'values'){
 				this[attrname] = this._sortGeneOrder(attrname, data[attrname]);
 			}else if(attrname == 'factors'){
@@ -18,7 +18,7 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 			} else {
 				this[attrname] = data[attrname];
 			}
-			console.log(this[attrname]);
+			// console.log(this[attrname]);
 		}
 		console.log(options);
 		this.opt = options;
@@ -126,9 +126,8 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 	getSortedKeys(fact) {
 		let gf = this.factors.get(fact);
 		let factors = [...gf.factors.values()]
-		let sortedFactors = factors.sort((a,b) => a.order - b.order);
-		return sortedFactors;
-
+		return factors.sort((a,b) => a.order - b.order);
+		
 		// var i = this.defaultFactorOrder[factor];
 		// var obj = this.renderedOrder[i];
 		// var keys = []; 

@@ -650,22 +650,22 @@ export class ExpressionBar {
     // checks.data("expression-bar", this);
     
     for (var fo in this.data.defaultFactorOrder) {
-      i = this.data.defaultFactorOrder[fo];
-      var name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
-      jQuery('#span_' + name).on("click", function (e) {
-        var nameinside = e.target.id.replace("span_", "dialog_");
-        var sdialog = jQuery('#' + nameinside);
-        sdialog.show();
-        jQuery(document).on("mouseup", function (e) {
-          var container = sdialog;
-          if (!container.is(e.target) // if the target of the click isn't the container...
-            && container.has(e.target).length === 0) // ... nor a descendant of the container
-          {
-            container.hide();
-          }
-        });
+      // i = this.data.defaultFactorOrder[fo];
+      // var name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
+      // jQuery('#span_' + name).on("click", function (e) {
+      //   var nameinside = e.target.id.replace("span_", "dialog_");
+      //   var sdialog = jQuery('#' + nameinside);
+      //   sdialog.show();
+      //   jQuery(document).on("mouseup", function (e) {
+      //     var container = sdialog;
+      //     if (!container.is(e.target) // if the target of the click isn't the container...
+      //       && container.has(e.target).length === 0) // ... nor a descendant of the container
+      //     {
+      //       container.hide();
+      //     }
+      //   });
 
-      });
+      // });
 
       var s = jQuery('#' + name);
       var factorDiv = jQuery('.' + this.opt.target + '_factor');
@@ -711,13 +711,13 @@ export class ExpressionBar {
         }
       });
 
-      sbtn.attr('width', this.opt.barHeight * 2);
-      sbtn.attr('height', this.opt.barHeight);
+      // sbtn.attr('width', this.opt.barHeight * 2);
+      // sbtn.attr('height', this.opt.barHeight);
 
       var possbtn = sbtn.position();
 
-      shbtn.attr('width', this.opt.barHeight * 2);
-      shbtn.attr('height', this.opt.barHeight);
+      // shbtn.attr('width', this.opt.barHeight * 2);
+      // shbtn.attr('height', this.opt.barHeight);
 
       sdialog.css('position', 'absolute');
       sdialog.css('left', xFact);
