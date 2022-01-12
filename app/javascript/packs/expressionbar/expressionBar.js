@@ -31,6 +31,7 @@ var heatmap = require('./heatmap.js');
 import ExpressionData from "./dataContainer"
 import GeneralControls from "./generalControls"
 import SortWindow from "./sortWindow"
+import Options from "./options"
 
 require('string.prototype.startswith');
 
@@ -57,13 +58,16 @@ export class ExpressionBar {
   * @type {ExpressionData}
   */
   data;
+/**
+ * @type {Options}
+ */
+  opt;
   constructor(options) {
 
     // try{
     this.setDefaultOptions();
     jQuery.extend(this.opt, options);
     this.general_controls = new GeneralControls(this, null);
-    this._setUserDefaultValues();
     this.setupContainer();
     this.setupProgressBar();
     this.setupButtons();
@@ -78,37 +82,28 @@ export class ExpressionBar {
     //   }
     // }   
   }
-  _setUserDefaultValues() {
-    this.opt.sc = d3.schemeCategory20;
-    this.opt.defaultGroupBy = this.opt.groupBy;
-    this.opt.defaultRenderProperty = this.opt.renderProperty;
-    this.opt.calculateLog = this.opt.defaultLog2State;
-    this.storeValue('calculateLog', this.opt.calculateLog);
-    this.opt.showTernaryPlot = false;
-  }
-  _restoreUserDefaults() {
-    this.opt.groupBy = this.opt.defaultGroupBy;
-    this.opt.renderProperty = this.opt.defaultRenderProperty;
-    this.opt.selectedFactors = this.data.selectedFactors;
-    this.opt.calculateLog = this.opt.defaultLog2State;
-    this.storeValue('calculateLog', this.opt.calculateLog);
-    this.opt.showTernaryPlot = false;
-    this.opt.showHomoeologues = false;
+  
+  // _restoreUserDefaults() {
+  //   this.opt.restoreUserDefaults();
+    // this.opt.groupBy = this.opt.defaultGroupBy;
+    // this.opt.renderProperty = this.opt.defaultRenderProperty;
+    // this.opt.selectedFactors = this.data.selectedFactors;
+    // this.opt.calculateLog = this.opt.defaultLog2State;
+    // // this.opt.storeValue('calculateLog', this.opt.calculateLog);
+    // this.opt.showTernaryPlot = false;
+    // this.opt.showHomoeologues = false;
 
-    if (this.opt.plot == 'Ternary') {
-      this.opt.plot = 'Bar';
-    }
+    // if (this.opt.plot == 'Ternary') {
+    //   this.opt.plot = 'Bar';
+    // }
 
-  }
-  _selectPlotType() {
+  // }
 
-
+  #selectPlotType() {
 
     switch (this.opt.plot) {
       case 'Bar':
         $(`#${this.opt.target}_calculateLogSpan`).css('display', 'initial');
-        // this.opt.calculateLog = this._retrieveValue("calculateLog");
-        // this.opt.showTernaryPlot = false;
         this.renderObject = new barPlot.BarPlot(this);
         break;
 
@@ -116,19 +111,14 @@ export class ExpressionBar {
         $(`#${this.opt.target}_calculateLogSpan`).css('display', 'initial');
         this.opt.showHomoeologues = true;
         this.opt.showTernaryPlot = false;
-        // If there is no session value for calculate log show the log2 for heatmap
-        this.opt.calculateLog = this._retrieveValue('calculateLog');
         this.renderObject = new heatmap.HeatMap(this);
         break;
 
       case 'Ternary':
         if ($(`#${this.opt.target}_calculateLog`).prop('checked')) {
-          $(`#${this.opt.target}_calculateLog`).trigger("click");
+            $(`#${this.opt.target}_calculateLog`).trigger("click");
         }
         $(`#${this.opt.target}_calculateLogSpan`).css('display', 'none');
-        // this.opt.showHomoeologues = true;
-        // this.opt.showTernaryPlot = true;
-        // this.opt.calculateLog = this._retrieveValue("calculateLog");
         this.renderObject = new ternaryPlot.TernaryPlot(this);
         break;
       default:
@@ -136,38 +126,18 @@ export class ExpressionBar {
         return;
     }
   }
-  _restoreProperty(key) {
-    var stored = this._retrieveValue(key);
-    if (stored) {
-      this.opt[key] = stored;
-    }
-  }
+ 
   restoreDefaults() {
-    this._removeValue('groupBy');
-    this._removeValue('renderProperty');
-    this._removeValue('sortOrder');
-    this._removeValue('renderedOrder');
-    this._removeValue('selectedFactors');
-    this._removeValue('showHomoeologues');
-    this._removeValue('calculateLog');
-    this._removeValue('showTernaryPlot');
-    this._selectPlotType();
-    this._restoreUserDefaults();
-
+    this.opt.restoreDefaults();
+    this.#selectPlotType();
+    this.opt.restoreUserDefaults();
     this.data.sortOrder = [];
     this.dataLoaded();
     this.refresh();
   }
   restoreDisplayOptions() {
-    this._restoreProperty('groupBy');
-    this._restoreProperty('renderProperty');
-    this._restoreProperty('sortOrder');
-    this._restoreProperty('renderedOrder');
-    this._restoreProperty('selectedFactors');
-    this._restoreProperty('showHomoeologues');
-    this._restoreProperty('showTernaryPlot');
-    this._restoreProperty('colorFactor');
-    this._restoreProperty('calculateLog');
+    this.opt.restoreOptions();
+    
     // should we add an option to the orders?
     // this can tide up this bit
     if (typeof this.opt.sortOrder !== 'undefined') {
@@ -180,10 +150,7 @@ export class ExpressionBar {
     if (this.opt.showHomoeologues) {
       hom_checked = true;
     }
-    jQuery('#' + this.opt.target + '_showHomoeologues')
-      .prop('checked', hom_checked);
-
-
+    jQuery('#' + this.opt.target + '_showHomoeologues').prop('checked', hom_checked);
     var tplot_checked = false;
     if (this.opt.showTernaryPlot) {
       tplot_checked = true;
@@ -192,33 +159,24 @@ export class ExpressionBar {
         this.opt.plot = 'Ternary';
       }
     }
-    jQuery('#' + this.opt.target + '_showTernaryPlot')
-      .prop('checked', tplot_checked);
-
-
-    var log_checked = false;
-    if (this.opt.calculateLog) {
-      this.opt.calculateLog = true;
-      log_checked = true;
-    }
-    jQuery('#' + this.opt.target + '_calculateLog')
-      .prop('checked', log_checked);
+    jQuery('#' + this.opt.target + '_showTernaryPlot').prop('checked', tplot_checked);
+    jQuery('#' + this.opt.target + '_calculateLog').prop('checked', this.opt.calculateLog);
 
   }
+
   setupProgressBar() {
     var progressBarId = this.opt.target + '_progressbar';
     this.pb = jQuery('#' + progressBarId);
     this.pb.attr('height', '20px');
     this.pb.attr('min-height', '20px');
     console.log(this.pb);
-
     this.pb.progressbar({
       value: false
     });
     this.pb.hide();
   }
-  setupSVG() {
 
+  setupSVG() {
     var self = this;
     var fontSize = this.opt.fontSize;
     this.renderGroupSelectorColour();
@@ -243,16 +201,9 @@ export class ExpressionBar {
 
     this.barGroups = [];
 
-    this.chart.on('mousemove', function (e) {
-      self.highlightRow(e);
-    });
-
-    this.chart.on('mouseenter', function (e) {
-      self.renderObject.showHighithRow();
-    });
-    this.chart.on('mouseleave', function (e) {
-      self.renderObject.hideHidelightRow();
-    });
+    this.chart.on('mousemove',   (e) => { self.highlightRow(e) });
+    this.chart.on('mouseenter',  (e) => { self.renderObject.showHighithRow() });
+    this.chart.on('mouseleave',  (e) => { self.renderObject.hideHidelightRow() });
   }
   setupButtons() {
     var self = this;
@@ -336,31 +287,8 @@ export class ExpressionBar {
 
   }
   setDefaultOptions() {
-    this.opt = {
-      target: 'bar_expression_viewer',
-      fontFamily: 'Andale mono, courier, monospace',
-      fontColor: 'white',
-      backgroundColor: 'white',
-      selectionFontColor: 'black',
-      selectionBackgroundColor: 'yellow',
-      width: $(window).width(),
-      height: $(window).height(),
-      barHeight: 17,
-      labelWidth: ($(window).width() * 0.4),
-      renderProperty: 'tpm',
-      renderGroup: 'group',
-      defaultLog2State: false,
-      restoreDisplayOptions: true,
-      highlight: null,
-      groupBy: 'groups',
-      groupBarWidth: 18,
-      colorFactor: 'renderGroup',
-      headerOffset: 0,
-      showHomoeologues: false,
-      plot: 'Bar',
-      fontSize: 14,
-      tpmThreshold: 1
-    };
+    this.opt = new Options(this);
+
   }
   setSelectedInJoinForm() {
 
@@ -421,7 +349,7 @@ export class ExpressionBar {
     }
     if (ret) {
       //sessionStorage.setItem( this.opt.target + 'groupBy' , self.opt.groupBy);
-      this.storeValue('groupBy', self.opt.groupBy);
+      this.opt.storeValue('groupBy', self.opt.groupBy);
     }
 
 
@@ -429,7 +357,7 @@ export class ExpressionBar {
   }
   setDefaultExpressionValue() {
     var def = this.data.getDefaultProperty();
-    this.storeValue('renderProperty', def);
+    this.opt.storeValue('renderProperty', def);
     this.restoreDisplayOptions();
 
   }
@@ -471,7 +399,7 @@ export class ExpressionBar {
       var value = src.data('value');
       self.data.selectedFactors[factor][value] = this.checked;
     });
-    this.storeValue('selectedFactors', this.data.selectedFactors);
+    this.opt.storeValue('selectedFactors', this.data.selectedFactors);
     this.refreshSVGEnabled = true;
 
   }
@@ -489,24 +417,24 @@ export class ExpressionBar {
       shbtn.addClass('ui-icon-circle-minus');
     }
   }
-  storeValue(key, value) {
-    var val = JSON.stringify(value);
-    sessionStorage.setItem(this.opt.target + "_" + key, val);
-  }
-  _removeValue(key, value) {
-    sessionStorage.removeItem(this.opt.target + "_" + key);
-    this.opt[key] = null;
-  }
-  _retrieveValue(key) {
-    var val = sessionStorage.getItem(this.opt.target + "_" + key);
-    var parsed = null;
-    try {
-      parsed = JSON.parse(val);
-    } catch (err) {
-      parsed = null;
-    }
-    return parsed;
-  }
+  // storeValue(key, value) {
+  //   var val = JSON.stringify(value);
+  //   sessionStorage.setItem(this.opt.target + "_" + key, val);
+  // }
+  // _removeValue(key, value) {
+  //   sessionStorage.removeItem(this.opt.target + "_" + key);
+  //   this.opt[key] = null;
+  // }
+  // _retrieveValue(key) {
+  //   var val = sessionStorage.getItem(this.opt.target + "_" + key);
+  //   var parsed = null;
+  //   try {
+  //     parsed = JSON.parse(val);
+  //   } catch (err) {
+  //     parsed = null;
+  //   }
+  //   return parsed;
+  // }
   checkSelectedFactors() {
     var self = this;
     for (var fo in this.data.defaultFactorOrder) {
@@ -649,7 +577,7 @@ export class ExpressionBar {
     // // icons stylings
     // checks.data("expression-bar", this);
     
-    for (var fo in this.data.defaultFactorOrder) {
+    // for (var fo in this.data.defaultFactorOrder) {
       // i = this.data.defaultFactorOrder[fo];
       // var name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
       // jQuery('#span_' + name).on("click", function (e) {
@@ -667,68 +595,68 @@ export class ExpressionBar {
 
       // });
 
-      var s = jQuery('#' + name);
-      var factorDiv = jQuery('.' + this.opt.target + '_factor');
-      var sbtn = jQuery('#span_' + name);
-      var shbtn = jQuery('#showHide_' + name);
-      var sdialog = jQuery('#dialog_' + name);
-      var count = s.children().length;
-      var sall = jQuery('#all_' + name);
-      var snone = jQuery('#none_' + name);
+      // var s = jQuery('#' + name);
+      // var factorDiv = jQuery('.' + this.opt.target + '_factor');
+      // var sbtn = jQuery('#span_' + name);
+      // var shbtn = jQuery('#showHide_' + name);
+      // var sdialog = jQuery('#dialog_' + name);
+      // var count = s.children().length;
+      // var sall = jQuery('#all_' + name);
+      // var snone = jQuery('#none_' + name);
 
-      $('#' + this.opt.target).css('overflow', 'hidden');
+      // $('#' + this.opt.target).css('overflow', 'hidden');
 
       // $('.ui-icon').css('margin', 0);
 
-      var iconWidth = factorDiv.width();
-      factorDiv.css('display', 'inline-block');
-      factorDiv.css('text-align', 'center');
-      factorDiv.css('width', 16);
-      factorDiv.css('margin-left', 2);
+      // var iconWidth = factorDiv.width();
+      // factorDiv.css('display', 'inline-block');
+      // factorDiv.css('text-align', 'center');
+      // factorDiv.css('width', 16);
+      // factorDiv.css('margin-left', 2);
 
-      sall.on('click', function (e) {
-        var nameinside = e.target.id.replace('all_', '');
-        self.selectAllorNoneFactor(nameinside, true);
+      // sall.on('click', function (e) {
+      //   var nameinside = e.target.id.replace('all_', '');
+      //   self.selectAllorNoneFactor(nameinside, true);
 
-      });
+      // });
 
-      snone.on('click', function (e) {
-        var nameinside = e.target.id.replace('none_', '');
-        self.selectAllorNoneFactor(nameinside, false);
+      // snone.on('click', function (e) {
+      //   var nameinside = e.target.id.replace('none_', '');
+      //   self.selectAllorNoneFactor(nameinside, false);
 
-      });
-      var xFact = 0;
-      s.css('text-align', 'left');
-      s.css('max-width', '100%;');
-      s.css('overflow-x', 'hidden;');
-      s.sortable({
-        axis: "y",
-        update: function (event, ui) {
-          var factor = ui.item.data('factor');
-          var value = ui.item.data('value');
-          var index = ui.item.index();
-          self._refershSortedOrder(factor);
-        }
-      });
+      // });
+      // var xFact = 0;
+      // s.css('text-align', 'left');
+      // s.css('max-width', '100%;');
+      // s.css('overflow-x', 'hidden;');
+      // s.sortable({
+      //   axis: "y",
+      //   update: function (event, ui) {
+      //     var factor = ui.item.data('factor');
+      //     var value = ui.item.data('value');
+      //     var index = ui.item.index();
+      //     self._refershSortedOrder(factor);
+      //   }
+      // });
 
       // sbtn.attr('width', this.opt.barHeight * 2);
       // sbtn.attr('height', this.opt.barHeight);
 
-      var possbtn = sbtn.position();
+      // var possbtn = sbtn.position();
 
-      // shbtn.attr('width', this.opt.barHeight * 2);
-      // shbtn.attr('height', this.opt.barHeight);
+      // // shbtn.attr('width', this.opt.barHeight * 2);
+      // // shbtn.attr('height', this.opt.barHeight);
 
-      sdialog.css('position', 'absolute');
-      sdialog.css('left', xFact);
-      sdialog.css('background-color', 'white');
-      sdialog.css('border', 'outset');
-      // s.disableSelection();
-      sdialog.hide();
+      // sdialog.css('position', 'absolute');
+      // sdialog.css('left', xFact);
+      // sdialog.css('background-color', 'white');
+      // sdialog.css('border', 'outset');
+      // // s.disableSelection();
+      // sdialog.hide();
 
-      //sdialog.on("mouseleave", function(){sdialog.hide()})
-      xFact += self.opt.groupBarWidth;
-    }
+      // //sdialog.on("mouseleave", function(){sdialog.hide()})
+      // xFact += self.opt.groupBarWidth;
+    // }
 
   }
   selectAllorNoneFactor(nameInside, value) {
@@ -756,8 +684,8 @@ export class ExpressionBar {
     }
     );
     this.data.addSortPriority(factor, false);
-    this.storeValue('sortOrder', this.data.sortOrder);
-    this.storeValue('renderedOrder', this.renderedOrder);
+    this.opt.storeValue('sortOrder', this.data.sortOrder);
+    this.opt.storeValue('renderedOrder', this.renderedOrder);
 
     this.data.sortRenderedGroups(this.data.sortOrder, this.renderedOrder);
     this.setFactorColor(factor);
@@ -1218,14 +1146,14 @@ export class ExpressionBar {
     var xFact = 0;
     var self = this;
     var longestFactorTitle = 0;
-    this.data.factors.forEach(function (value, key, map) {
+    this.data.sortedFactorGroups.forEach( gf  => {
       var factorTitle = self.factorTitle.append('text')
         .attr('y', xFact)
         .attr('dy', '1em')
         .attr('transform', function (d) {
           return 'rotate(-90)';
         })
-        .text(key);
+        .text(gf.name);
       xFact += self.opt.groupBarWidth;
 
       // Calculating the longest factor title
@@ -1288,10 +1216,13 @@ export class ExpressionBar {
           .attr('opacity', 0.0);
 
         if (typeof factorValue !== 'undefined') {
-          rect.on('mouseenter', function () { self.showTooltip(tooltip, this, this.tooltip, this.tooltipBox, false); })
+          rect
+            .on('mouseenter', function () { 
+            self.showTooltip(tooltip, this, this.tooltip, this.tooltipBox, false); 
+            })
             .on('click', function () {
               self.data.addSortPriority(key, false);
-              self.storeValue('sortOrder', self.data.sortOrder);
+              self.opt.storeValue('sortOrder', self.data.sortOrder);
               self.data.sortRenderedGroups();
               self.setFactorColor(key);
               self.refresh();
@@ -1310,7 +1241,7 @@ export class ExpressionBar {
   }
   setFactorColor(factor) {
     this.opt.colorFactor = factor;
-    this.storeValue('colorFactor', factor);
+    this.opt.storeValue('colorFactor', factor);
   }
   renderTooltip() {
     var barHeight = this.opt.barHeight;
@@ -1507,7 +1438,7 @@ export class ExpressionBar {
     document.body.removeChild(element);
   }
   render() {
-    this._selectPlotType();
+    this.#selectPlotType();
     var chart = this.chart;
     var gene = this.opt.highlight;
     var data = this.data.getGroupedData(this.opt.renderProperty, this.opt.groupBy);

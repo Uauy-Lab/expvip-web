@@ -34,22 +34,23 @@ export default class SortWindow{
 		span.css("margin", 0);
 		span.attr('width', this.#eb.opt.barHeight * 2);
 		span.attr('height', this.#eb.opt.barHeight);
+		target_div.append(span);
 		return span;
-		// target_div.append(span);
 	}
 
-	#renderSingleFactorDiv(fg: FactorGroup){
+	#renderSingleFactorDiv(fg: FactorGroup, index:number){
 		let name =  this.#target + '_sorted_list_' + html_name(fg.name);
 		let outer_div = jQuery("<div/>");
 		outer_div.attr("id", name);
 		outer_div.attr("class",  `${this.#target}_factor`);
-		outer_div.attr("style", "display: inline-block; text-align: centre; width: 16px; margin-left: 2px;");
+		outer_div.css('display', 'inline-block');
+		outer_div.css('text-align', 'center');
+		outer_div.css('width', 16);
+		outer_div.css('margin-left', 2);
 		let span_div = this.#appendSpanButton(outer_div, "span", name, "Filter/reorder", "ui-icon-arrowthick-2-n-s" );
-		outer_div.append(span_div);
 		outer_div.append("<br/>");
-		let show_hide_div = this.#appendSpanButton(outer_div, "showHide", name,"Display/Hide Category",  "ui-icon-circle-plus");
-		outer_div.append(show_hide_div);
-		let dialog_div = this.#appendFactorDialog(fg, name, outer_div);
+		this.#appendSpanButton(outer_div, "showHide", name,"Display/Hide Category",  "ui-icon-circle-plus");
+		let dialog_div = this.#appendFactorDialog(fg, name, outer_div, index);
 		this.#addShowAndHideForCategoryCheckbox(span_div, dialog_div);
 		return outer_div;
 	}
@@ -59,8 +60,8 @@ export default class SortWindow{
 			menu.show();
 		})
 		jQuery(document).on("mouseup", e=>{
-			if(!menu.is(e.target) &&
-				menu.has(e.target).length === 0 ){
+			if(!menu.is(e.target[0]) &&
+				menu.has(e.target[0]).length === 0 ){
 				menu.hide();
 			}
 		})
@@ -74,9 +75,9 @@ export default class SortWindow{
 		target_div.append(div);
 	}
 
-	#appendFactorDialog(fg: FactorGroup, name:string, div: JQuery){
-		let factors = fg.sortedFactors();
-		let xFact = 0
+	#appendFactorDialog(fg: FactorGroup, name:string, div: JQuery, index: number): JQuery<HTMLElement>{
+		let factors = fg.sortedFactors;
+		let xFact = index * this.#eb.opt.groupBarWidth;
 		let dialog_div = jQuery("<div/>");
 		dialog_div.attr("id", `dialog_${name}`);
 		dialog_div.attr("style", `z-index:3; overflow:auto; min-width:250px; max-height:${this.#eb.opt.height / 2}px`);
@@ -98,8 +99,6 @@ export default class SortWindow{
 		  axis: "y",
 		  update:  (event, ui) => {
 			var factor = ui.item.data('factor');
-			// var value = ui.item.data('value');
-			// var index = ui.item.index();
 			this.#refershSortedOrder(factor);
 		  }
 		});
@@ -115,26 +114,30 @@ export default class SortWindow{
 	}
 
 	#refershSortedOrder(factor: string) {
-		var self = this;
-	
 		var find = html_name(factor);
 		var name = this.#target + '_sorted_list_' + find;
+		var factors: Map<string, FactorGroup> = this.#eb.data.factors;
 		jQuery('#' + name + ' div').each(function (e) {
-		  let div = jQuery(this);
-		  var factor = div.data('factor');
-		  var value = div.data('value');
-		  console.log(div[0]);
-		  console.log(factor);
-		  console.log(value);
-		  console.log(self.#eb.data.renderedOrder);
-		  self.#eb.data.renderedOrder[factor][value] = div.index();
+			let div = jQuery(this);
+			var factor = div.data('factor');
+			var value = div.data('value');
+			if(typeof factor === "undefined"){
+				return;
+			}
+			let fact = factors.get(factor);
+			
+			// self.#eb.data.renderedOrder[factor][value] = div.index();
+			fact.factors.get(value).order = div.index();
 		}
 		);
 		this.#eb.data.addSortPriority(factor, false);
-		this.#eb.storeValue('sortOrder', this.#eb.data.sortOrder);
-		this.#eb.storeValue('renderedOrder', this.#eb.renderedOrder);
-	
-		this.#eb.data.sortRenderedGroups(this.#eb.data.sortOrder, this.#eb.renderedOrder);
+		console.log("Saving");
+		console.log(this.#eb.data.sortOrder);
+		console.log(this.#eb.data.renderedOrder);
+		this.#eb.opt.storeValue('sortOrder', this.#eb.data.sortOrder);
+		this.#eb.opt.storeValue('renderedOrder', this.#eb.data.renderedOrder);
+		//this.#eb.data.sortOrder, this.#eb.data.renderedOrder
+		this.#eb.data.sortRenderedGroups();
 		this.#eb.setFactorColor(factor);
 		this.#eb.refresh();
 	  }
@@ -176,14 +179,12 @@ export default class SortWindow{
 	render(){
 		this.#setDefault();
 		var data:ExpressionData = this.#eb.data;
-		var selectedFactors:Map<string, FactorGroup> = data.factors;
+		// var selectedFactors:Map<string, FactorGroup> = data.factors;
 		var sorted_div = jQuery(`#${this.#eb.sortDivId}`);
-		for(let fg of selectedFactors.values()){
-			// console.log("About to render", fo);
-			// let fg:FactorGroup = data.factors.get(fo);
-			let fdiv = this.#renderSingleFactorDiv(fg);
+		var index = 0
+		for(let fg of data.sortedFactorGroups){
+			let fdiv = this.#renderSingleFactorDiv(fg, index++);
 			sorted_div.append(fdiv);
-
 		}
 		sorted_div.tooltip({
 			track: true

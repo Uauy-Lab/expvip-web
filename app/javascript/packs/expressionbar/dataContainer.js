@@ -6,15 +6,20 @@ require('string.prototype.startswith');
 import ExpressionValues from "./expressionValues"
 import GroupedValues from "./groupedValues"
 import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} from "./factorHelpers"
+import FactorGroup from "./factorGroup";
 
  class ExpressionData{
+	/**
+	 * @type {Map<string, FactorGroup>}
+	 */
+	factors;
 	constructor(data, options) {
 		for (var attrname in data) {
 			// console.log(attrname);
 			if (attrname == 'values'){
 				this[attrname] = this._sortGeneOrder(attrname, data[attrname]);
 			}else if(attrname == 'factors'){
-				this[attrname] = parseFactors(data[attrname]);
+				this.factors = parseFactors(data[attrname]);
 			} else {
 				this[attrname] = data[attrname];
 			}
@@ -23,7 +28,6 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 		console.log(options);
 		this.opt = options;
 		this.sortOrder = [];
-		console.log(this);
 	}
 
 	getExpressionValueTypes(){
@@ -123,10 +127,17 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 		return !ret;
 	};
 
-	getSortedKeys(fact) {
-		let gf = this.factors.get(fact);
-		let factors = [...gf.factors.values()]
-		return factors.sort((a,b) => a.order - b.order);
+	/**
+	 * 
+	 * @param {string} fact 
+	 * @returns {Array<FactorGroup>}
+	 */
+	getSortedFactors(fact) {
+		/**
+		 * @type{FactorGroup}
+		 */
+		let factors = [...this.factors.get(fact)];
+		return factors.sort((a,b)=> a.order - b.order);
 		
 		// var i = this.defaultFactorOrder[factor];
 		// var obj = this.renderedOrder[i];
@@ -137,16 +148,33 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 		// return keys.sort(function(a,b){return obj[a] - obj[b];});
 	};
 
+	/**
+	 * @return {Array<FactorGroup>}
+	 */
+	get sortedFactorGroups(){
+		return [...this.factors.values()].sort((a,b) => a.order - b.order);
+	}
+
+	get renderedOrder(){
+		let ret = {}
+		this.sortedFactorGroups.forEach(fg => {
+			ret[fg.name] = fg.sortedFactors.map(f => f.name);
+		})
+		return ret;
+	}
 
 	/*
 	The only parameter, sortOrder, is an array of the factors that will be used to sort. 
 	*/
 	sortRenderedGroups(){
+		console.log("Re-sorting");
 		var i;
 		if(this.renderedData.length == 0){
 			return;
 		}
+		console.log("We enter to the method properlu");
 		var sortable = this.renderedData[0].slice();
+		console.log(sortable);
 		var sortOrder =  this.sortOrder;
 		var sorted = sortable.sort((a, b) => {
 			for(let o of sortOrder){
@@ -565,6 +593,9 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 	};
 
 	addSortPriority(factor, end){
+		console.log("Adding sort priority");
+		console.log(factor);
+		console.log(this.sortOrder);
 		end = typeof end !== 'undefined' ? end : true;
 		this.removeSortPriority(factor);
 		if(end === true){
@@ -572,6 +603,7 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} 
 		}else{
 			this.sortOrder.unshift(factor);
 		}
+		console.log(this.sortOrder);
 
 	};
 

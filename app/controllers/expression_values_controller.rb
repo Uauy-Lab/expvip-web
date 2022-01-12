@@ -142,7 +142,7 @@ class ExpressionValuesController < ApplicationController
   end
 
   def add_ret_values(ret, params)
-    factorOrder, longFactorName, selectedFactors = ExperimentsHelper.getFactorOrder
+    # factorOrder, longFactorName, selectedFactors = ExperimentsHelper.getFactorOrder
     experiments, groups =  ExperimentsHelper.getExperimentGroups
     # params["studies"].each do |e|
     #   selectedFactors["study"][e] = true
@@ -151,7 +151,7 @@ class ExpressionValuesController < ApplicationController
     # ret["factorOrder"] = factorOrder
     # ret["longFactorName"] = longFactorName
 
-    ret["selectedFactors"] = selectedFactors
+    # ret["selectedFactors"] = selectedFactors
     ret["defaultFactorSelection"] = getDefaultSelection
     ret["defaultFactorOrder"] = ExperimentsHelper.getDefaultOrder
 

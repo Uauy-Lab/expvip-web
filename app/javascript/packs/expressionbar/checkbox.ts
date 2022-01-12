@@ -33,7 +33,7 @@ class Checkbox extends Control{
 	saveStatus(): void {
 		let checked = this.el.is(":checked");
 		this.expression_bar.opt[this.name] = checked;
-		this.expression_bar.storeValue(checked);
+		this.expression_bar.opt.storeValue(checked);
 		this.expression_bar.general_controls.updateControls();
 	}
 }

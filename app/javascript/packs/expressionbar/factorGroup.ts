@@ -17,8 +17,33 @@ export default class FactorGroup{
 	   }
 	}
 
-	sortedFactors(){
+	get sortedFactors() : Array<Factor>{
 		let factors = [...this.factors.values()]
 		return factors.sort((a,b) => a.order - b.order);
 	}
+
+	get defaultOrder(){
+		let ret = {}
+		let factors = [...this.factors.values()].forEach(factor => {
+			ret[factor.name] = factor.defaultOrder;
+		})
+		return ret;
+	}
+
+	get factorOrder(){
+		let ret = {}
+		let factors = [...this.factors.values()]
+		factors.forEach(factor => {
+			ret[factor.name] = factor.order;
+		})
+		return ret;
+	}
+
+	set factorOrder(ord:object){
+		for(let key in ord ){
+			this.factors.get(key).order = ord[key];
+		}
+	}
+
+
 }
