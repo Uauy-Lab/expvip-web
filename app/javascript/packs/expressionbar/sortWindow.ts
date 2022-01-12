@@ -181,6 +181,7 @@ export default class SortWindow{
 		var data:ExpressionData = this.#eb.data;
 		// var selectedFactors:Map<string, FactorGroup> = data.factors;
 		var sorted_div = jQuery(`#${this.#eb.sortDivId}`);
+		sorted_div.empty();
 		var index = 0
 		for(let fg of data.sortedFactorGroups){
 			let fdiv = this.#renderSingleFactorDiv(fg, index++);

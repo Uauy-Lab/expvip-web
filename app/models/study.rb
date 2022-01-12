@@ -7,6 +7,7 @@ class Study < ActiveRecord::Base
 		ret.name = self.accession
 		ret.description = self.title
 		ret.order = self.order
+		ret.selected = self.selected
 		ret
 	end
 end

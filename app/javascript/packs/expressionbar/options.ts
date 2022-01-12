@@ -110,6 +110,9 @@ export default class Options{
 		this.removeValue('showHomoeologues');
 		this.removeValue('calculateLog');
 		this.removeValue('showTernaryPlot');
+		let factors : Map<string, FactorGroup> = this.#eb.data.factors;
+		[...factors.values()].forEach(fg => fg.restoreDefaults());
+
 	}
 
 	restoreOptions() {
@@ -133,17 +136,24 @@ export default class Options{
 
 	set selectedFactors(sf: object){
 		let data: ExpressionData = this.#eb.data;
-		for(let key in sf){
-			let fg: FactorGroup = data.factors.get(key);
-			fg.factorOrder = sf[key];
-		}
+		let fgs : Map<string, FactorGroup> = data.factors;
+		fgs.forEach((fg, group) => fg.factors.forEach(f =>  f.selected =  sf[group] &&  sf[group][f.name] )) ;
 	}
 
-	get selectedFactors(){
+	get selectedFactors(): object{
 		let data: ExpressionData = this.#eb.data;
 		let ret = {};
 		let fgs : Map<string, FactorGroup> = data.factors;
-		fgs.forEach((fg, key) => ret[key] = fg.factorOrder);
+		fgs.forEach((fg, key) => ret[key] = fg.selectedFactors);
+		// console.log("Returning selected factors");
+		// console.log(ret);
+		// console.trace();
 		return ret;
+	}
+
+	setSelectedFactor(group: string, factor: string, value: boolean){
+		let data: ExpressionData = this.#eb.data;
+		let fgs : Map<string, FactorGroup> = data.factors;
+		fgs.get(group).factors.get(factor).selected = value;
 	}
 }

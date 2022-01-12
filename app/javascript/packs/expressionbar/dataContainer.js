@@ -116,9 +116,10 @@ import FactorGroup from "./factorGroup";
 
 	isFiltered(group){
 		var ret = true;
+		let selectedFactors = this.opt.selectedFactors;
 		for(var f in group.factors){
-			if(this.selectedFactors[f]){
-				ret &= this.selectedFactors[f][group.factors[f]];   
+			if(selectedFactors[f]){
+				ret &= selectedFactors[f][group.factors[f]];   
 			}else{
 				throw new Error('The factor ' + f + ' is not available (' + this.selectedFactors.keys + ')');
 			}
@@ -167,15 +168,17 @@ import FactorGroup from "./factorGroup";
 	The only parameter, sortOrder, is an array of the factors that will be used to sort. 
 	*/
 	sortRenderedGroups(){
-		console.log("Re-sorting");
+		// console.log("Re-sorting");
 		var i;
+		// console.log(this.renderedData);
 		if(this.renderedData.length == 0){
 			return;
 		}
-		console.log("We enter to the method properlu");
+		// console.log("We enter to the method properlu");
 		var sortable = this.renderedData[0].slice();
-		console.log(sortable);
+		// console.log(sortable);
 		var sortOrder =  this.sortOrder;
+		// console.log(sortOrder);
 		var sorted = sortable.sort((a, b) => {
 			for(let o of sortOrder){
 				let fg = this.factors.get(o);
@@ -357,7 +360,8 @@ import FactorGroup from "./factorGroup";
 		var filtered;
 		var i = index;
 		for(o in g){  
-			var newObject = this._prepareGroupedByExperiment(i++,o);
+			// var newObject = this._prepareGroupedByExperiment(i++,o);
+			var newObject = new GroupedValues(i++, o);
 			newObject.gene = gene;
 			groups[o] = newObject;
 		}
@@ -368,7 +372,7 @@ import FactorGroup from "./factorGroup";
 		for(o in groups){
 			var newObject = groups[o];
 			newObject.gene = gene;
-			this.calculateStats(newObject);
+			newObject.calculateStats();
 			if(!this.isFiltered(newObject)){
 				newObject.renderIndex = i;
 				newObject.id = i++;
@@ -389,12 +393,13 @@ import FactorGroup from "./factorGroup";
 		var names = [];
 		var o;
 		var i = index;
-
+		console.log(g);
 		for(o in g){  
 			var description = this.getGroupFactorDescription(g[o], groupBy);
 			var longDescription = this.getGroupFactorLongDescription(g[o], groupBy);
 			if(names.indexOf(description) === -1){
 				var newObject = new GroupedValues(i++, description);
+				// console.log(`Adding: ${description}`);
 				newObject.gene = gene;
 				newObject.longDescription = longDescription;
 				var factorValues = this.getGroupFactor(g[o], groupBy);
@@ -403,6 +408,7 @@ import FactorGroup from "./factorGroup";
 				names.push(description);
 			}
 		}
+		// console.log(groups);
 		i = index;
 		for(o in e){
 			if( !data  || typeof data[o] === 'undefined' ){

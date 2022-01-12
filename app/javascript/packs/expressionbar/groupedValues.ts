@@ -25,7 +25,7 @@ export default class GroupedValues{
 	}
 
 	get data():Array<number>{
-		return this.#data.map( o => o["value"]);
+		return this.#data.map( o => o  &&  o["value"] ? o["value"] : null).filter( o => o != null) ;
 	}
 
 	addValueObject(o: object):void {

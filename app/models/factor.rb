@@ -13,7 +13,18 @@ class Factor < ActiveRecord::Base
 		ret["name"] = self.name
 		ret["description"] = self.description
 		ret["order"] = self.order
+		ret["selected"] = true
 		return ret
+	end
+
+	def selected
+		#TODO: maybe we want to add this as a real column
+		return @selected if defined? @selected
+		return true
+	end
+
+	def selected=(s)
+		@selected=s
 	end
 
 end

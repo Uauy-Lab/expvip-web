@@ -379,8 +379,8 @@ export class ExpressionBar {
     var self = this;
     d3.json(this.opt.data).then(function (json) {
       self.data = new ExpressionData(json, self.opt);
-      self.storeValue('selectedFactors', self.data.selectedFactors);
-      self.storeValue('groupBy', self.opt.groupBy);
+      self.opt.storeValue('selectedFactors', self.data.opt.selectedFactors);
+      self.opt.storeValue('groupBy', self.opt.groupBy);
       self.updateGroupBy(self);
       self.refresh();
     }).catch(error => console.warn(error));
@@ -397,9 +397,10 @@ export class ExpressionBar {
       // var self = src.data('expression-bar');
       var factor = src.data('factor');
       var value = src.data('value');
-      self.data.selectedFactors[factor][value] = this.checked;
+      // self.data.selectedFactors[factor][value] = this.checked;
+      self.opt.setSelectedFactor(factor, value, this.checked);
     });
-    this.opt.storeValue('selectedFactors', this.data.selectedFactors);
+    this.opt.storeValue('selectedFactors', this.opt.selectedFactors);
     this.refreshSVGEnabled = true;
 
   }
