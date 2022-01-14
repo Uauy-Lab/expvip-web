@@ -56,9 +56,8 @@ export default class FactorGroup{
 	}
 
 	restoreDefaults(){
+		this.selected = this.defaultSelected;
 		let factors = [...this.factors.values()]
-		console.log("Restoring");
-		console.log(factors);
 		factors.forEach(f => f.restoreDefaults());
 	}
 

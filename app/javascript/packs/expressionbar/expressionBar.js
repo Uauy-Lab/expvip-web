@@ -32,6 +32,7 @@ import ExpressionData from "./dataContainer"
 import GeneralControls from "./generalControls"
 import SortWindow from "./sortWindow"
 import Options from "./options"
+import {getGroupFactorLongDescription} from "./factorHelpers"
 
 require('string.prototype.startswith');
 
@@ -695,7 +696,8 @@ export class ExpressionBar {
   showHighlightedFactors(toShow, evt) {
     //console.log("TADA!");
     //console.log(evt);
-    var factorNames = this.data.longFactorName;
+    // var factorNames = this.data.longFactorName;
+    //TODO: we are not rendering this label things anywhere. 
     var self = this;
     for (let key in toShow.factors) {
 
@@ -706,11 +708,13 @@ export class ExpressionBar {
       var colour_div_id = self.opt.target + '_factor_colour_' + escaped_key;
       var label_full_div_id = self.opt.target + '_factor_full_label_' + escaped_key;
 
-      var long_name = factorNames[key][value];
+      // var long_name = factorNames[key][value];
+      var long_name = this.data.factors.get(key).factors.get(value);
       var colour = self.factorColors[key][value];
       if (long_name.length > 28) {
         long_name = value;
       }
+      // console.log(label_div_id);
       jQuery('#' + label_div_id).text(long_name);
       jQuery('#' + colour_div_id).css('background-color', colour);
       jQuery('#' + label_full_div_id).show();
@@ -745,7 +749,7 @@ export class ExpressionBar {
     this.propertySelector.val(this.opt.renderProperty);
     this.propertySelector.on('change', function (event) {
       self.opt.renderProperty = self.propertySelector.find(':selected').text();
-      self.storeValue('renderProperty', self.opt.renderProperty);
+      self.opt.storeValue('renderProperty', self.opt.renderProperty);
       self.refresh();
     });
 
@@ -825,18 +829,19 @@ export class ExpressionBar {
 
     return source;
   }
-  _saveFactorsInOutput(selectedFactors, factorNames, output) {
+  _saveFactorsInOutput(selectedFactors, output) {
     for (let fact in selectedFactors) {
       // console.log(fact);
       output += fact + "\t";
       var vals = selectedFactors[fact];
-      var curr_fact = factorNames[fact];
+      // var curr_fact = factorNames[fact];
+      var curr_fact = this.data.factors.get(fact);
       for (let v in vals) {
-        if (vals[v]) {
-
-          let curr_long = curr_fact[v];
+        // if (vals[v]) {
+          // let curr_long = curr_fact[v];
+          let curr_long = curr_fact.factors.get(v).description;
           output += curr_long + ", ";
-        }
+        // }
       }
       output += "\n";
     }
@@ -845,9 +850,7 @@ export class ExpressionBar {
   }
   _generateFileName(renderedProperty, toSave, isRawData) {
     var fileName = renderedProperty;
-
     for (var gene in toSave) {
-
       if (Object.keys(toSave).length > 3) {
         var date = `${new Date().getDate()}_${new Date().getMonth() + 1}_${new Date().getFullYear()}`;
         fileName = `heatmap_${date}_${renderedProperty}`;
@@ -856,21 +859,20 @@ export class ExpressionBar {
       }
 
     }
-
     fileName += isRawData ? '_raw' : '';
-
     return fileName += ".tsv";
   }
+
   saveRenderedData() {
     var toSave = this.data.renderedData;
     var selectedFactors = this.data.selectedFactors;
     var output = '';
-    var factorNames = this.data.longFactorName;
+    // var factorNames = this.data.longFactorName;
     var renderedProperty = this.opt.renderProperty;
     var fileName = '';
 
     // Printing all the factors used
-    output = this._saveFactorsInOutput(selectedFactors, factorNames, output);
+    output = this._saveFactorsInOutput(selectedFactors, output);
 
     // Printing the headers
     output += "\t";
@@ -911,14 +913,14 @@ export class ExpressionBar {
     var toSave = self.data.renderedData;
     var selectedFactors = self.data.selectedFactors;
     var output = '';
-    var factorNames = this.data.longFactorName;
+    // var factorNames = this.data.longFactorName;
     var renderedProperty = self.opt.renderProperty;
     var valueObject = allData.values;
     var fileName = "";
     var defaultFactorOrder = allData.defaultFactorOrder;
 
     // Printing all the factors used
-    output = this._saveFactorsInOutput(selectedFactors, factorNames, output);
+    output = this._saveFactorsInOutput(selectedFactors, output);
 
     // Printing the headers
     output += "\n" + renderedProperty;
@@ -1509,7 +1511,7 @@ export class ExpressionBar {
       jQuery('#' + this.opt.target + '_ternSpan').hide();
     }
 
-    if (typeof this.opt.sortOrder !== 'undefined') {
+    if (typeof this.data.sortOrder !== 'undefined') {
       this.data.sortRenderedGroups();
       //TODO: add an option to remove the annimation on the initial load
       this.refresh();

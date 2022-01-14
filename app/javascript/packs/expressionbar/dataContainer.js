@@ -7,6 +7,7 @@ import ExpressionValues from "./expressionValues"
 import GroupedValues from "./groupedValues"
 import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} from "./factorHelpers"
 import FactorGroup from "./factorGroup";
+import { getFilesChange } from "fork-ts-checker-webpack-plugin/lib/reporter/FilesChange";
 
  class ExpressionData{
 	/**
@@ -239,7 +240,7 @@ import FactorGroup from "./factorGroup";
 	//This means that the function is not stateles, but the object is the container
 	//For the data. It could be possible to make it "reentrant"
 	getGroupedData(property, groupBy){
-		console.log(groupBy);
+		// console.log(groupBy);
 		var dataArray = [];
 		for(var gene in this.values){
 			// console.log(gene);
@@ -361,12 +362,17 @@ import FactorGroup from "./factorGroup";
 		var i = index;
 		for(o in g){  
 			// var newObject = this._prepareGroupedByExperiment(i++,o);
-			var newObject = new GroupedValues(i++, o);
+			/** @type {GroupedValues}} */
+			var newObject = new GroupedValues(i++, g[o].description);
 			newObject.gene = gene;
-			groups[o] = newObject;
+			newObject.description = newObject.name;
+			newObject.longDescription = g[o].description;
+			newObject.factors = g[o].factors;
+			groups[g[o].name] = newObject;
 		}
 		for(o in e){
-			groups[e[o].group].addValueObject(data[o]);
+			var values = data[o];
+			groups[e[o].name].addValueObject(values);
 		}
 		i = index;
 		for(o in groups){
@@ -393,7 +399,7 @@ import FactorGroup from "./factorGroup";
 		var names = [];
 		var o;
 		var i = index;
-		console.log(g);
+		// console.log(g);
 		for(o in g){  
 			var description = this.getGroupFactorDescription(g[o], groupBy);
 			var longDescription = this.getGroupFactorLongDescription(g[o], groupBy);
@@ -434,8 +440,6 @@ import FactorGroup from "./factorGroup";
 
 	addNames(o){
 		var factors = o.factors;
-		var factorNames = this.longFactorName;
-		var numOfFactors = factors.length;
 		var groupBy = []; //TODO: change this to something like factors.keys
 		for(var i in factors){
 			groupBy.push(i);
@@ -614,9 +618,6 @@ import FactorGroup from "./factorGroup";
 	};
 
 	removeSortPriority(factor){
-		if(typeof this.sortOrder === 'undefined' || this.sortOrder === null){
-			this.sortOrder = [];
-		}
 		var index = this.sortOrder.indexOf(factor);
 		if (index > -1) {
 			this.sortOrder.splice(index, 1);
@@ -645,6 +646,12 @@ import FactorGroup from "./factorGroup";
 
 	get hasHomologues(){
 		return "homologues" in this && this.homologues.length > 0
+	}
+
+	get longFactorName(){
+		let ret = {}
+		this.factors.forEach((fg, group) => fg.factors.forEach(f => ret[group][f.name] = f.description));
+		return ret;
 	}
 
 }

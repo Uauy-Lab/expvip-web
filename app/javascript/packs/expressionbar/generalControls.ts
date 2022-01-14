@@ -47,9 +47,11 @@ class GeneralControls{
 		eb.opt.plot = "Bar";
 		if(eb.opt.showHomoeologues){
 			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false);
+			jQuery(`#${eb.target}_showHomoeologues`).prop('checked', true);
 		}
 		if(eb.opt.showTernaryPlot){
 			jQuery( '#' + eb.target + '_showHomoeologues' ).prop('checked', false);
+			jQuery( '#' + eb.target + '_showTernaryPlot' ).prop('checked', true);
 			eb.opt.showHomoeologues = true;   // For the homoeologues data to be calculated        
 			eb.opt.plot = "Ternary"; 
 		}

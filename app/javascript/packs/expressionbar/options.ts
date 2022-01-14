@@ -29,7 +29,7 @@ export default class Options{
 	fontSize: number;
 	tpmThreshold: number;
 	sc: any; 
-	defaultGroupBy: string | Array<string>;
+	// defaultGroupBy: string | Array<string>;
 	defaultRenderProperty: string;
 	calculateLog: boolean;
 	showTernaryPlot: boolean;
@@ -60,11 +60,18 @@ export default class Options{
 		this.fontSize = 14;
 		this.tpmThreshold = 1;
 		this.sc = colorbrewer.schemeCategory20;
-		this.defaultGroupBy = this.groupBy;
+		// this.defaultGroupBy = this.groupBy;
 		this.defaultRenderProperty = this.renderProperty;
 		this.calculateLog = this.defaultLog2State;
 		this.showTernaryPlot = false;
 		this.#eb = eb;
+	}
+
+	get defaultGroupBy(){
+		let ret = new Array<string>();
+		let fgs : Map<string, FactorGroup> = this.#eb.data.factors;
+		ret = [...fgs.values()].filter(fg => fg.defaultSelected).map(fg => fg.name);
+		return ret;
 	}
 
 	restoreUserDefaults(){
@@ -137,7 +144,16 @@ export default class Options{
 	set selectedFactors(sf: object){
 		let data: ExpressionData = this.#eb.data;
 		let fgs : Map<string, FactorGroup> = data.factors;
-		fgs.forEach((fg, group) => fg.factors.forEach(f =>  f.selected =  sf[group] &&  sf[group][f.name] )) ;
+		fgs.forEach((fg, group) => fg.factors.forEach(f =>
+			f.selected = sf === null? f.defaultSelected :  sf[group] ?  sf[group][f.name] : f.selected
+			));
+	}
+
+	set sortOrder(so: Array<string>){
+		if(so === null){
+			this.#eb.data.sortOrder = new Array<string>();
+		}
+		this.#eb.data.sortOrder = so;
 	}
 
 	get selectedFactors(): object{
