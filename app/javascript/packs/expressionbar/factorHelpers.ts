@@ -1,6 +1,6 @@
 import Factor from "./factor";
 import FactorGroup from "./factorGroup";
-
+import OrtholgueGroupSet from "./OrthologueGroupSet"
 function parseFactors(gfs: Array<object>): Map<string, FactorGroup>{
 	let ret = new Map<string, FactorGroup>();
 	for(const gf of gfs){
@@ -34,5 +34,16 @@ function getFactorsForSample(sample: {description: string, name:string, factors:
 function html_name(name: string):string{
 	return name.split(" ").join("_");
 }
+
+
+function parseOrthoGroups(o: object):Map<string, OrtholgueGroupSet>{
+	let ret = new Map<string, OrtholgueGroupSet>();
+
+	for (var attrname in o) {
+		ret.set(attrname, new OrtholgueGroupSet(o[attrname]));
+	}
+	return ret;
+
+} 
 
 export {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, html_name}

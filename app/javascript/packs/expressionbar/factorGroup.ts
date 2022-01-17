@@ -34,7 +34,8 @@ export default class FactorGroup{
 
 	get defaultOrder(){
 		let ret = {}
-		let factors = [...this.factors.values()].forEach(factor => {
+		let factors = [...this.factors.values()]
+		factors.forEach(factor => {
 			ret[factor.name] = factor.defaultOrder;
 		})
 		return ret;

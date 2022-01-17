@@ -161,9 +161,6 @@ export default class Options{
 		let ret = {};
 		let fgs : Map<string, FactorGroup> = data.factors;
 		fgs.forEach((fg, key) => ret[key] = fg.selectedFactors);
-		// console.log("Returning selected factors");
-		// console.log(ret);
-		// console.trace();
 		return ret;
 	}
 

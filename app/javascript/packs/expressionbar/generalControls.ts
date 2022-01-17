@@ -4,6 +4,7 @@ import ExpressionBar from "./expressionBar"
 import Button from "./button"
 import Control from './control';
 import Checkbox from './checkbox';
+import Select from './select';
 
 class GeneralControls{
 	#expression_bar : ExpressionBar;
@@ -32,6 +33,7 @@ class GeneralControls{
 		new Checkbox(this.#expression_bar, "showHomoeologues",  "Homoeologues", this.#options_div);
 		new Checkbox(this.#expression_bar, "showTernaryPlot", "Ternary plot", this.#options_div);
 		new Checkbox(this.#expression_bar, "orthologues", "Pangenome orthologues", this.#options_div);
+		new Select(this.#expression_bar, "ortho-set", "Orthologue set", this.#options_div, this.#data.ortholog_groups);
 		let chartScale = this.#expression_bar.target + '_scale';
 		let post_button = `<div id="${chartScale}"></div>`
 		this.#options_div.append(post_button);
@@ -64,8 +66,8 @@ class GeneralControls{
 		if(!this.#data.hasHomologues){
 			jQuery(`#${this.#expression_bar.target}_showHomoeologuesSpan`).hide('fast');
 			jQuery(`#${this.#expression_bar.target}_showTernaryPlotSpan`).html("");
-			this.#expression_bar.storeValue('showTernaryPlot',false);
-			this.#expression_bar.storeValue('showHomoeologues',false);
+			this.#expression_bar.opt.storeValue('showTernaryPlot',false);
+			this.#expression_bar.opt.storeValue('showHomoeologues',false);
 		}else {  // If there is homoeologues
 			jQuery(`#${this.#expression_bar.target}_showHomoeologuesSpan`).css('display', 'initial');
 			jQuery(`#${this.#expression_bar.target}_showTernaryPlotSpan`).css('display', 'initial');
@@ -77,7 +79,7 @@ class GeneralControls{
 			jQuery(`#${this.#expression_bar.target}_showTernaryPlotSpan`).css('display', 'initial');
 		}else {
 			jQuery(`#${this.#expression_bar.target}_showTernaryPlotSpan`).html("No homologies for ternary plot").css('display', 'initial').css('color', 'red');
-			this.#expression_bar.storeValue('showTernaryPlot',false);
+			this.#expression_bar.opt.storeValue('showTernaryPlot',false);
 		}
 	}
 

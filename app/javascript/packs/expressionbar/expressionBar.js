@@ -32,7 +32,6 @@ import ExpressionData from "./dataContainer"
 import GeneralControls from "./generalControls"
 import SortWindow from "./sortWindow"
 import Options from "./options"
-import {getGroupFactorLongDescription} from "./factorHelpers"
 
 require('string.prototype.startswith');
 
@@ -239,45 +238,6 @@ export class ExpressionBar {
 
     this._container.append(containerContent);
 
-
-    // jQuery( '#' + this.opt.target + '_showHomoeologues' ).
-    //  on('change', function(evt) {
-    //   if(self.opt.showTernaryPlot){
-    //     $(`#${self.opt.target}_showTernaryPlot`).prop('checked', false);
-    //     self.storeValue('showTernaryPlot',false);
-    //     self.opt.showTernaryPlot = false;      
-    //     self.opt.plot = "Bar";
-    //   }    
-    //   self.opt.showHomoeologues = this.checked;    
-    //   if(typeof self.opt.sortOrder !== 'undefined'){
-    //     self.refresh();
-    //   }
-    //   self.storeValue('showHomoeologues',this.checked);
-    //   self.refreshSVG();
-    // });
-    // $(`#${this.opt.target}_showTernaryPlot`)
-    //   .on('change', function (evt) {
-
-    //     $('#' + self.opt.target + '_showHomoeologues').prop('checked', false);
-    //     self.storeValue('showHomoeologues', false);
-
-    //     self.opt.showTernaryPlot = this.checked;
-    //     if (self.opt.showTernaryPlot) {
-    //       self.opt.showHomoeologues = true; // For the homoeologues data to be calculated        
-    //       self.opt.plot = "Ternary";
-    //     } else {
-    //       self.opt.showHomoeologues = false;
-    //       self.opt.plot = "Bar";
-    //     }
-
-    //     if (typeof self.opt.sortOrder !== 'undefined') {
-    //       self.refresh();
-    //     }
-
-    //     self.storeValue('showTernaryPlot', this.checked);
-    //     self.refreshSVG();
-    //   });
-
     $(`#bar_expression_viewer_ternSpan`).css('display', 'none');
 
     this.renderChartScale();
@@ -419,24 +379,7 @@ export class ExpressionBar {
       shbtn.addClass('ui-icon-circle-minus');
     }
   }
-  // storeValue(key, value) {
-  //   var val = JSON.stringify(value);
-  //   sessionStorage.setItem(this.opt.target + "_" + key, val);
-  // }
-  // _removeValue(key, value) {
-  //   sessionStorage.removeItem(this.opt.target + "_" + key);
-  //   this.opt[key] = null;
-  // }
-  // _retrieveValue(key) {
-  //   var val = sessionStorage.getItem(this.opt.target + "_" + key);
-  //   var parsed = null;
-  //   try {
-  //     parsed = JSON.parse(val);
-  //   } catch (err) {
-  //     parsed = null;
-  //   }
-  //   return parsed;
-  // }
+  
   checkSelectedFactors() {
     var self = this;
     for (var fo in this.data.defaultFactorOrder) {
@@ -484,182 +427,7 @@ export class ExpressionBar {
     $('#' + this.opt.target).css('overflow', 'hidden'); //TODO: maybe this needs to go elsewhere
     var sw = new SortWindow(this);
     sw.render();
-    // var self = this;
     return;
-    // var selectedFactors = this.data.selectedFactors;
-
-    // if (typeof this.opt.selectedFactors !== 'undefined') {
-    //   selectedFactors = this.opt.selectedFactors;
-    // }
-
-    // var listText = '';
-
-    // var factorCount = 0;
-
-    // for (let fo in this.data.defaultFactorOrder) {
-    //   console.log("In default factor order loop");
-    //   var i = this.data.defaultFactorOrder[fo];
-    //   factorCount++;
-    //   var orderedKeys = this.data.getSortedKeys(fo);
-    //   name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
-
-    //   listText += '<div class="' + this.opt.target + '_factor">';
-    //   listText += '<span id="span_' +
-    //     name + '" class="ui-icon  ui-icon-arrowthick-2-n-s" title="Filter/reorder" ></span><br>';
-    //   listText += '<span id="showHide_' + name + '" class="ui-icon  ui-icon-circle-plus"\
-    // title="Display/Hide Category"  ></span>';
-
-    //   listText += '<div id="dialog_' + name + '"  \
-    // style="z-index:3; overflow:auto; min-width:250px; max-height:' + this.opt.height / 2 + 'px" >';
-
-    //   listText += '<div id="all_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">all</div>';
-    //   listText += '<div id="none_' + name + '"  onmouseover="this.style.cursor=\'pointer\';">none</div>';
-
-    //   listText += '<div id="div_' + name + '">';
-    //   listText += '<form id="' + name + '">';
-
-    //   // Forms for each facor to select displayed data
-    //   //console.log(name);
-    //   for (let j in orderedKeys) {
-    //     var bgcolor = this.factorColors[i][orderedKeys[j]];
-    //     var longFactorName = this.data.longFactorName[i][orderedKeys[j]];
-    //     var shortId = i.split(' ').join('_') + '|' + orderedKeys[j];
-    //     var checked = '';
-    //     if (selectedFactors[i][orderedKeys[j]]) {
-    //       checked = 'checked';
-    //     }
-
-    //     listText += '<div \
-    //   id="' + this.opt.target + '_sorted_position:' + shortId + '" \
-    //   style="background-color:' + bgcolor + '" \
-    //   height="' + this.opt.barHeight + 'px" \
-    //   data-factor="' + i + '" \
-    //   data-value="' + orderedKeys[j] + '" \
-    //   title="' + longFactorName + '"\
-    //   >';
-    //     var toDisplay = longFactorName.length > 40 ? orderedKeys[j] : longFactorName;
-    //     listText += '<input type="checkbox" id="' + shortId + '" \
-    //   name="' + shortId + '" \
-    //   data-factor="' + i + '" \
-    //   data-value="' + orderedKeys[j] + '" \
-    //   ' + checked + '/>';
-    //     listText += toDisplay + '</div>';
-
-    //   }
-    //   listText += '</form>';
-    //   listText += "</div>";
-    //   listText += "</div>";
-    //   listText += "</div>";
-    // }
-
-    // this.sortDiv = jQuery('#' + this.sortDivId);
-    // this.sortDiv.tooltip({
-    //   track: true
-    // });
-
-      //////////////////////////////////////
-    //this.sortDiv.html(listText);
-    //this.sortDiv.css('column-count',factorCount);
-    //this.sortDiv.css('height',factorCount * this.opt.barHeight *2);
-    //this.sortDiv.disableSelection();
-    // var checks = jQuery(":checkbox[id*='|']");
-
-    // checks.on("click", function (evt) {
-    //   var src = jQuery(this);
-    //   var self2 = src.data('expression-bar');
-    //   self2._updateFilteredFactors(self2.sortDivId);
-    //   if (self2.refreshSVGEnabled == true) {
-    //     self2.updateGroupBy(self2);
-    //     self2.refreshSVG(self2);
-    //     self2.data.sortRenderedGroups();
-    //     self2.refresh();
-    //   }
-    // });
-
-    // // icons stylings
-    // checks.data("expression-bar", this);
-    
-    // for (var fo in this.data.defaultFactorOrder) {
-      // i = this.data.defaultFactorOrder[fo];
-      // var name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
-      // jQuery('#span_' + name).on("click", function (e) {
-      //   var nameinside = e.target.id.replace("span_", "dialog_");
-      //   var sdialog = jQuery('#' + nameinside);
-      //   sdialog.show();
-      //   jQuery(document).on("mouseup", function (e) {
-      //     var container = sdialog;
-      //     if (!container.is(e.target) // if the target of the click isn't the container...
-      //       && container.has(e.target).length === 0) // ... nor a descendant of the container
-      //     {
-      //       container.hide();
-      //     }
-      //   });
-
-      // });
-
-      // var s = jQuery('#' + name);
-      // var factorDiv = jQuery('.' + this.opt.target + '_factor');
-      // var sbtn = jQuery('#span_' + name);
-      // var shbtn = jQuery('#showHide_' + name);
-      // var sdialog = jQuery('#dialog_' + name);
-      // var count = s.children().length;
-      // var sall = jQuery('#all_' + name);
-      // var snone = jQuery('#none_' + name);
-
-      // $('#' + this.opt.target).css('overflow', 'hidden');
-
-      // $('.ui-icon').css('margin', 0);
-
-      // var iconWidth = factorDiv.width();
-      // factorDiv.css('display', 'inline-block');
-      // factorDiv.css('text-align', 'center');
-      // factorDiv.css('width', 16);
-      // factorDiv.css('margin-left', 2);
-
-      // sall.on('click', function (e) {
-      //   var nameinside = e.target.id.replace('all_', '');
-      //   self.selectAllorNoneFactor(nameinside, true);
-
-      // });
-
-      // snone.on('click', function (e) {
-      //   var nameinside = e.target.id.replace('none_', '');
-      //   self.selectAllorNoneFactor(nameinside, false);
-
-      // });
-      // var xFact = 0;
-      // s.css('text-align', 'left');
-      // s.css('max-width', '100%;');
-      // s.css('overflow-x', 'hidden;');
-      // s.sortable({
-      //   axis: "y",
-      //   update: function (event, ui) {
-      //     var factor = ui.item.data('factor');
-      //     var value = ui.item.data('value');
-      //     var index = ui.item.index();
-      //     self._refershSortedOrder(factor);
-      //   }
-      // });
-
-      // sbtn.attr('width', this.opt.barHeight * 2);
-      // sbtn.attr('height', this.opt.barHeight);
-
-      // var possbtn = sbtn.position();
-
-      // // shbtn.attr('width', this.opt.barHeight * 2);
-      // // shbtn.attr('height', this.opt.barHeight);
-
-      // sdialog.css('position', 'absolute');
-      // sdialog.css('left', xFact);
-      // sdialog.css('background-color', 'white');
-      // sdialog.css('border', 'outset');
-      // // s.disableSelection();
-      // sdialog.hide();
-
-      // //sdialog.on("mouseleave", function(){sdialog.hide()})
-      // xFact += self.opt.groupBarWidth;
-    // }
-
   }
   selectAllorNoneFactor(nameInside, value) {
     var self = this;

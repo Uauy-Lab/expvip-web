@@ -11,9 +11,8 @@ class Checkbox extends Control{
 
 	render(){
 		this.span = jQuery(`<span/>`);
-		this.span.attr("id", `${this.label}Span`)
-// <span id="${this.#expression_bar.target}_log2Span"><input type="checkbox" id="${this.#expression_bar.target}_log2" style="cursor: pointer;"><label for="${this.#expression_bar.target}_log2" style="cursor: pointer;">Log<sub>2</sub></label></input></span>
-		let self = this;
+		this.span.attr("id", `${this.label}Span`);
+		
 		this.el = jQuery(`<input/>`)
 		.attr("type", "checkbox")
 		.attr("style", "cursor:pointer")
@@ -22,8 +21,7 @@ class Checkbox extends Control{
 
 		this.text_label = jQuery(`<label>${this.text}</label>`)
 		.attr("for", this.label)
-		.attr("style", "cursor:pointer")
-		// for="${this.#expression_bar.target}_log2" style="cursor: pointer;">Log<sub>2</sub></label>
+		.attr("style", "cursor:pointer");
 
 		this.span.append(this.el);
 		this.span.append(this.text_label);
