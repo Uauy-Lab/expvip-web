@@ -46,4 +46,4 @@ function parseOrthoGroups(o: object):Map<string, OrtholgueGroupSet>{
 
 } 
 
-export {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, html_name}
+export {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, html_name, parseOrthoGroups}

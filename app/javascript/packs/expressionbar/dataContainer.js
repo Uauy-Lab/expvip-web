@@ -5,7 +5,7 @@ require('string.prototype.startswith');
 //  require("./expressionValues")
 import ExpressionValues from "./expressionValues"
 import GroupedValues from "./groupedValues"
-import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription} from "./factorHelpers"
+import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, parseOrthoGroups} from "./factorHelpers"
 import FactorGroup from "./factorGroup";
 import { getFilesChange } from "fork-ts-checker-webpack-plugin/lib/reporter/FilesChange";
 
@@ -21,7 +21,9 @@ import { getFilesChange } from "fork-ts-checker-webpack-plugin/lib/reporter/File
 				this[attrname] = this._sortGeneOrder(attrname, data[attrname]);
 			}else if(attrname == 'factors'){
 				this.factors = parseFactors(data[attrname]);
-			} else {
+			}else if(attrname == 'ortholog_groups'){
+				this.ortholog_groups = parseOrthoGroups(data[attrname]);
+			}else {
 				this[attrname] = data[attrname];
 			}
 			// console.log(this[attrname]);

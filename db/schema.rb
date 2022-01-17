@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_25_111141) do
+ActiveRecord::Schema.define(version: 2022_01_17_151128) do
 
   create_table "ExperimentGroups_Factors", id: false, charset: "utf8mb3", force: :cascade do |t|
     t.integer "ExperimentGroup_id", null: false
@@ -185,6 +185,7 @@ ActiveRecord::Schema.define(version: 2021_12_25_111141) do
     t.string "description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "selected", default: false
   end
 
   create_table "sample_genes", charset: "utf8mb3", force: :cascade do |t|
