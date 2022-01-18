@@ -18,7 +18,7 @@ module Bio
 		end
 	
 
-		def self.getCommadPairedEnd(index:, output_dir:, left:, right:, keep_bam:false)
+		def self.getCommadPairedEnd(index:, output_dir:, left:, right:, keep_bam:false, bias:false)
 			l=left.split(":")
 			r=right.split(":")
 			raise "Reads should have at least one path for each pair #{left}" if l.size == 0 or r.size == 0
@@ -29,14 +29,14 @@ module Bio
 				reads << r[i]
 			end
 			#puts "PE: #{keep_bam}"
-			self.getCommand(index:index, fastq:reads, output_dir:output_dir, keep_bam:keep_bam)
+			self.getCommand(index:index, fastq:reads, output_dir:output_dir, keep_bam:keep_bam, bias:bias)
 		end
 
-		def self.getCommadSingleEnd(index:, output_dir:, single:, fragment_length:, sd:0, keep_bam:false)
+		def self.getCommadSingleEnd(index:, output_dir:, single:, fragment_length:, sd:0, keep_bam:false, bias:false)
 			s=single.split(":")
 			raise "Reads should have at least one path" if s.size == 0
 			reads=[]
-			self.getCommand(index:index, single:true, fastq:s, output_dir:output_dir, fragment_length:fragment_length, sd:sd, keep_bam:keep_bam)
+			self.getCommand(index:index, single:true, fastq:s, output_dir:output_dir, fragment_length:fragment_length, sd:sd, keep_bam:keep_bam, bias:bias)
 		end
 	end
 
@@ -94,12 +94,12 @@ CSV.foreach(options[:metadata], col_sep: "\t", headers:true) do |row|
 	#output_sam = "#{out_d}/#{id}.sam"
 	
 	if l and r and l.length > 1 and r.length > 1
-		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d, keep_bam: options[:keep_bam])}" + "\"\n"  
+		cmd_str += "\"#{Bio::Kallisto.getCommadPairedEnd(index: options[:index], left:l, right:r,  output_dir:out_d, keep_bam: options[:keep_bam], bias: true)}" + "\"\n"  
 	else
 		single = row['single']
 		fl = row['fragment_size'].to_i
 		sd = row['sd'].to_f
-		cmd_str += "\"#{Bio::Kallisto.getCommadSingleEnd(index: options[:index], single:single,fragment_length:fl, sd:sd, output_dir:out_d, keep_bam:options[:keep_bam])}" + "\"\n"
+		cmd_str += "\"#{Bio::Kallisto.getCommadSingleEnd(index: options[:index], single:single,fragment_length:fl, sd:sd, output_dir:out_d, keep_bam:options[:keep_bam], bias: true)}" + "\"\n"
 	end
 	sam_str += "\"#{output_prefix}\"\n" 
 end
@@ -126,7 +126,7 @@ File.open(options[:out],"w") do |f|
 	f.puts "#SBATCH -o log/kallisto_\%A_\%a.out"
 	f.puts "#SBATCH --array=0-#{i}"
 	f.puts "#SBATCH --time=12:00:00"
-	f.puts "source kallisto-0.42.3"
+	f.puts "source kallisto-0.46.1J"
 	f.puts "source  samtools-1.4.1"
 	f.puts "i=$SLURM_ARRAY_TASK_ID"
 	f.puts "declare -a out_dirs=(#{mkdir_str})"

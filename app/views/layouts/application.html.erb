@@ -2,13 +2,13 @@
 <html>
 <head>
   <title>expVIP</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= javascript_pack_tag 'application' %>
   <%= csrf_meta_tags %>
   <%= render :partial =>"layouts/analytics" rescue nil %>
   <%= csrf_meta_tags %>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+  <%= stylesheet_link_tag '//ajax.aspnetcdn.com/ajax/jquery.ui/1.13.0/themes/cupertino/jquery-ui.css' %>
 <script type="text/javascript">
     window.cookieconsent_options = {"message":"This website uses cookies to ensure you get the best experience on our website","dismiss":"Got it!","learnMore":"More info","link":null,"theme":"dark-bottom"};
 </script>
@@ -24,12 +24,12 @@
 
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+<!--        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
-        </button>
+        </button> -->
         <h3>Wheat Expression Browser   <span style="font-size:50%">powered by expVIP</span></h3>
       </div>
 
@@ -60,12 +60,12 @@
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
-
+  <!--
   <div id="about_studies" >
     <div class="dialogs">
       <%= render :partial => "studies/studiesInfo" %>
     </div>
-  </div>
+  </div>-->
 
   
 

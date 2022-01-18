@@ -49,7 +49,7 @@ class GenesController < ApplicationController
     genes_arr = genes.split(",")
     genes_query = {}
 
-    arguments = {gene_set: gene_set, genes: genes}.to_query
+   # arguments = {gene_set: gene_set, genes: genes}.to_query
     uri_base = "#{request.base_url}/genes/heatmap/"
     allowed_arg_length = WEBrick::HTTPRequest::MAX_URI_LENGTH - uri_base.length
 
@@ -135,10 +135,9 @@ class GenesController < ApplicationController
       flash[:error] = e.to_s
       #puts "ERROR: #{e.inspect}"
       #puts e.backtrace
-      redirect_back fallback_location: request.base_url.to_s
-      return 
+      redirect_back fallback_location: request.base_url.to_s 
     end
-	end
+  end
 
   def autocomplete
     gene_set_id = session[:gene_set_id] 
@@ -197,7 +196,7 @@ class GenesController < ApplicationController
     #Use TRIAE_CS42_2BL_TGACv1_130848_AA0418720 as it has multiple transcripts
     studies = session[:studies] if session[:studies]
     compare = ""
-    alert = ""
+    #alert = ""
 
     #search_by = params[:search_by]
     #search_by.capitalize! if search_by
@@ -311,21 +310,17 @@ class GenesController < ApplicationController
     end
     
     def create_sharable_link gene_set_name, hashed_settings
-    	if session[:heatmap]
-
-    		response = "#{request.base_url}/#{params[:controller]}/heatmap?#{{settings: hashed_settings}.to_query}"
-
-    	else
-    		response = "#{request.base_url}/#{params[:controller]}/#{@gene.id}?#{{gene_set: gene_set_name}.to_query}&#{{name: session[:name]}.to_query}&#{{search_by: @search_by}.to_query}&#{{settings: hashed_settings}.to_query}"
-    		response += "&" +{compare: params[:compare]}.to_query if params[:compare]
-
-    	end
-    	
-    	return response
+      if session[:heatmap]
+        response = "#{request.base_url}/#{params[:controller]}/heatmap?#{{settings: hashed_settings}.to_query}"
+      else
+        response = "#{request.base_url}/#{params[:controller]}/#{@gene.id}?#{{gene_set: gene_set_name}.to_query}&#{{name: session[:name]}.to_query}&#{{search_by: @search_by}.to_query}&#{{settings: hashed_settings}.to_query}"
+        response += "&#{{compare: params[:compare]}.to_query}" if params[:compare]
+      end
+      return response
     end    
 
     def set_shared_settings
-    	@client = MongodbHelper.getConnection unless @client    
+      @client = MongodbHelper.getConnection unless @client    
       data = @client[:share].find({'hash' =>  params[:settings]}).first
       session[:genes] = data[:genes] if data[:genes]
       @settings = data[:settings]
@@ -335,5 +330,5 @@ class GenesController < ApplicationController
       settingsObj = JSON.parse @settings
       return settingsObj['study']
     end
-
+    
 end

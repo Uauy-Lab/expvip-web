@@ -13,16 +13,16 @@
  *= require jquery-ui
  */
 
-@import "*";
-@import "bootstrap-sprockets";
-@import "bootstrap";
+// @import "*";
+// @import "bootstrap-sprockets";
+@import 'bootstrap';
 
 body{
     background-color: #E6E6E6;    
 }
 
 #content{    
-    margin-bottom: 5px;       // margin between footer 5    
+    margin-bottom: 6px;       // margin between footer 5    
     overflow-y: scroll;
 }
 

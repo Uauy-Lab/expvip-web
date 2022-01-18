@@ -60,4 +60,9 @@ namespace :updatenames do
 		end
 		puts "Modified #{i} transcripts"
 	end
+
+	desc "Migrate from mongo to mysql"
+	task :mongo_to_mysql => :environment do |t, args|
+		ExpressionValuesHelper.migrate_from_mongodb
+	end
 end

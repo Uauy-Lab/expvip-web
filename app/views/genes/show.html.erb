@@ -48,8 +48,9 @@
   var gene = "<%= @gene.name %>";
   var eb;
   console.log(data_url);  
+  console.log(window);
   function loadBarChart(){
-    eb =  new biovisexpressionbar.ExpressionBar({
+    eb =  new ExpressionBar({
       target: container_div,
       highlight: gene, 
       data: data_url,

@@ -31,3 +31,12 @@ log/development.log
 /node_modules/
 npm-debug.log
 /nbproject
+
+config/database.yml
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+.vscode

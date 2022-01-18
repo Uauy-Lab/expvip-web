@@ -2,6 +2,7 @@ class ExpressionValue < ActiveRecord::Base
   belongs_to :gene
   belongs_to :meta_experiment
   belongs_to :type_of_value
+ # serialize :values, JSON
 
   def  self.find_expressions_for_unit(unit) 
 
