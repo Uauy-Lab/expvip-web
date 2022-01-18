@@ -1,3 +1,5 @@
-export default class OrtholgueGroupSet extends Option{
+import OptionData from "./option";
+
+export default class OrtholgueGroupSet extends OptionData{
 	
 }

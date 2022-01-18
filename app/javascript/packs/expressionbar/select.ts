@@ -7,9 +7,9 @@ export default class Select extends Control{
 	text_label : JQuery;
 	#options: Option[];
 
-	constructor(expression_bar: ExpressionBar, name: string, text: string, container: JQuery, options: Array<Option> ){
+	constructor(expression_bar: ExpressionBar, name: string, text: string, container: JQuery ){
 		super(expression_bar, name, text, container);
-		this.options = options;
+		this.options = [];
 	}
 
 	render(): void {
@@ -38,6 +38,7 @@ export default class Select extends Control{
 
 	set options(options:Option[]){
 		this.#options = options;
+		console.log(options);
 		this.#options.forEach( o => this.el.append(o.render()))
 	}
 

@@ -1,5 +1,5 @@
 
-export default class Option{
+export default class OptionData{
 	name: string;
 	description: string;
 	selected: boolean;

@@ -38,10 +38,10 @@ function html_name(name: string):string{
 
 function parseOrthoGroups(o: object):Map<string, OrtholgueGroupSet>{
 	let ret = new Map<string, OrtholgueGroupSet>();
-
 	for (var attrname in o) {
 		ret.set(attrname, new OrtholgueGroupSet(o[attrname]));
 	}
+	console.log(ret);
 	return ret;
 
 } 
