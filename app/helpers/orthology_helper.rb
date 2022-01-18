@@ -85,6 +85,8 @@
 							"gene" => g.gene, 
 							"gene_set" =>  g.gene_set.name, 
 							"full_name" => g.full_gene_name,
+							"chromosome" => g.chromosome,
+							"genome" => g.genome,
 							"group" => og.name
 						}
 						genes_to_find[g.full_gene_name] = g

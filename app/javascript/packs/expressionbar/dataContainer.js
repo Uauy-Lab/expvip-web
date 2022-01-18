@@ -7,20 +7,20 @@ import ExpressionValues from "./expressionValues"
 import GroupedValues from "./groupedValues"
 import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, parseOrthoGroups} from "./factorHelpers"
 import FactorGroup from "./factorGroup";
-import { getFilesChange } from "fork-ts-checker-webpack-plugin/lib/reporter/FilesChange";
+import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 
  class ExpressionData{
 	/**
 	 * @type {Map<string, FactorGroup>}
 	 */
-	factors;
+	#default_factors;
 	constructor(data, options) {
 		for (var attrname in data) {
 			// console.log(attrname);
 			if (attrname == 'values'){
 				this[attrname] = this._sortGeneOrder(attrname, data[attrname]);
 			}else if(attrname == 'factors'){
-				this.factors = parseFactors(data[attrname]);
+				this.#default_factors = parseFactors(data[attrname]);
 			}else if(attrname == 'ortholog_groups'){
 				this.ortholog_groups = parseOrthoGroups(data[attrname]);
 			}else {
@@ -31,6 +31,15 @@ import { getFilesChange } from "fork-ts-checker-webpack-plugin/lib/reporter/File
 		console.log(options);
 		this.opt = options;
 		this.sortOrder = [];
+	}
+
+	get factors(){
+		if(this.opt.showOrthologues ){
+			let extra_facts = getFactorsForOrthilogues(this.ortholog_groups.get("EI-orthos"));
+			console.log(extra_facts);
+		}
+
+		return this.#default_factors;
 	}
 
 	getExpressionValueTypes(){

@@ -33,6 +33,8 @@ export default class Options{
 	defaultRenderProperty: string;
 	calculateLog: boolean;
 	showTernaryPlot: boolean;
+	orthoSet: string;
+	showOrthologues: boolean;
 	#eb: ExpressionBar;
 
 	constructor(eb : ExpressionBar){

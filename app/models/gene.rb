@@ -12,7 +12,6 @@ class Gene < ActiveRecord::Base
 
 		#puts arr.inspect
 		self.send(arr[0]+'=',arr[1])
-
 	end
 
 	def to_s
@@ -22,4 +21,27 @@ class Gene < ActiveRecord::Base
 	def full_gene_name
 		"#{gene_set.name}:#{gene}"
 	end
+
+	def chromosome
+		self.name[chrom_pos]
+	end
+
+	def genome 
+		self.name[chrom_pos + 1]
+	end
+
+	def is_traes? #Following the IWGSC convention
+		self.name.starts_with? "Traes"
+	end
+
+	def is_triae? #Following TGAC convention
+		self.name.starts_with? "TRIAE_CS42"
+	end
+
+	def chrom_pos
+		number_poistions = name.scan(/[[:digit:]]/)
+		return name.index(number_poistions[2] )if self.is_triae?	
+		return name.index(number_poistions[0])
+	end
+
 end
