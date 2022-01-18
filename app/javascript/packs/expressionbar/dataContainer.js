@@ -34,9 +34,10 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 	}
 
 	get factors(){
-		if(this.opt.showOrthologues ){
+		// console.log(this.opt);
+		if(this.opt.orthologues ){
 			let extra_facts = getFactorsForOrthilogues(this.ortholog_groups.get("EI-orthos"));
-			console.log(extra_facts);
+			// console.log(extra_facts);
 		}
 
 		return this.#default_factors;

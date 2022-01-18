@@ -34,7 +34,7 @@ export default class Options{
 	calculateLog: boolean;
 	showTernaryPlot: boolean;
 	orthoSet: string;
-	showOrthologues: boolean;
+	orthologues: boolean;
 	#eb: ExpressionBar;
 
 	constructor(eb : ExpressionBar){
@@ -58,6 +58,7 @@ export default class Options{
 		this.colorFactor = 'renderGroup';
 		this.headerOffset = 0;
 		this.showHomoeologues = false;
+		this.orthologues = false;
 		this.plot = 'Bar';
 		this.fontSize = 14;
 		this.tpmThreshold = 1;
