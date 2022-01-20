@@ -7,18 +7,30 @@ import ExpressionValues from "./expressionValues"
 import GroupedValues from "./groupedValues"
 import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, parseOrthoGroups} from "./factorHelpers"
 import FactorGroup from "./factorGroup";
-import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
+import {getFactorsForGenes, getFactorsForOrthologues, recalculateValues} from "./pangenomeFactorHelper";
+import Gene from "./gene"
 
  class ExpressionData{
 	/**
 	 * @type {Map<string, FactorGroup>}
 	 */
 	#default_factors;
+	/**
+	 * @type {Map<string, FactorGroup>}
+	 */
+	#factors;
+
+	#default_values;
+
+	#values;
+
+	#gene_factors;
+
 	constructor(data, options) {
 		for (var attrname in data) {
 			// console.log(attrname);
 			if (attrname == 'values'){
-				this[attrname] = this._sortGeneOrder(attrname, data[attrname]);
+				this.#default_values = this._sortGeneOrder(attrname, data[attrname]);
 			}else if(attrname == 'factors'){
 				this.#default_factors = parseFactors(data[attrname]);
 			}else if(attrname == 'ortholog_groups'){
@@ -28,19 +40,53 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 			}
 			// console.log(this[attrname]);
 		}
+	
 		console.log(options);
 		this.opt = options;
 		this.sortOrder = [];
+		this.#gene_factors = new Map();
 	}
 
 	get factors(){
-		// console.log(this.opt);
+		this.#recalculateFactorAndValues( typeof(this.#factors) === "undefined");
+		return this.#factors;
+	}
+
+	get values(){
+		this.#recalculateFactorAndValues(typeof(this.#values) === "undefined");
+		return this.#values
+	}
+
+	get defaultFactorOrder(){
+		let sorted = [...this.factors.values()].sort((a,b) => a.order - b.order)
+		console.log(sorted);
+		return sorted.map(f => f.name);
+	}
+
+	/**
+	 * 
+	 * @param {boolean} force 
+	 * @returns 
+	 */
+	#recalculateFactorAndValues(force){
+		if(!force && this.opt.orthologues == this.opt.orthologues_last_status){
+		 	return
+		}
+		this.#factors = new Map(this.#default_factors);
 		if(this.opt.orthologues ){
-			let extra_facts = getFactorsForOrthilogues(this.ortholog_groups.get("EI-orthos"));
-			// console.log(extra_facts);
+			//TODO: We need to fix this to be dynamic. Probably we want to pre-build them
+			let orth_group = this.opt.orth_group;
+			let og = this.ortholog_groups.get(orth_group);
+			let tmp_fact = getFactorsForOrthologues(og)
+			tmp_fact.forEach(fg => this.#factors.set(fg.name, fg));
+			recalculateValues(this.#default_values, og);
+			this.#gene_factors = getFactorsForGenes(og);
+			console.log(this.#gene_factors);
 		}
 
-		return this.#default_factors;
+		this.#values = this.#default_values;
+		
+		this.opt.orthologues_last_status = this.opt.orthologues ;
 	}
 
 	getExpressionValueTypes(){
@@ -78,7 +124,7 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 		}
 
 		this.selectedFactors = jQuery.extend(true, {},  sf);
-		var factorOrder = this.defaultFactorOrder;
+		// var factorOrder = this.defaultFactorOrder;
 
 		// this.factors = new Map();
 		// for (var f in factorOrder) {
@@ -136,7 +182,6 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 			}else{
 				throw new Error('The factor ' + f + ' is not available (' + this.selectedFactors.keys + ')');
 			}
-
 		}
 		return !ret;
 	};
@@ -247,6 +292,22 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 		}
 	}
 
+	get displayed_genes(){
+		if(this.opt.orthologues){
+			/**
+			 * @type {OrtholgueGroupSet}
+			 */
+			return this.ortholog_groups.get(this.opt.orth_group).genes.map(g => g.full_name);
+		}
+		if(this.compare){
+			return [this.gene, this.compare];
+		}
+		if(this.opt.showHomoeologues){
+			return Object.keys(this.values);
+		}
+		return [this.gene];
+	}
+
 
 	//WARN: This method sets "this.renderedData" to the result of this call. 
 	//This means that the function is not stateles, but the object is the container
@@ -254,17 +315,19 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 	getGroupedData(property, groupBy){
 		// console.log(groupBy);
 		var dataArray = [];
-		for(var gene in this.values){
+		console.log("Genes to display:");
+		console.log(this.displayed_genes);
+		for(var gene of this.displayed_genes){
 			// console.log(gene);
-			if(!this.opt.showHomoeologues && 
-				( 	
-					gene !== this.gene &&  
-					gene !==  this.compare 
-					) 
-				)
-			{
-				continue;
-			}
+			// if(!this.opt.showHomoeologues && 
+			// 	( 	
+			// 		gene !== this.gene &&  
+			// 		gene !==  this.compare 
+			// 		) 
+			// 	)
+			// {
+			// 	continue;
+			// }
 			var i = 0;
 			var innerArray;
 			if(groupBy === 'ungrouped'){
@@ -284,15 +347,22 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 				dataArray.push(innerArray);
 			}else if(groupBy === 'groups'){
 				innerArray = this._fillGroupByExperiment(i++, gene, property);
+				
 				dataArray.push(innerArray);
 			}else if(groupBy.constructor === Array){
 				//This is grouping by factors.  
 				innerArray = this.#fillGroupByFactor(i++, gene, property, groupBy);
-				dataArray.push(innerArray);
+				if(innerArray.length > 0){
+					dataArray.push(innerArray);
+				}
 			}else{
 				console.log('Not yet implemented');
 			}
 		}
+		if(groupBy.includes("Gene")){
+			dataArray = [dataArray.flat(2)]
+		}
+
 		this.addMissingFactors(dataArray);
 		if(this.renderedData && this.renderedData.length > 0){ 
 			this.setRenderIndexes(dataArray,this.renderedData);
@@ -407,20 +477,28 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 		var innerArray = [];
 		var data = this.values[gene][property];
 		var g = this.groups;
+
+		var g_f = this.#gene_factors.get(gene);
 		var e = this.experiments;
 		var names = [];
 		var o;
 		var i = index;
 		// console.log(g);
 		for(o in g){  
-			var description = this.getGroupFactorDescription(g[o], groupBy);
-			var longDescription = this.getGroupFactorLongDescription(g[o], groupBy);
+			let sample = g[o];
+			if(g_f){
+				//If we have factors for the gene, we add them here. 
+				//TODO: This pis overwriting the original object. May have secondary effects. 
+				Object.keys(g_f).forEach(k => sample.factors[k] = g_f[k]);
+			}
+			var description = this.getGroupFactorDescription(sample, groupBy);
+			var longDescription = this.getGroupFactorLongDescription(sample, groupBy);
 			if(names.indexOf(description) === -1){
 				var newObject = new GroupedValues(i++, description);
 				// console.log(`Adding: ${description}`);
 				newObject.gene = gene;
 				newObject.longDescription = longDescription;
-				var factorValues = this.getGroupFactor(g[o], groupBy);
+				var factorValues = this.getGroupFactor(sample, groupBy);
 				newObject.factors = factorValues;
 				groups[description] = newObject;
 				names.push(description);
@@ -435,7 +513,7 @@ import {getFactorsForOrthilogues} from "./pangenomeFactorHelper";
 			var group = g[e[data[o].experiment].group];
 
 			if(!this.isFiltered(group)){
-				var description = this.getGroupFactorDescription(g[e[o].group], groupBy);
+				var description = this.getGroupFactorDescription(g[e[o].group], groupBy, g_f);
 				groups[description].addValueObject(data[o]);
 			}
 		}

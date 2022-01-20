@@ -6,7 +6,7 @@ export default class OrtholgueGroupSet extends OptionData{
 
 	constructor(obj: object){
 		super(obj);
-		this.genes = obj["genes"].map(o => new Gene(o));
+		this.genes = obj["genes"].map((o: object) => new Gene(o));
 	}
 
 }

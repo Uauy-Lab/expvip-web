@@ -83,21 +83,6 @@ export class ExpressionBar {
     // }   
   }
   
-  // _restoreUserDefaults() {
-  //   this.opt.restoreUserDefaults();
-    // this.opt.groupBy = this.opt.defaultGroupBy;
-    // this.opt.renderProperty = this.opt.defaultRenderProperty;
-    // this.opt.selectedFactors = this.data.selectedFactors;
-    // this.opt.calculateLog = this.opt.defaultLog2State;
-    // // this.opt.storeValue('calculateLog', this.opt.calculateLog);
-    // this.opt.showTernaryPlot = false;
-    // this.opt.showHomoeologues = false;
-
-    // if (this.opt.plot == 'Ternary') {
-    //   this.opt.plot = 'Bar';
-    // }
-
-  // }
 
   #selectPlotType() {
 
@@ -286,6 +271,7 @@ export class ExpressionBar {
     var ret = true;
     if (self.showFactors == true) {
       var facts = [];
+      console.log(self.data.defaultFactorOrder);
       for (var fo in self.data.defaultFactorOrder) {
         var i = self.data.defaultFactorOrder[fo];
         var name = self.opt.target + '_sorted_list_' + i.split(' ').join('_');
@@ -323,6 +309,8 @@ export class ExpressionBar {
 
   }
   refreshSVG() {
+    this.prepareColorsForFactors();
+  
     var chart = this.chart;
     chart.selectAll('*').remove();
     this.data.renderedData = [];
@@ -333,6 +321,10 @@ export class ExpressionBar {
     this.hideHidelightRow();
     this.data.sortRenderedGroups();
     this.refresh();
+
+    this.renderPropertySelector();
+    this.renderSortWindow();
+    this.checkSelectedFactors();
   }
   createInitialSessionStorage() {
 
@@ -382,8 +374,9 @@ export class ExpressionBar {
   
   checkSelectedFactors() {
     var self = this;
-    for (var fo in this.data.defaultFactorOrder) {
-      var i = this.data.defaultFactorOrder[fo];
+    let defaultFactorOrder = this.data.defaultFactorOrder;
+    for (var fo in defaultFactorOrder) {
+      var i = defaultFactorOrder[fo];
       var name = this.opt.target + '_sorted_list_' + i.split(' ').join('_');
       var shbtn = jQuery('#showHide_' + name);
       var groupByValue = this.opt.groupBy;
@@ -392,7 +385,7 @@ export class ExpressionBar {
       shbtn.data('factor', i);
       shbtn.on('click', function (evt) {
         var target = jQuery(this);
-
+        console.log("SElecting factor")
         self.toggleFactorCheckbox(target);
         self.updateGroupBy(self);
         self.refreshSVG();
@@ -1259,12 +1252,9 @@ export class ExpressionBar {
       this.restoreDisplayOptions();
     }
     this.setAvailableFactors();
-    this.prepareColorsForFactors();
+    
     this.refreshSVG();
-    this.renderPropertySelector();
-
-    this.renderSortWindow();
-    this.checkSelectedFactors();
+    
 
     if (typeof this.data.compare === "undefined" || this.data.compare.length == 0) {
       jQuery('#' + this.opt.target + '_homSpan').show();

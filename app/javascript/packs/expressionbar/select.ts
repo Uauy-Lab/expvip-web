@@ -1,11 +1,11 @@
 import Control from "./control";
 import ExpressionBar from "./expressionBar";
-import Option from "./option";
+import OptionData from "./option";
 
 export default class Select extends Control{
 	span  : JQuery;
 	text_label : JQuery;
-	#options: Option[];
+	#options: OptionData[];
 
 	constructor(expression_bar: ExpressionBar, name: string, text: string, container: JQuery ){
 		super(expression_bar, name, text, container);
@@ -36,7 +36,7 @@ export default class Select extends Control{
 		throw new Error("Method not implemented.");
 	}
 
-	set options(options:Option[]){
+	set options(options:OptionData[]){
 		this.#options = options;
 		console.log(options);
 		this.#options.forEach( o => this.el.append(o.render()))

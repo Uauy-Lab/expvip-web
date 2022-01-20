@@ -4,7 +4,7 @@ export default class Gene{
 	group: string;
 	full_name: string;
 	genome: string;
-	chromsome: string;
+	chromosome: string;
 	
 	constructor(data: object){
 		for (var attrname in data) {

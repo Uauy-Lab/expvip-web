@@ -35,6 +35,8 @@ export default class Options{
 	showTernaryPlot: boolean;
 	orthoSet: string;
 	orthologues: boolean;
+	orthologues_last_status: boolean;
+	orth_group: string;
 	#eb: ExpressionBar;
 
 	constructor(eb : ExpressionBar){
@@ -59,6 +61,7 @@ export default class Options{
 		this.headerOffset = 0;
 		this.showHomoeologues = false;
 		this.orthologues = false;
+		this.orthologues_last_status = true;
 		this.plot = 'Bar';
 		this.fontSize = 14;
 		this.tpmThreshold = 1;
@@ -67,6 +70,7 @@ export default class Options{
 		this.defaultRenderProperty = this.renderProperty;
 		this.calculateLog = this.defaultLog2State;
 		this.showTernaryPlot = false;
+		this.orth_group = "EI-orthos";
 		this.#eb = eb;
 	}
 
@@ -170,6 +174,6 @@ export default class Options{
 	setSelectedFactor(group: string, factor: string, value: boolean){
 		let data: ExpressionData = this.#eb.data;
 		let fgs : Map<string, FactorGroup> = data.factors;
-		fgs.get(group).factors.get(factor).selected = value;
+		fgs.get(`${group}`).factors.get(`${factor}`).selected = value;
 	}
 }

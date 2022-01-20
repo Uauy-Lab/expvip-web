@@ -153,7 +153,7 @@ class ExpressionValuesController < ApplicationController
 
     # ret["selectedFactors"] = selectedFactors
     ret["defaultFactorSelection"] = getDefaultSelection
-    ret["defaultFactorOrder"] = ExperimentsHelper.getDefaultOrder
+    # ret["defaultFactorOrder"] = ExperimentsHelper.getDefaultOrder
 
     ret["experiments"] = experiments
     ret["groups"] = groups

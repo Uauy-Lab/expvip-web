@@ -34,7 +34,7 @@ class GeneralControls{
 		new Checkbox(this.#expression_bar, "showHomoeologues",  "Homoeologues", this.#options_div);
 		new Checkbox(this.#expression_bar, "showTernaryPlot", "Ternary plot", this.#options_div);
 		new Checkbox(this.#expression_bar, "orthologues", "Pangenome orthologues", this.#options_div);
-		this.ortholog_set_select = new Select(this.#expression_bar, "ortho-set", "Orthologue set", this.#options_div);
+		this.ortholog_set_select = new Select(this.#expression_bar, "orthoSet", "Orthologue set", this.#options_div);
 		let chartScale = this.#expression_bar.target + '_scale';
 		let post_button = `<div id="${chartScale}"></div>`
 		this.#options_div.append(post_button);
