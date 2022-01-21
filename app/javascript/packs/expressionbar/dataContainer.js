@@ -179,9 +179,10 @@ import Gene from "./gene"
 		for(var f in group.factors){
 			if(selectedFactors[f]){
 				ret &= selectedFactors[f][group.factors[f]];   
-			}else{
-				throw new Error('The factor ' + f + ' is not available (' + this.selectedFactors.keys + ')');
 			}
+			// }else{
+			// 	throw new Error('The factor ' + f + ' is not available (' + this.selectedFactors.keys + ')');
+			// }
 		}
 		return !ret;
 	};

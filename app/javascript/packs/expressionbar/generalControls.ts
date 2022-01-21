@@ -58,8 +58,10 @@ class GeneralControls{
 			eb.opt.showHomoeologues = true;   // For the homoeologues data to be calculated        
 			eb.opt.plot = "Ternary"; 
 		}
-		eb.refresh();
+
 		eb.refreshSVG();
+		eb.refresh();
+		
 		this.#updating = false;
 	}
 
