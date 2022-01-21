@@ -7,8 +7,8 @@
   <%= render :partial =>"layouts/analytics" rescue nil %>
   <%= csrf_meta_tags %>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
   <%= stylesheet_link_tag '//ajax.aspnetcdn.com/ajax/jquery.ui/1.13.0/themes/cupertino/jquery-ui.css' %>
+  <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
 <script type="text/javascript">
     window.cookieconsent_options = {"message":"This website uses cookies to ensure you get the best experience on our website","dismiss":"Got it!","learnMore":"More info","link":null,"theme":"dark-bottom"};
 </script>
@@ -19,47 +19,41 @@
 
 <body>
 
-  <nav class="navbar navbar-default">
-    <div class="container-fluid">
+  
+    <div class="header">
 
       <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-<!--        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button> -->
+      <div class="left">
         <h3>Wheat Expression Browser   <span style="font-size:50%">powered by expVIP</span></h3>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-
+      
+      <div class="right">
         <%= form_tag "/genes/forward", method: :post, class: 'navbar-form navbar-right' do %>
           <div class="form-group">
-             <%= text_field_tag :query, params[:query], id: "gene-search-input", class: 'form-control', value: session[:gene] %>
-             <%= submit_tag "Search" , name: 'submit', class: "btn btn-default"  %>
-
-             <%= text_field_tag :compare, params[:query], id: "gene-search-compare", class: 'form-control', placeholder: params[:query], value:  params[:compare]%>
-             <%= submit_tag "Compare", name: 'submit', class: "btn btn-default"  %>              
+             <%= text_field_tag :query, params[:query], id: "gene-search-input",  value: session[:gene] %>
+             <%= submit_tag "Search" , name: 'submit'  %>
+             <%= text_field_tag :compare, params[:query], id: "gene-search-compare",  placeholder: params[:query], value:  params[:compare]%>
+             <%= submit_tag "Compare", name: 'submit'  %>              
               Gene set <%= select_tag(:gene_set_selector, options_for_select(reference_gene_sets() , session[:gene_set_id]) ) %>
           </div>
         <% end %>
 
-        <div class="navigation left">
-          <%= link_to "Home", root_path %>
-          <%= link_to "Studies", "#", :id => 'studies_button'%>
-          <%= link_to "Download", "/download" %>
-          <%= link_to "Add your data", "https://github.com/homonecloco/expvip-web/wiki/LoadingVM"%>
-          <%= link_to "Tutorials",  "https://github.com/homonecloco/expvip-web/wiki" %>
-          <%= link_to "Videos",  "https://github.com/homonecloco/expvip-web/wiki/List-of-tutorial-videos" %>
-          <%= link_to "Cite", "cite", :id => 'cite_button'%>
-        </div>
+          
 
       </div><!-- /.navbar-collapse -->
+      <div class="navigation left">
+        <%= link_to "Home", root_path %>
+        <%= link_to "Studies", "#", :id => 'studies_button'%>
+        <%= link_to "Download", "/download" %>
+        <%= link_to "Add your data", "https://github.com/homonecloco/expvip-web/wiki/LoadingVM"%>
+        <%= link_to "Tutorials",  "https://github.com/homonecloco/expvip-web/wiki" %>
+        <%= link_to "Videos",  "https://github.com/homonecloco/expvip-web/wiki/List-of-tutorial-videos" %>
+        <%= link_to "Cite", "/cite", :id => 'cite_button'%>
+      </div>
     </div><!-- /.container-fluid -->
-  </nav>
+
   <!--
   <div id="about_studies" >
     <div class="dialogs">

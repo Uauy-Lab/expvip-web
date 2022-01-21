@@ -143,27 +143,40 @@ import Gene from "./gene"
 
 	prepareColorsForFactors(){//TODO: this should go somewher in the rendering, not in the data. 
 	//this.factorColors = Map.new();
-	this.totalColors = 8;
+	this.totalColors = 9;
 	var self = this;
-	var colors = [
-	colorbrewer.Pastel2[this.totalColors],
-	colorbrewer.Accent[this.totalColors],
-	colorbrewer.Dark2[this.totalColors],
-	colorbrewer.Set1[this.totalColors],
-	colorbrewer.Set2[this.totalColors],
-	colorbrewer.Paired[this.totalColors],
-	colorbrewer.Pastel1[this.totalColors], 
-	colorbrewer.Set3[this.totalColors]
-	];
+	var sets = 
+	[{color: "Pastel2", id: 8}, 
+	{color: "Accent",   id: 8}, 
+	{color: "Dark2",    id: 8}, 
+	{color: "Set1",     id: 9}, 
+	{color: "Set2",     id: 8}, 
+	{color: "Paired",   id: 12}, 
+	{color: "Pastel1",  id: 9},
+	{color: "Set3",     id: 12}]
+	var colors = sets.map(c => colorbrewer[c.color][c.id])
+	console.log(colorbrewer);
+	// var colors = [
+	// colorbrewer.Pastel2[ Object.keys(o).length],
+	// colorbrewer.Accent[ Object.keys(o).length],
+	// colorbrewer.Dark2[ Object.keys(o).length],
+	// colorbrewer.Set1[ Object.keys(o).length],
+	// colorbrewer.Set2[ Object.keys(o).length],
+	// colorbrewer.Paired[ Object.keys(o).length],
+	// colorbrewer.Pastel1[ Object.keys(o).length], 
+	// colorbrewer.Set3[ Object.keys(o).length]
+	// ];
 	this.factorColors= new Map();  
 	var i = 0;  
 	this.factors.forEach(function(fg, key, map){
 		var color = new Map();
-		var index =  i % self.totalColors ;
+		var index =  i % sets.length ;
 		var currentColorSet = colors[index];
+		let totalColors = currentColorSet.length - 1;
+		
 		var j = 0;  
 		fg.factors.forEach((factor, name) => {
-			color[name] = currentColorSet[j++ % self.totalColors ]; //We will eventually need to remove this line. 
+			color[name] = currentColorSet[j++ % totalColors ]; //We will eventually need to remove this line. 
 			factor.color = color[name];
 		}) 
 		i ++ ; 
