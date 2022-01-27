@@ -48,8 +48,10 @@
 						i += 1
 						row.each_pair do |geneset, transcripts|
 							next if geneset == "name"
+							next unless transcripts
 							transcripts.split(",").each do |g| 
 								next unless g
+								g = g.delete(" \t\r\n")
 								next if g == "-"
 								gs = gene_sets[geneset]
 								gene =  gs[g]

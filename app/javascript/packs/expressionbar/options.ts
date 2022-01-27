@@ -34,7 +34,9 @@ export default class Options{
 	calculateLog: boolean;
 	showTernaryPlot: boolean;
 	orthoSet: string;
-	showOrthologues: boolean;
+	#orthologues: boolean;
+	orthologues_last_status: boolean;
+	orth_group: string;
 	#eb: ExpressionBar;
 
 	constructor(eb : ExpressionBar){
@@ -58,6 +60,8 @@ export default class Options{
 		this.colorFactor = 'renderGroup';
 		this.headerOffset = 0;
 		this.showHomoeologues = false;
+		this.#orthologues = false;
+		this.orthologues_last_status = true;
 		this.plot = 'Bar';
 		this.fontSize = 14;
 		this.tpmThreshold = 1;
@@ -66,6 +70,7 @@ export default class Options{
 		this.defaultRenderProperty = this.renderProperty;
 		this.calculateLog = this.defaultLog2State;
 		this.showTernaryPlot = false;
+		this.orth_group = "EI-orthos";
 		this.#eb = eb;
 	}
 
@@ -74,6 +79,25 @@ export default class Options{
 		let fgs : Map<string, FactorGroup> = this.#eb.data.factors;
 		ret = [...fgs.values()].filter(fg => fg.defaultSelected).map(fg => fg.name);
 		return ret;
+	}
+
+	get orthologues(){
+		return this.#orthologues;
+	}
+
+	set orthologues(value: boolean){
+		console.log(`Setting orthologues ${value}`)
+		if(!value && typeof(this.groupBy) != "string"){
+			this.groupBy = this.groupBy.filter( f => !(f == "Chromsome" || f == "Gene" || f == "Genome")  )
+		}
+		if(!value){
+			//TODO: Maybe we can move the sort priorities to the options object. 
+			this.#eb.data.removeSortPriority("Chromsome");
+			this.#eb.data.removeSortPriority("Gene");
+			this.#eb.data.removeSortPriority("Genome");
+		}
+
+		this.#orthologues = value;
 	}
 
 	restoreUserDefaults(){
@@ -169,6 +193,6 @@ export default class Options{
 	setSelectedFactor(group: string, factor: string, value: boolean){
 		let data: ExpressionData = this.#eb.data;
 		let fgs : Map<string, FactorGroup> = data.factors;
-		fgs.get(group).factors.get(factor).selected = value;
+		fgs.get(`${group}`).factors.get(`${factor}`).selected = value;
 	}
 }

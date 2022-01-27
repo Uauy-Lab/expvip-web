@@ -12,7 +12,7 @@ class Checkbox extends Control{
 	render(){
 		this.span = jQuery(`<span/>`);
 		this.span.attr("id", `${this.label}Span`);
-		
+
 		this.el = jQuery(`<input/>`)
 		.attr("type", "checkbox")
 		.attr("style", "cursor:pointer")
@@ -32,7 +32,7 @@ class Checkbox extends Control{
 		let checked = this.el.is(":checked");
 		this.expression_bar.opt[this.name] = checked;
 		this.expression_bar.opt.storeValue(checked);
-		this.expression_bar.general_controls.updateControls();
+		this.expression_bar.general_controls.updateControls();	
 	}
 }
 

@@ -12,12 +12,20 @@ function parseFactors(gfs: Array<object>): Map<string, FactorGroup>{
 
 function getGroupFactorDescription(sample: {description: string, name:string, factors:object },groupBy : Array<string>, fgs: Map<string, FactorGroup>):string{
 	var factorArray   = getFactorsForSample(sample, groupBy,fgs);
+	// console.log(groupBy);
 	var numOfFactors  = groupBy.length;
-	return factorArray.map(f => numOfFactors > 4 || f.description.length > 20? f.name : f.description).join(', ');
+	let ret = "Not read";
+	try {
+		// console.log(factorArray);
+		ret = factorArray.map(f => numOfFactors > 4 || f.description.length > 20? f.name : f.description).join(', ');
+	} catch (error  ) {
+		throw error;
+	}
+	return ret;
 }
 
 function getGroupFactorLongDescription(sample: {description: string, name:string, factors:object },groupBy : Array<string>, fgs: Map<string, FactorGroup>):string{
-	var factorArray   = getFactorsForSample(sample, groupBy,fgs);
+	var factorArray   = getFactorsForSample(sample, groupBy,fgs,);
 	return factorArray.map(f => f.description).join(', ');
 }
 
@@ -26,7 +34,15 @@ function getFactorsForSample(sample: {description: string, name:string, factors:
 	for(var grpby of groupBy) {
 		let fg = fgs.get(grpby);
 		let fact = sample.factors[grpby];
-		factorArray.push(fg.factors.get(fact));
+		if(fact){
+			// console.log(fact);
+			factorArray.push(fg.factors.get(fact));
+		}else{
+			// console.warn(`Can't find Factor for ${grpby}`);
+			// console.error(grpby)
+			// console.log(sample.factors);
+			// console.log(fg);
+		}
 	};
 	return factorArray;
 }
@@ -45,5 +61,6 @@ function parseOrthoGroups(o: object):Map<string, OrtholgueGroupSet>{
 	return ret;
 
 } 
+
 
 export {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, html_name, parseOrthoGroups}
