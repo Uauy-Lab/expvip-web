@@ -96,11 +96,14 @@
 				end
 			end
 			ret["ortholog_groups"] = all_og
+			ret["genes"] = Hash.new unless ret["genes"] 
 			genes_to_find.each_pair do |k, g|
 				transcripts = GenesHelper.findTranscripts(g.gene, g.gene_set)
 				ret["values"][k] = ExpressionValuesHelper.getValuesForTranscripts(transcripts)
+				ret["genes"][k] = g
 			end
-
+			
+			
 		end
 
 	end
