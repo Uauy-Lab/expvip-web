@@ -70,7 +70,7 @@ export default class Options{
 		this.defaultRenderProperty = this.renderProperty;
 		this.calculateLog = this.defaultLog2State;
 		this.showTernaryPlot = false;
-		this.orth_group = "EI-orthos";
+		this.orth_group = "W10-orth";
 		this.#eb = eb;
 	}
 

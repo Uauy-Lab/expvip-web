@@ -173,7 +173,6 @@ import Gene from "./gene"
 		var index =  i % sets.length ;
 		var currentColorSet = colors[index];
 		let totalColors = currentColorSet.length - 1;
-		
 		var j = 0;  
 		fg.factors.forEach((factor, name) => {
 			color[name] = currentColorSet[j++ % totalColors ]; //We will eventually need to remove this line. 

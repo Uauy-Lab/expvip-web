@@ -34,7 +34,7 @@ function getFactorsForSample(sample: {description: string, name:string, factors:
 	for(var grpby of groupBy) {
 		let fg = fgs.get(grpby);
 		let fact = sample.factors[grpby];
-		if(fact){
+		if(fact && fg){
 			// console.log(fact);
 			factorArray.push(fg.factors.get(fact));
 		}else{
