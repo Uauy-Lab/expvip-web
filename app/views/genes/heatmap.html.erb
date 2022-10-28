@@ -14,10 +14,11 @@
 
 <script type="text/javascript">  
 
-  // rescaling the bar chart after a 1.5 second delay
+  //rescaling the bar chart after a 1.5 second delay
   var resizeTimer;
-  $(window).on('resize', function(e){      
-    clearTimeout(resizeTimer);  // Making sure that the reload doesn't happen if the window is resized within 1.5 seconds
+  $(window).on('resize', function(e){
+    //Making sure that the reload doesnt happen if the window is resized within 1.5 seconds
+    clearTimeout(resizeTimer);  
     resizeTimer = setTimeout(function(){
 
       var windowHeight = $(window).outerHeight();

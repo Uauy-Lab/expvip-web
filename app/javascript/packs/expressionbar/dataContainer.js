@@ -72,6 +72,8 @@ import Gene from "./gene"
 		if(!force && this.opt.orthologues == this.opt.orthologues_last_status){
 		 	return
 		}
+		console.log("Recalculating factors...");
+        console.log(this.opt);
 		this.#factors = new Map(this.#default_factors);
 		if(this.opt.orthologues ){
 			//TODO: We need to fix this to be dynamic. Probably we want to pre-build them

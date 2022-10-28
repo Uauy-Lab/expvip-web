@@ -52,11 +52,17 @@ class GeneralControls{
 			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false);
 			jQuery(`#${eb.target}_showHomoeologues`).prop('checked', true);
 		}
+		
 		if(eb.opt.showTernaryPlot){
 			jQuery( '#' + eb.target + '_showHomoeologues' ).prop('checked', false);
 			jQuery( '#' + eb.target + '_showTernaryPlot' ).prop('checked', true);
 			eb.opt.showHomoeologues = true;   // For the homoeologues data to be calculated        
 			eb.opt.plot = "Ternary"; 
+		}
+
+		if(eb.opt.orthologues){
+			//TODO: Convert back to bars when the genes are being displayed as factors.
+			eb.opt.plot = "HeatMap"
 		}
 
 		eb.refreshSVG();
