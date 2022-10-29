@@ -50,7 +50,7 @@ function arrayToFactors(elements: string[]){
 }
 
 function recalculateValues(values: object, ortholog_group: OrtholgueGroupSet) {
-	console.log("Recalculating values");
+	console.log("Recalculating values: NOT IMPLEMENTED");
 	console.log(values);
 	console.log(ortholog_group);
 }

@@ -10,7 +10,7 @@ import FactorGroup from "./factorGroup";
 import {getFactorsForGenes, getFactorsForOrthologues, recalculateValues} from "./pangenomeFactorHelper";
 import Gene from "./gene"
 
- class ExpressionData{
+ export default class ExpressionData{
 	/**
 	 * @type {Map<string, FactorGroup>}
 	 */
@@ -25,6 +25,22 @@ import Gene from "./gene"
 	#values;
 
 	#gene_factors;
+	ortholog_groups: Map<string, import("/Users/ramirezr/Documents/public_code/expvip-web/app/javascript/packs/expressionbar/OrthologueGroupSet").default>;
+	opt: any;
+	sortOrder: any[];
+	factorOrder: any;
+	selectedFactors: any;
+	totalColors: number;
+	factorColors: Map<any, any>;
+	renderedData: any;
+	compare: any;
+	gene: any;
+	max: number;
+	min: number;
+	experiments: any;
+	groups: any;
+	tern: any;
+	homologues: any[];
 
 	constructor(data, options) {
 		for (var attrname in data) {
@@ -69,6 +85,7 @@ import Gene from "./gene"
 	 * @returns 
 	 */
 	#recalculateFactorAndValues(force){
+		force = false
 		if(!force && this.opt.orthologues == this.opt.orthologues_last_status){
 		 	return
 		}
@@ -121,24 +138,11 @@ import Gene from "./gene"
 			numberOfElements = Object.keys(this.renderedOrder).length;
 		}
 
-		if(numberOfElements === 0){
-			this.renderedOrder = jQuery.extend(true, {}, fo);
-		}
+		// if(numberOfElements === 0){
+		// 	this.renderedOrder = jQuery.extend(true, {}, fo);
+		// }
 
 		this.selectedFactors = jQuery.extend(true, {},  sf);
-		// var factorOrder = this.defaultFactorOrder;
-
-		// this.factors = new Map();
-		// for (var f in factorOrder) {
-		// 	var g = factorOrder[f];
-		// 	for(var k in groups[g]){
-		// 		if(! this.factors.has(g)){
-		// 			this.factors.set(g, new Set());
-		// 		}
-		// 		var currentSet = this.factors.get(g);
-		// 		currentSet.add(k);
-		// 	}  
-		// }
 	};
 
 
@@ -158,16 +162,7 @@ import Gene from "./gene"
 	{color: "Set3",     id: 12}]
 	var colors = sets.map(c => colorbrewer[c.color][c.id])
 	console.log(colorbrewer);
-	// var colors = [
-	// colorbrewer.Pastel2[ Object.keys(o).length],
-	// colorbrewer.Accent[ Object.keys(o).length],
-	// colorbrewer.Dark2[ Object.keys(o).length],
-	// colorbrewer.Set1[ Object.keys(o).length],
-	// colorbrewer.Set2[ Object.keys(o).length],
-	// colorbrewer.Paired[ Object.keys(o).length],
-	// colorbrewer.Pastel1[ Object.keys(o).length], 
-	// colorbrewer.Set3[ Object.keys(o).length]
-	// ];
+	
 	this.factorColors= new Map();  
 	var i = 0;  
 	this.factors.forEach(function(fg, key, map){
@@ -188,15 +183,12 @@ import Gene from "./gene"
 
 
 	isFiltered(group){
-		var ret = true;
+		var ret : boolean = true;
 		let selectedFactors = this.opt.selectedFactors;
 		for(var f in group.factors){
 			if(selectedFactors[f]){
-				ret &= selectedFactors[f][group.factors[f]];   
+				ret &&= selectedFactors[f][group.factors[f]];   
 			}
-			// }else{
-			// 	throw new Error('The factor ' + f + ' is not available (' + this.selectedFactors.keys + ')');
-			// }
 		}
 		return !ret;
 	};
@@ -212,14 +204,7 @@ import Gene from "./gene"
 		 */
 		let factors = [...this.factors.get(fact)];
 		return factors.sort((a,b)=> a.order - b.order);
-		
-		// var i = this.defaultFactorOrder[factor];
-		// var obj = this.renderedOrder[i];
-		// var keys = []; 
-		// for(var key in obj) {
-		// 	keys.push(key);
-		// }
-		// return keys.sort(function(a,b){return obj[a] - obj[b];});
+
 	};
 
 	/**
@@ -421,14 +406,10 @@ import Gene from "./gene"
 				if(val < min) min = val ;
 			}
 		}
-		//if(isLog){
 		min = 0;
-		//}
 		
 		this.max = max;
 		this.min = min;
-		//this.min = -1;
-		//this.max = 1;
 	}
 
 	_prepareSingleObject(index, oldObject){
@@ -528,7 +509,7 @@ import Gene from "./gene"
 			var group = g[e[data[o].experiment].group];
 
 			if(!this.isFiltered(group)){
-				var description = this.getGroupFactorDescription(g[e[o].group], groupBy, g_f);
+				var description = this.getGroupFactorDescription(g[e[o].group], groupBy);
 				groups[description].addValueObject(data[o]);
 			}
 		}
@@ -556,43 +537,10 @@ import Gene from "./gene"
 
 	getGroupFactorDescription(o,groupBy){
 		return getGroupFactorDescription(o, groupBy, this.factors)
-		// var factorArray = [];
-		// var factorNames = this.longFactorName;
-		// var numOfFactors = groupBy.length;
-		// var arrOffset = 0;
-		// for(var i in groupBy) {
-		// 	var grpby = groupBy[i];
-		// 	var currFact = factorNames[grpby];
-		// 	var currShort =  o.factors[groupBy[i]]; 
-		// 	if(typeof currShort === 'undefined' ){
-		// 		console.error(groupBy[i] + ' is not present in ' + o.factors );
-		// 		console.error(o.factors);
-		// 	}
-		// 	var currLong = currFact[currShort];
-		// 	factorArray[i - arrOffset ] = currLong;
-		// 	if(numOfFactors > 4 || currLong.length > 20 ){
-		// 		factorArray[i - arrOffset ] = currShort;
-		// 	}
-		// };
-		// return factorArray.join(', ');
 	};
 
 	getGroupFactorLongDescription(o,groupBy){
 		return getGroupFactorLongDescription(o, groupBy, this.factors);
-		// var factorArray = [];
-		// var factorNames = this.longFactorName;
-		// //console.log(factorNames);
-
-		// var numOfFactors = groupBy.length;
-		// for(var i in groupBy) {
-		// 	var grpby = groupBy[i];
-		// 	var currFact = factorNames[grpby];
-		// 	var currShort =  o.factors[groupBy[i]]; 
-		// 	var currLong = currFact[currShort];
-		// 	factorArray[i] = currLong;
-
-		// }
-		// return factorArray.join(', ');
 	};
 
 
@@ -641,7 +589,6 @@ import Gene from "./gene"
 	};
 
 	addMissingFactors(dataArray){
-		//console.log(dataArray);
 		var allFactors = [];
 		for( var i in dataArray){
 			var gene = dataArray[i];
@@ -652,7 +599,6 @@ import Gene from "./gene"
 				}
 			}
 		}
-		//console.log(allFactors);
 		var fullDataArray = []
 		for(var i in dataArray){
 			var gene = dataArray[i];
@@ -668,43 +614,27 @@ import Gene from "./gene"
 			}
 			for(var j in allFactors){
 				var localObject = this._arrayContains(localFactors, allFactors[j])
-				j =   parseInt(j);
+				var j_int: number =   parseInt(j);
 				if(localObject >= 0){
 					localDataArray.push(tmpDataArray[localObject]);
-					//console.log(tmpDataArray[localObject]);
 				}else{
-					var obj = new GroupedValues(j, "");
-					// console.log(gene);
-					// console.log(obj);
+					var obj = new GroupedValues(j_int, "");
 					obj.gene = gene[0].gene;
 					obj.factors = allFactors[j];
 					localDataArray.push( obj);
 				}
-				//localDataArray[j].id = j;
-				//localDataArray[j].renderIndexs = j;
 			}
 			for(var j in localDataArray){
-				j = parseInt(j);
-				//console.log(j);
-				localDataArray[j].id = j;
-				localDataArray[j].renderIndex = j;
+				var j_int: number = parseInt(j);
+				localDataArray[j_int].id = j;
+				localDataArray[j_int].renderIndex = j_int;
 				this.addNames(localDataArray[j]);
-				
-
-				//console.log(localDataArray[j]);
 			}
-			//console.log(localDataArray);
 			fullDataArray.push(localDataArray);
-
 		}
 		for(var j in fullDataArray){
-			//console.log(j);
 			dataArray[j] = fullDataArray[j];
-		}
-		//console.log(dataArray);
-		//console.log(fullDataArray);
-		
-
+		}		
 	};
 
 	addSortPriority(factor, end){
@@ -744,6 +674,9 @@ import Gene from "./gene"
 			return value;	
 		}
 	}
+	 tooltip_order(tooltip_order: any) {
+		 throw new Error("Method not implemented.");
+	 }
 
 	get hasTern(){
 		return "tern" in this && Object.keys(this.tern).length === 3;
@@ -760,5 +693,3 @@ import Gene from "./gene"
 	}
 
 }
-
-export default ExpressionData;

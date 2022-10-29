@@ -186,7 +186,9 @@ export default class Options{
 		let data: ExpressionData = this.#eb.data;
 		let ret = {};
 		let fgs : Map<string, FactorGroup> = data.factors;
-		fgs.forEach((fg, key) => ret[key] = fg.selectedFactors);
+		if (typeof(fgs) !== 'undefined') {
+			fgs.forEach((fg, key) => ret[key] = fg.selectedFactors);			
+		}
 		return ret;
 	}
 
