@@ -9,24 +9,22 @@ import {parseFactors, getGroupFactorDescription, getGroupFactorLongDescription, 
 import FactorGroup from "./factorGroup";
 import {getFactorsForGenes, getFactorsForOrthologues, recalculateValues} from "./pangenomeFactorHelper";
 import Gene from "./gene"
+import OrtholgueGroupSet from "./OrthologueGroupSet";
+import Options from "./options";
 
  export default class ExpressionData{
-	/**
-	 * @type {Map<string, FactorGroup>}
-	 */
-	#default_factors;
-	/**
-	 * @type {Map<string, FactorGroup>}
-	 */
-	#factors;
+
+	#default_factors: Map<string, FactorGroup>;
+
+	#factors: Map<string, FactorGroup>;
 
 	#default_values;
 
 	#values;
 
 	#gene_factors;
-	ortholog_groups: Map<string, import("/Users/ramirezr/Documents/public_code/expvip-web/app/javascript/packs/expressionbar/OrthologueGroupSet").default>;
-	opt: any;
+	ortholog_groups: Map<string, OrtholgueGroupSet>;
+	opt: Options;
 	sortOrder: any[];
 	factorOrder: any;
 	selectedFactors: any;
@@ -84,15 +82,15 @@ import Gene from "./gene"
 	 * @param {boolean} force 
 	 * @returns 
 	 */
-	#recalculateFactorAndValues(force){
+	#recalculateFactorAndValues(force: boolean){
 		force = false
-		if(!force && this.opt.orthologues == this.opt.orthologues_last_status){
+		if(!force && this.opt.showOrthologues == this.opt.orthologues_last_status){
 		 	return
 		}
 		console.log("Recalculating factors...");
         console.log(this.opt);
 		this.#factors = new Map(this.#default_factors);
-		if(this.opt.orthologues ){
+		if(this.opt.showOrthologues ){
 			//TODO: We need to fix this to be dynamic. Probably we want to pre-build them
 			let orth_group = this.opt.orth_group;
 			let og = this.ortholog_groups.get(orth_group);
@@ -105,7 +103,7 @@ import Gene from "./gene"
 
 		this.#values = this.#default_values;
 		
-		this.opt.orthologues_last_status = this.opt.orthologues ;
+		this.opt.orthologues_last_status = this.opt.showOrthologues ;
 	}
 
 	getExpressionValueTypes(){
@@ -193,24 +191,13 @@ import Gene from "./gene"
 		return !ret;
 	};
 
-	/**
-	 * 
-	 * @param {string} fact 
-	 * @returns {Array<FactorGroup>}
-	 */
-	getSortedFactors(fact) {
-		/**
-		 * @type{FactorGroup}
-		 */
-		let factors = [...this.factors.get(fact)];
+	getSortedFactors(fact: string): Array<FactorGroup> {
+		let factors: Array<FactorGroup> = [...this.factors.get(fact)];
 		return factors.sort((a,b)=> a.order - b.order);
 
 	};
 
-	/**
-	 * @return {Array<FactorGroup>}
-	 */
-	get sortedFactorGroups(){
+	get sortedFactorGroups(): Array<FactorGroup>{
 		return [...this.factors.values()].sort((a,b) => a.order - b.order);
 	}
 
@@ -226,17 +213,12 @@ import Gene from "./gene"
 	The only parameter, sortOrder, is an array of the factors that will be used to sort. 
 	*/
 	sortRenderedGroups(){
-		// console.log("Re-sorting");
 		var i;
-		// console.log(this.renderedData);
 		if(this.renderedData.length == 0){
 			return;
 		}
-		// console.log("We enter to the method properlu");
 		var sortable = this.renderedData[0].slice();
-		// console.log(sortable);
 		var sortOrder =  this.sortOrder;
-		// console.log(sortOrder);
 		var sorted = sortable.sort((a, b) => {
 			for(let o of sortOrder){
 				let fg = this.factors.get(o);
@@ -261,12 +243,10 @@ import Gene from "./gene"
 
 		for(i = 0; i < this.renderedData.length; i++){
 			for (var j = 0; j < sorted.length; j++) { 
-				// console.log(sorted[j]);
 				var obj = this.renderedData[i][sorted[j].id];
 				if(!obj){
 					continue;
 				}
-				// console.log(obj);
 				obj.renderIndex = sorted[j].renderIndex;
 			}
 		}
@@ -293,17 +273,17 @@ import Gene from "./gene"
 	}
 
 	get displayed_genes(){
-		if(this.opt.orthologues){
-			/**
-			 * @type {OrtholgueGroupSet}
-			 */
+		if(this.opt.showOrthologues){
+			//TODO: Make a different way to display the current genome the A B and D copie
 			return this.ortholog_groups.get(this.opt.orth_group).genes.map(g => g.full_name);
 		}
 		if(this.compare){
 			return [this.gene, this.compare];
 		}
 		if(this.opt.showHomoeologues){
-			return Object.keys(this.values);
+			//TODO: Only show genes of the current variety
+			
+			return this.homologues;
 		}
 		return [this.gene];
 	}
@@ -318,16 +298,6 @@ import Gene from "./gene"
 		console.log("Genes to display:");
 		console.log(this.displayed_genes);
 		for(var gene of this.displayed_genes){
-			// console.log(gene);
-			// if(!this.opt.showHomoeologues && 
-			// 	( 	
-			// 		gene !== this.gene &&  
-			// 		gene !==  this.compare 
-			// 		) 
-			// 	)
-			// {
-			// 	continue;
-			// }
 			var i = 0;
 			var innerArray;
 			if(groupBy === 'ungrouped'){
@@ -368,11 +338,6 @@ import Gene from "./gene"
 			this.setRenderIndexes(dataArray,this.renderedData);
 		}
 		this.renderedData = dataArray;
-		// this.renderedData.forEach(gene_arr => gene_arr.forEach(group => group.log = this.isLog));
-		// if(this.isLog()){
-
-		// 	this.calculateLog2();
-		// }
 		this.calculateMinMax();
 		return dataArray;
 	};
@@ -435,12 +400,9 @@ import Gene from "./gene"
 		var data = this.values[gene][property];
 		var g = this.groups;
 		var e = this.experiments;
-		var o;
-		var filtered;
+		var o: string | number;
 		var i = index;
 		for(o in g){  
-			// var newObject = this._prepareGroupedByExperiment(i++,o);
-			/** @type {GroupedValues}} */
 			var newObject = new GroupedValues(i++, g[o].description);
 			newObject.gene = gene;
 			newObject.description = newObject.name;
@@ -467,13 +429,11 @@ import Gene from "./gene"
 		return innerArray;
 	};
 
-	#fillGroupByFactor(index, gene, property, groupBy){
+	#fillGroupByFactor(index: any, gene: string, property: string | number, groupBy: any){
 		var groups ={};
-		/** @type {[GroupedValues]} */
-		var innerArray = [];
+		var innerArray: Array<GroupedValues> = [];
 		var data = this.values[gene][property];
 		var g = this.groups;
-
 		var g_f = this.#gene_factors.get(gene);
 		var e = this.experiments;
 		var names = [];

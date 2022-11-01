@@ -33,7 +33,7 @@ class GeneralControls{
 		new Button(this.#expression_bar, "restoreDefaults", "Restore defaults", this.#options_div);
 		new Checkbox(this.#expression_bar, "showHomoeologues",  "Homoeologues", this.#options_div);
 		new Checkbox(this.#expression_bar, "showTernaryPlot", "Ternary plot", this.#options_div);
-		new Checkbox(this.#expression_bar, "orthologues", "Pangenome orthologues", this.#options_div);
+		new Checkbox(this.#expression_bar, "showOrthologues", "Pangenome orthologues", this.#options_div);
 		this.ortholog_set_select = new Select(this.#expression_bar, "orthoSet", "Orthologue set", this.#options_div);
 		let chartScale = this.#expression_bar.target + '_scale';
 		let post_button = `<div id="${chartScale}"></div>`
@@ -49,22 +49,26 @@ class GeneralControls{
 		let eb = this.#expression_bar;
 		eb.opt.plot = "Bar";
 		if(eb.opt.showHomoeologues){
-			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false);
-			jQuery(`#${eb.target}_showHomoeologues`).prop('checked', true);
+			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false); 
+			//TODO: encapsulate this lines in the objects rendering
+			jQuery(`#${eb.target}_showOrthologues`).prop('checked', false);
 		}
 		
 		if(eb.opt.showTernaryPlot){
-			jQuery( '#' + eb.target + '_showHomoeologues' ).prop('checked', false);
-			jQuery( '#' + eb.target + '_showTernaryPlot' ).prop('checked', true);
+			jQuery(`#${eb.target}_showHomoeologues`).prop('checked', true);
+			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', true);
+			jQuery(`#${eb.target}_showOrthologues`).prop('checked', false);
 			eb.opt.showHomoeologues = true;   // For the homoeologues data to be calculated        
 			eb.opt.plot = "Ternary"; 
 		}
 
-		if(eb.opt.orthologues){
+		if(eb.opt.showOrthologues){
 			//TODO: Convert back to bars when the genes are being displayed as factors.
+			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false);
+			jQuery(`#${eb.target}_showOrthologues`).prop('checked', true);
+			// jQuery(`#${eb.target}_showHomoeologues`).prop('checked', false);
 			eb.opt.plot = "HeatMap"
 		}
-
 		eb.refreshSVG();
 		eb.refresh();
 		

@@ -81,11 +81,11 @@ export default class Options{
 		return ret;
 	}
 
-	get orthologues(){
+	get showOrthologues(){
 		return this.#orthologues;
 	}
 
-	set orthologues(value: boolean){
+	set showOrthologues(value: boolean){
 		console.log(`Setting orthologues ${value}`)
 		if(!value && typeof(this.groupBy) != "string"){
 			this.groupBy = this.groupBy.filter( f => !(f == "Chromsome" || f == "Gene" || f == "Genome")  )

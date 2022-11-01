@@ -99,7 +99,6 @@ genes.each_pair do |name, gene|
 	end
 	to_print.map! {|item| item["gene"].name if  item and not item.is_a? String and item["gene"]}
 	to_print[0] = name
-	sum = 0
 	sum = to_print.collect do| c | 
 		ret = 0
 		ret = 1 if c
