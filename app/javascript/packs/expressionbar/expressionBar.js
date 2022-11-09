@@ -94,7 +94,7 @@ export class ExpressionBar {
 
       case 'HeatMap':
         $(`#${this.opt.target}_calculateLogSpan`).css('display', 'initial');
-        this.opt.showHomoeologues = true;
+        //TODO: check if this doesn't break the regular heatmap this.opt.showHomoeologues = true;
         this.opt.showTernaryPlot = false;
         this.renderObject = new heatmap.HeatMap(this);
         break;
@@ -317,6 +317,7 @@ export class ExpressionBar {
     if (!this.data.hasExpressionValue(this.opt.renderProperty)) {
       this.setDefaultExpressionValue();
     }
+    
     this.render();
     this.hideHidelightRow();
     this.data.sortRenderedGroups();

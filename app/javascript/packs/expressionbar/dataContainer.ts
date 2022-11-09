@@ -32,7 +32,7 @@ import Options from "./options";
 	factorColors: Map<any, any>;
 	renderedData: any;
 	compare: any;
-	gene: any;
+	gene: string;
 	max: number;
 	min: number;
 	experiments: any;
@@ -77,6 +77,18 @@ import Options from "./options";
 		return sorted.map(f => f.name);
 	}
 
+	get orth_group(){
+		let orth_group = this.opt.orth_group;
+		let og = this.ortholog_groups.get(orth_group);
+		console.log("data container")
+		console.log(this)
+		let gene = og.genes.filter(g => g.gene == this.gene)
+		console.log(gene)
+		og.homologues = this.opt.showHomoeologues;
+		og.genome = gene[0].genome;
+		return og;
+	}
+
 	/**
 	 * 
 	 * @param {boolean} force 
@@ -92,8 +104,7 @@ import Options from "./options";
 		this.#factors = new Map(this.#default_factors);
 		if(this.opt.showOrthologues ){
 			//TODO: We need to fix this to be dynamic. Probably we want to pre-build them
-			let orth_group = this.opt.orth_group;
-			let og = this.ortholog_groups.get(orth_group);
+			let og = this.orth_group;
 			let tmp_fact = getFactorsForOrthologues(og)
 			tmp_fact.forEach(fg => this.#factors.set(fg.name, fg));
 			recalculateValues(this.#default_values, og);
@@ -146,36 +157,36 @@ import Options from "./options";
 
 
 	prepareColorsForFactors(){//TODO: this should go somewher in the rendering, not in the data. 
-	//this.factorColors = Map.new();
-	this.totalColors = 9;
-	var self = this;
-	var sets = 
-	[{color: "Pastel2", id: 8}, 
-	{color: "Accent",   id: 8}, 
-	{color: "Dark2",    id: 8}, 
-	{color: "Set1",     id: 9}, 
-	{color: "Set2",     id: 8}, 
-	{color: "Paired",   id: 12}, 
-	{color: "Pastel1",  id: 9},
-	{color: "Set3",     id: 12}]
-	var colors = sets.map(c => colorbrewer[c.color][c.id])
-	console.log(colorbrewer);
-	
-	this.factorColors= new Map();  
-	var i = 0;  
-	this.factors.forEach(function(fg, key, map){
-		var color = new Map();
-		var index =  i % sets.length ;
-		var currentColorSet = colors[index];
-		let totalColors = currentColorSet.length - 1;
-		var j = 0;  
-		fg.factors.forEach((factor, name) => {
-			color[name] = currentColorSet[j++ % totalColors ]; //We will eventually need to remove this line. 
-			factor.color = color[name];
-		}) 
-		i ++ ; 
-		self.factorColors[key] = color;
-	});
+		//this.factorColors = Map.new();
+		this.totalColors = 9;
+		var self = this;
+		var sets = 
+		[{color: "Pastel2", id: 8}, 
+		{color: "Accent",   id: 8}, 
+		{color: "Dark2",    id: 8}, 
+		{color: "Set1",     id: 9}, 
+		{color: "Set2",     id: 8}, 
+		{color: "Paired",   id: 12}, 
+		{color: "Pastel1",  id: 9},
+		{color: "Set3",     id: 12}]
+		var colors = sets.map(c => colorbrewer[c.color][c.id])
+		console.log(colorbrewer);
+		
+		this.factorColors= new Map();  
+		var i = 0;  
+		this.factors.forEach(function(fg, key, map){
+			var color = new Map();
+			var index =  i % sets.length ;
+			var currentColorSet = colors[index];
+			let totalColors = currentColorSet.length - 1;
+			var j = 0;  
+			fg.factors.forEach((factor, name) => {
+				color[name] = currentColorSet[j++ % totalColors ]; //We will eventually need to remove this line. 
+				factor.color = color[name];
+			}) 
+			i ++ ; 
+			self.factorColors[key] = color;
+		});
 	return self.factorColors;
 	};
 
@@ -275,7 +286,7 @@ import Options from "./options";
 	get displayed_genes(){
 		if(this.opt.showOrthologues){
 			//TODO: Make a different way to display the current genome the A B and D copie
-			return this.ortholog_groups.get(this.opt.orth_group).genes.map(g => g.full_name);
+			return this.orth_group.genes.map(g => g.full_name);
 		}
 		if(this.compare){
 			return [this.gene, this.compare];

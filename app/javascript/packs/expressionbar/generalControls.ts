@@ -51,7 +51,7 @@ class GeneralControls{
 		if(eb.opt.showHomoeologues){
 			jQuery(`#${eb.target}_showTernaryPlot`).prop('checked', false); 
 			//TODO: encapsulate this lines in the objects rendering
-			jQuery(`#${eb.target}_showOrthologues`).prop('checked', false);
+			// jQuery(`#${eb.target}_showOrthologues`).prop('checked', false);
 		}
 		
 		if(eb.opt.showTernaryPlot){
